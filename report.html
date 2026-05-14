@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔨</text></svg>">
+<title>Legal Pack Analysis Report — LegalPack AI</title>
+<meta name="description" content="View a shared LegalPack AI legal pack analysis report — risk flags, hidden costs, title defects, mortgageability verdict and before-bidding checklist.">
+<meta name="robots" content="noindex, follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LegalPack AI">
+<meta property="og:title" content="Legal Pack Analysis Report — LegalPack AI">
+<meta property="og:description" content="AI-powered UK auction legal pack analysis — risk flags, hidden costs, title defects and mortgageability verdict.">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--t1:#111111;--t2:#555555;--t3:#999999;--b1:#e2e2ee;--red:#7c3aed;--redbg:#f5f0ff;--redmid:#ddd6fe;--amber:#d97706;--ambermid:#fef3c7;--amberbg:#fffbeb;--green:#2db87a;--greenmid:#0d2e1a;}
+body{background:#ffffff;color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--b1);background:var(--bg2);}
+.logo{font-size:1rem;font-weight:800;text-decoration:none;color:var(--t1);}
+.logo em{color:var(--red);font-style:normal;}
+main{max-width:800px;margin:0 auto;padding:32px 20px;}
+.report-header{margin-bottom:24px;}
+.report-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.report-meta{font-size:0.78rem;color:var(--t3);}
+.shared-badge{display:inline-block;background:var(--bg3);border:1px solid var(--b1);color:var(--t3);font-size:0.65rem;font-weight:800;padding:3px 8px;border-radius:5px;margin-left:8px;letter-spacing:1px;}
+.fact-card{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;}
+.fact-label{font-size:0.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:4px;}
+.fact-val{font-size:0.88rem;font-weight:700;}
+.facts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.section-title{font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+.risk-item{background:#fff;border:1px solid var(--b1);border-radius:10px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.risk-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.risk-severity{font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;}
+.risk-severity.high{background:var(--redmid);color:var(--red);}
+.risk-severity.medium{background:var(--ambermid);color:var(--amber);}
+.risk-severity.low{background:var(--greenmid);color:var(--green);}
+.risk-title{font-size:0.85rem;font-weight:700;flex:1;}
+.risk-desc{font-size:0.78rem;color:var(--t2);line-height:1.5;margin-bottom:4px;}
+.risk-impact{font-size:0.72rem;color:var(--amber);font-style:italic;}
+.cost-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;margin-bottom:6px;}
+.cost-amount{font-family:'DM Mono',monospace;font-weight:700;color:var(--amber);}
+.cta-box{background:var(--redbg);border:1px solid var(--redmid);border-radius:16px;padding:28px;text-align:center;margin-top:28px;}
+.cta-box h3{font-size:1rem;font-weight:800;margin-bottom:6px;}
+.cta-box p{font-size:0.82rem;color:var(--t2);margin-bottom:14px;}
+.cta-btn{display:inline-block;background:var(--red);color:#fff;padding:11px 28px;border-radius:9px;text-decoration:none;font-weight:800;font-size:0.9rem;}
+.loading{text-align:center;padding:60px;color:var(--t3);}
+footer{text-align:center;padding:28px;color:var(--t3);font-size:0.72rem;border-top:1px solid var(--b1);margin-top:40px;background:var(--bg2);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><img src="/logo.png" srcset="/logo@2x.png 2x" alt="LegalPack AI" style="height:36px;width:auto;display:block;"></a>
+  <a href="/dashboard.html" style="color:var(--t3);font-size:0.78rem;text-decoration:none;">Go to Dashboard →</a>
+</nav>
+<main>
+  <div id="loading" class="loading">Loading report...</div>
+  <div id="content" style="display:none;"></div>
+</main>
+<footer>LegalPack AI · For informational purposes only — not legal advice · <a href="/privacy.html" style="color:var(--t3);">Privacy</a></footer>
+<script>
+const API_BASE = 'https://legalpack-backend-production.up.railway.app';
+
+async function loadSharedReport() {
+  const id = new URLSearchParams(window.location.search).get('id');
+  if (!id) { document.getElementById('loading').textContent = 'No report ID specified.'; return; }
+
+  try {
+    const r = await fetch(`${API_BASE}/share/${id}`);
+    const d = await r.json();
+    if (!r.ok || !d.report) throw new Error('Report not found');
+
+    const report = d.report;
+    const result = report.result_json || {};
+    const flags = result.flags || result.risks || [];
+    const critical = flags.filter(f => f.severity === 'critical' || f.severity === 'high').length;
+    const warnings = flags.filter(f => f.severity === 'warning' || f.severity === 'medium').length;
+    const date = new Date(report.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+
+    document.title = `${report.pack_name || 'Legal Pack'} — LegalPack AI`;
+
+    document.getElementById('content').innerHTML = `
+      <div class="report-header">
+        <div class="report-title">${report.pack_name || 'Legal Pack'} <span class="shared-badge">SHARED REPORT</span></div>
+        <div class="report-meta">Analysed ${date} · ${flags.length} flags · ${critical} critical</div>
+      </div>
+
+      ${result.summary ? `<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;">Summary</div><div style="font-size:0.88rem;line-height:1.6;color:var(--t2);">${result.summary}</div></div>` : ''}
+
+      <div class="facts-grid">
+        <div class="fact-card"><div class="fact-label">Critical Flags</div><div class="fact-val" style="color:var(--red);font-size:1.4rem;">${critical}</div></div>
+        <div class="fact-card"><div class="fact-label">Warnings</div><div class="fact-val" style="color:var(--amber);font-size:1.4rem;">${warnings}</div></div>
+        <div class="fact-card"><div class="fact-label">Tenure</div><div class="fact-val">${result.tenure || '—'}</div></div>
+        <div class="fact-card"><div class="fact-label">Mortgageability</div><div class="fact-val">${result.mortgageability || '—'}</div></div>
+        ${result.leaseYears ? `<div class="fact-card"><div class="fact-label">Lease</div><div class="fact-val" style="color:${result.leaseYears < 85 ? 'var(--red)' : 'var(--t1)'};">${result.leaseYears} yrs</div></div>` : ''}
+        ${result.groundRent && result.groundRent !== 'N/A' ? `<div class="fact-card"><div class="fact-label">Ground Rent</div><div class="fact-val">${result.groundRent}</div></div>` : ''}
+      </div>
+
+      ${result.extraCosts?.length ? `
+        <div class="section-title">Hidden & Extra Costs</div>
+        ${result.extraCosts.map(c => `<div class="cost-item"><div>${c.label}</div><div class="cost-amount">${c.amount}${c.mandatory ? '<span style="font-size:0.6rem;color:var(--red);font-weight:800;margin-left:6px;">MANDATORY</span>' : ''}</div></div>`).join('')}
+        <div style="margin-bottom:16px;"></div>` : ''}
+
+      <div class="section-title">Risk Flags (${flags.length})</div>
+      ${flags.map(f => {
+        const sev = f.severity || 'note';
+        const sevLabel = (sev === 'critical' || sev === 'high') ? 'CRITICAL' : (sev === 'warning' || sev === 'medium') ? 'WARNING' : 'NOTE';
+        const sevClass = (sev === 'critical' || sev === 'high') ? 'high' : (sev === 'warning' || sev === 'medium') ? 'medium' : 'low';
+        return `<div class="risk-item"><div class="risk-header"><div class="risk-severity ${sevClass}">${sevLabel}</div><div class="risk-title">${f.title}</div></div><div class="risk-desc">${f.detail || f.description || ''}</div>${(f.buyerImpact || f.investorImpact) ? `<div class="risk-impact">⚡ ${f.buyerImpact || f.investorImpact}</div>` : ''}</div>`;
+      }).join('')}
+
+      <div class="cta-box">
+        <h3>Analyse your own legal packs</h3>
+        <p>LegalPack AI reads every page of UK property auction legal packs and flags every risk, hidden cost, and red flag before you bid.</p>
+        <a href="/" class="cta-btn">Get Started →</a>
+      </div>`;
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loading').textContent = 'Report not found or no longer available.';
+  }
+}
+
+loadSharedReport();
+</script>
+</body>
+</html>

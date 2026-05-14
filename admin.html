@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>LegalPack AI — Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0e0d1a;--bg2:#13121f;--bg3:#1a1829;--bg4:#232135;--bg5:#2c2a42;--t1:#f0eeff;--t2:#a09cc0;--t3:#625e80;--b1:#2a2840;--b2:#363454;--purple:#7c3aed;--purplebg:rgba(124,58,237,0.12);--purplemid:rgba(124,58,237,0.3);--green:#22c55e;--greenbg:rgba(34,197,94,0.1);--greenmid:rgba(34,197,94,0.2);--red:#ef4444;--redbg:rgba(239,68,68,0.1);--redmid:rgba(239,68,68,0.2);--amber:#f59e0b;--amberbg:rgba(245,158,11,0.1);--ambermid:rgba(245,158,11,0.2);--blue:#3b82f6;--bluebg:rgba(59,130,246,0.1);--bluemid:rgba(59,130,246,0.2);--cyan:#06b6d4;--cyanbg:rgba(6,182,212,0.1);}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;background:var(--bg2);border-bottom:1px solid var(--b1);position:sticky;top:0;z-index:100;}
+.logo{font-size:1rem;font-weight:800;letter-spacing:-0.5px;color:var(--t1);}
+.logo em{color:var(--purple);font-style:normal;}
+.admin-badge{font-size:0.6rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;background:var(--purplebg);color:var(--purple);border:1px solid var(--purplemid);padding:3px 8px;border-radius:5px;}
+.topbar-time{font-size:0.72rem;color:var(--t3);font-family:'DM Mono',monospace;}
+.btn-sm{background:var(--bg3);border:1px solid var(--b1);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;padding:6px 12px;border-radius:7px;cursor:pointer;transition:all 0.12s;text-decoration:none;display:inline-block;}
+.btn-sm:hover{border-color:var(--purple);color:var(--t1);}
+.layout{display:grid;grid-template-columns:190px 1fr;min-height:calc(100vh - 56px);}
+.sidebar{background:var(--bg2);border-right:1px solid var(--b1);padding:12px 0;}
+.sidebar-section{font-size:0.58rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);padding:8px 14px 5px;margin-top:6px;}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--t2);transition:all 0.12s;border-left:2px solid transparent;}
+.sidebar-item:hover{color:var(--t1);background:var(--bg3);}
+.sidebar-item.active{color:var(--purple);background:var(--purplebg);border-left-color:var(--purple);}
+.main{padding:22px;overflow:auto;}
+.panel{display:none;}.panel.active{display:block;}
+.page-title{font-size:1.2rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px;}
+.page-sub{font-size:0.75rem;color:var(--t3);margin-bottom:20px;}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:14px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0.7;}
+.stat-card.purple::after{background:var(--purple);}.stat-card.green::after{background:var(--green);}.stat-card.amber::after{background:var(--amber);}.stat-card.red::after{background:var(--red);}.stat-card.blue::after{background:var(--blue);}.stat-card.cyan::after{background:var(--cyan);}
+.stat-label{font-size:0.58rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;}
+.stat-value{font-size:1.7rem;font-weight:800;line-height:1;font-family:'DM Mono',monospace;margin-bottom:3px;}
+.stat-sub{font-size:0.65rem;color:var(--t3);}
+.stat-card.purple .stat-value{color:var(--purple);}.stat-card.green .stat-value{color:var(--green);}.stat-card.amber .stat-value{color:var(--amber);}.stat-card.red .stat-value{color:var(--red);}.stat-card.blue .stat-value{color:var(--blue);}.stat-card.cyan .stat-value{color:var(--cyan);}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;margin-bottom:18px;overflow:hidden;}
+.card-header{padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.card-title{font-size:0.82rem;font-weight:800;}.card-sub{font-size:0.68rem;color:var(--t3);}
+.card-body{padding:16px;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:0.56rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);padding:9px 13px;text-align:left;border-bottom:1px solid var(--b1);white-space:nowrap;}
+td{font-size:0.76rem;padding:9px 13px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--t2);vertical-align:middle;}
+td:first-child{color:var(--t1);font-weight:600;}
+tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
+.mono{font-family:'DM Mono',monospace;}
+.badge{display:inline-block;font-size:0.58rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;white-space:nowrap;}
+.badge.payg{background:var(--bg4);color:var(--t2);border:1px solid var(--b1);}
+.badge.standard{background:var(--bluebg);color:var(--blue);border:1px solid var(--bluemid);}
+.badge.pro{background:var(--purplebg);color:var(--purple);border:1px solid var(--purplemid);}
+.badge.green{background:var(--greenbg);color:var(--green);border:1px solid var(--greenmid);}
+.badge.red{background:var(--redbg);color:var(--red);border:1px solid var(--redmid);}
+.badge.amber{background:var(--amberbg);color:var(--amber);border:1px solid var(--ambermid);}
+.search-wrap{display:flex;align-items:center;gap:7px;}
+.search-input{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.76rem;padding:6px 10px;width:200px;transition:border-color 0.12s;}
+.search-input:focus{outline:none;border-color:var(--purple);}
+.select-sm{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:0.72rem;padding:6px 9px;cursor:pointer;}
+.action-btn{background:none;border:1px solid var(--b1);color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:5px;cursor:pointer;transition:all 0.12s;white-space:nowrap;}
+.action-btn:hover{border-color:var(--purple);color:var(--purple);background:var(--purplebg);}
+.action-btn.success{border-color:var(--green);color:var(--green);}
+.action-btn.success:hover{background:var(--greenbg);}
+.cost-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.03);}
+.cost-row:last-child{border-bottom:none;}
+.cost-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cost-bar-wrap{flex:1;background:var(--bg4);border-radius:3px;height:5px;overflow:hidden;}
+.cost-bar{height:100%;border-radius:3px;}
+.cost-label{font-size:0.72rem;color:var(--t2);width:150px;flex-shrink:0;}
+.cost-amount{font-size:0.72rem;font-family:'DM Mono',monospace;color:var(--t1);font-weight:700;width:55px;text-align:right;flex-shrink:0;}
+.cost-pct{font-size:0.62rem;color:var(--t3);width:34px;text-align:right;flex-shrink:0;}
+.metric-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.metric-row:last-child{border-bottom:none;}
+.metric-label{font-size:0.76rem;color:var(--t2);}
+.metric-value{font-size:0.8rem;font-weight:700;font-family:'DM Mono',monospace;color:var(--t1);}
+.alert{padding:11px 14px;border-radius:9px;font-size:0.76rem;margin-bottom:16px;border-left:3px solid;}
+.alert.warn{background:var(--amberbg);border-color:var(--amber);color:var(--amber);}
+.alert.info{background:var(--purplebg);border-color:var(--purple);color:var(--purple);}
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-radius:14px;width:min(440px,95vw);overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6);}
+.modal-header{padding:16px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:0.9rem;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--t3);font-size:1.1rem;cursor:pointer;}
+.modal-body{padding:18px;}
+.modal-field{margin-bottom:13px;}
+.modal-label{font-size:0.65rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:block;}
+.modal-input,.modal-select{width:100%;background:var(--bg3);border:1px solid var(--b1);border-radius:7px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:8px 11px;}
+.modal-input:focus,.modal-select:focus{outline:none;border-color:var(--purple);}
+.modal-footer{padding:14px 18px;border-top:1px solid var(--b1);display:flex;gap:8px;justify-content:flex-end;}
+.btn-primary{padding:7px 16px;background:var(--purple);color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
+.btn-primary:hover{opacity:0.85;}
+.btn-cancel{padding:7px 16px;background:none;color:var(--t2);border:1px solid var(--b1);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
+#admin-toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);border:1px solid var(--b2);color:var(--t1);padding:9px 16px;border-radius:8px;font-size:0.78rem;font-weight:600;z-index:999;transition:transform 0.2s ease;white-space:nowrap;pointer-events:none;}
+#admin-toast.show{transform:translateX(-50%) translateY(0);}
+#access-denied{display:none;position:fixed;inset:0;background:var(--bg);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;}
+.loading{padding:32px;text-align:center;color:var(--t3);font-size:0.8rem;}
+.empty{padding:32px;text-align:center;color:var(--t3);}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}.stat-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<div id="access-denied">
+  <div style="font-size:2.5rem;">🔒</div>
+  <div style="font-size:1.1rem;font-weight:800;color:var(--t1);">Access Denied</div>
+  <div style="color:var(--t3);font-size:0.8rem;">Admin only.</div>
+  <a href="/dashboard.html" style="color:var(--purple);font-size:0.76rem;margin-top:8px;">← Back to Dashboard</a>
+</div>
+
+<div id="admin-app" style="display:none;">
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="logo">Legal<em>Pack</em> AI</div>
+    <span class="admin-badge">ADMIN CONSOLE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span class="topbar-time" id="last-refresh"></span>
+    <button class="btn-sm" onclick="loadAll()">↻ Refresh</button>
+    <a href="/dashboard.html" class="btn-sm">← App</a>
+  </div>
+</div>
+
+<div class="layout">
+<div class="sidebar">
+  <div class="sidebar-section">Overview</div>
+  <div class="sidebar-item active" onclick="showPanel('overview',this)">📊 Dashboard</div>
+  <div class="sidebar-section">Users & Revenue</div>
+  <div class="sidebar-item" onclick="showPanel('users',this)">👥 Users</div>
+  <div class="sidebar-item" onclick="showPanel('revenue',this)">💰 Revenue</div>
+  <div class="sidebar-section">Analyses</div>
+  <div class="sidebar-item" onclick="showPanel('analyses',this)">📋 Analyses</div>
+  <div class="sidebar-section">API & Costs</div>
+  <div class="sidebar-item" onclick="showPanel('apicost',this)">⚡ API Cost</div>
+  <div class="sidebar-item" onclick="showPanel('usage',this)">📈 Usage Chart</div>
+  <div class="sidebar-section">Tools</div>
+  <div class="sidebar-item" onclick="showPanel('broadcast',this)">📣 User Tools</div>
+</div>
+
+<div class="main">
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="page-title">Dashboard</div>
+  <div class="page-sub" id="overview-sub">Loading...</div>
+  <div class="stat-grid">
+    <div class="stat-card purple"><div class="stat-label">Total Users</div><div class="stat-value" id="s-users">—</div><div class="stat-sub">registered accounts</div></div>
+    <div class="stat-card green"><div class="stat-label">MRR</div><div class="stat-value" id="s-mrr">—</div><div class="stat-sub">subscriptions</div></div>
+    <div class="stat-card blue"><div class="stat-label">Analyses</div><div class="stat-value" id="s-analyses">—</div><div class="stat-sub">all time</div></div>
+    <div class="stat-card amber"><div class="stat-label">Real API Cost</div><div class="stat-value" id="s-cost">$38.62</div><div class="stat-sub">Anthropic billing May</div></div>
+    <div class="stat-card red"><div class="stat-label">Net Margin</div><div class="stat-value" id="s-margin">—</div><div class="stat-sub">MRR minus API cost</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="card"><div class="card-header"><div class="card-title">Recent Signups</div></div><div id="recent-signups"><div class="loading">Loading...</div></div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Recent Analyses</div></div><div id="recent-analyses-overview"><div class="loading">Loading...</div></div></div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">Plan Distribution</div></div><div class="card-body" id="plan-distribution"></div></div>
+</div>
+
+<!-- USERS -->
+<div class="panel" id="panel-users">
+  <div class="page-title">Users</div><div class="page-sub">All registered accounts</div>
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card purple"><div class="stat-label">Total</div><div class="stat-value" id="u-total">—</div></div>
+    <div class="stat-card blue"><div class="stat-label">Subscribers</div><div class="stat-value" id="u-subs">—</div></div>
+    <div class="stat-card amber"><div class="stat-label">PAYG</div><div class="stat-value" id="u-payg">—</div></div>
+    <div class="stat-card green"><div class="stat-label">This Week</div><div class="stat-value" id="u-week">—</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">All Users</div>
+      <div class="search-wrap">
+        <input class="search-input" id="user-search" placeholder="Search email or name..." oninput="filterUsers()">
+        <select class="select-sm" id="user-plan-filter" onchange="filterUsers()">
+          <option value="">All plans</option>
+          <option value="pay_as_you_go">PAYG</option>
+          <option value="standard">Standard</option>
+          <option value="pro">Pro</option>
+        </select>
+      </div>
+    </div>
+    <div id="users-table"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<!-- REVENUE -->
+<div class="panel" id="panel-revenue">
+  <div class="page-title">Revenue</div><div class="page-sub">Subscription and cost breakdown</div>
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card green"><div class="stat-label">MRR</div><div class="stat-value" id="r-mrr">—</div></div>
+    <div class="stat-card blue"><div class="stat-label">ARR</div><div class="stat-value" id="r-arr">—</div></div>
+    <div class="stat-card amber"><div class="stat-label">API Cost MTD</div><div class="stat-value">$38.62</div><div class="stat-sub">real Anthropic billing</div></div>
+    <div class="stat-card red"><div class="stat-label">Net Margin</div><div class="stat-value" id="r-margin">—</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="card"><div class="card-header"><div class="card-title">Plan Breakdown</div></div><div id="revenue-breakdown"><div class="loading">Loading...</div></div></div>
+    <div class="card"><div class="card-header"><div class="card-title">Cost vs Revenue</div></div><div class="card-body" id="cost-vs-revenue"></div></div>
+  </div>
+</div>
+
+<!-- ANALYSES -->
+<div class="panel" id="panel-analyses">
+  <div class="page-title">Analyses</div><div class="page-sub">All legal pack analyses</div>
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card blue"><div class="stat-label">Total</div><div class="stat-value" id="a-total">—</div></div>
+    <div class="stat-card red"><div class="stat-label">Avg Critical</div><div class="stat-value" id="a-avg-crit">—</div></div>
+    <div class="stat-card amber"><div class="stat-label">Avg Tokens</div><div class="stat-value" id="a-avg-tokens">—</div></div>
+    <div class="stat-card green"><div class="stat-label">Avg Est. Cost</div><div class="stat-value" id="a-avg-cost">—</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">All Analyses</div>
+      <input class="search-input" id="analysis-search" placeholder="Search property..." oninput="filterAnalyses()">
+    </div>
+    <div id="analyses-table"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<!-- API COST -->
+<div class="panel" id="panel-apicost">
+  <div class="page-title">API Cost</div><div class="page-sub">Real costs from Anthropic billing — not estimated from token counts</div>
+  <div class="alert warn">⚠️ Old estimate ($1.53) was wrong — it used token counts × $3/$15/M rates, ignoring web search costs ($2.66), cache write costs ($0.65), and Opus model usage ($0.70). <strong>Real May total from Anthropic: $38.62</strong></div>
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card red"><div class="stat-label">Real Total (May)</div><div class="stat-value">$38.62</div><div class="stat-sub">Anthropic billing</div></div>
+    <div class="stat-card amber"><div class="stat-label">Input Tokens</div><div class="stat-value">$23.92</div><div class="stat-sub">62% of cost</div></div>
+    <div class="stat-card blue"><div class="stat-label">Output Tokens</div><div class="stat-value">$11.37</div><div class="stat-sub">29% of cost</div></div>
+    <div class="stat-card purple"><div class="stat-label">Web Search</div><div class="stat-value">$2.66</div><div class="stat-sub">property intel</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="card"><div class="card-header"><div class="card-title">Cost by Type — May 2026</div></div><div id="cost-breakdown-chart"></div></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Daily Cost — May 1–11</div></div>
+      <div class="card-body" style="padding:12px 16px 16px;">
+        <div style="display:flex;gap:5px;align-items:flex-end;height:110px;" id="daily-cost-chart"></div>
+        <div style="display:flex;gap:5px;margin-top:4px;" id="daily-cost-labels"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Why the estimate was wrong</div></div>
+    <div class="card-body">
+      <div class="metric-row"><span class="metric-label">Old method</span><span class="metric-value" style="color:var(--red);">DB token count × $3/$15 per million</span></div>
+      <div class="metric-row"><span class="metric-label">Missing: web search costs</span><span class="metric-value" style="color:var(--amber);">$2.66 not captured</span></div>
+      <div class="metric-row"><span class="metric-label">Missing: Opus model (higher rate)</span><span class="metric-value" style="color:var(--amber);">$0.70 difference</span></div>
+      <div class="metric-row"><span class="metric-label">Missing: cache write costs</span><span class="metric-value" style="color:var(--amber);">$0.65 not captured</span></div>
+      <div class="metric-row"><span class="metric-label">Correct total (Anthropic CSV)</span><span class="metric-value" style="color:var(--green);">$38.62</span></div>
+      <div style="margin-top:12px;padding:11px;background:var(--bg3);border-radius:7px;font-size:0.72rem;color:var(--t2);line-height:1.6;">
+        💡 Import your Anthropic billing CSV monthly and update the REAL_API_COSTS object in this page for accurate tracking. Token count estimates will always under-count.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USAGE CHART -->
+<div class="panel" id="panel-usage">
+  <div class="page-title">Usage Chart</div><div class="page-sub">Analyses per day and token usage</div>
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-card blue"><div class="stat-label">Total Input Tokens</div><div class="stat-value" id="uc-input">—</div></div>
+    <div class="stat-card purple"><div class="stat-label">Total Output Tokens</div><div class="stat-value" id="uc-output">—</div></div>
+    <div class="stat-card green"><div class="stat-label">Avg Input/Analysis</div><div class="stat-value" id="uc-avg">—</div></div>
+  </div>
+  <div class="card"><div class="card-header"><div class="card-title">Analyses Per Day</div><div class="card-sub">Last 14 days</div></div><div class="card-body" id="analyses-per-day-chart"></div></div>
+  <div class="card"><div class="card-header"><div class="card-title">Token Usage — Recent 20</div></div><div id="token-usage-table"><div class="loading">Loading...</div></div></div>
+</div>
+
+<!-- BROADCAST / USER TOOLS -->
+<div class="panel" id="panel-broadcast">
+  <div class="page-title">User Tools</div><div class="page-sub">Grant credits, manage plans</div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Quick Actions</div></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:13px;background:var(--bg3);border-radius:9px;border:1px solid var(--b1);">
+        <div style="flex:1;"><div style="font-size:0.8rem;font-weight:700;margin-bottom:2px;">Grant Credits</div><div style="font-size:0.68rem;color:var(--t3);">Add free PAYG credits to any user</div></div>
+        <button class="btn-primary" onclick="openModal('modal-grant')">Grant Credits</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:13px;background:var(--bg3);border-radius:9px;border:1px solid var(--b1);">
+        <div style="flex:1;"><div style="font-size:0.8rem;font-weight:700;margin-bottom:2px;">Change Plan</div><div style="font-size:0.68rem;color:var(--t3);">Manually upgrade or downgrade any user</div></div>
+        <button class="btn-primary" onclick="openModal('modal-plan')">Change Plan</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">User Search</div></div>
+    <div style="padding:12px 14px;border-bottom:1px solid var(--b1);">
+      <input class="search-input" id="broadcast-search" placeholder="Search by email..." oninput="filterBroadcastUsers()" style="width:280px;">
+    </div>
+    <div id="broadcast-users-list"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+</div><!-- end admin-app -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-grant" onclick="if(event.target===this)closeModal('modal-grant')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Grant Credits</div><button class="modal-close" onclick="closeModal('modal-grant')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label class="modal-label">User</label><select class="modal-select" id="grant-user-select"></select></div>
+      <div class="modal-field"><label class="modal-label">Credits to Grant</label><input class="modal-input" id="grant-credits" type="number" min="1" max="100" value="1"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-grant')">Cancel</button><button class="btn-primary" onclick="submitGrantCredits()">Grant</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-plan" onclick="if(event.target===this)closeModal('modal-plan')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Change Plan</div><button class="modal-close" onclick="closeModal('modal-plan')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label class="modal-label">User</label><select class="modal-select" id="plan-user-select"></select></div>
+      <div class="modal-field"><label class="modal-label">New Plan</label>
+        <select class="modal-select" id="plan-new-plan">
+          <option value="pay_as_you_go">Pay As You Go</option>
+          <option value="standard">Standard (£69.99/mo)</option>
+          <option value="pro">Pro (£119.99/mo)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-plan')">Cancel</button><button class="btn-primary" onclick="submitChangePlan()">Update Plan</button></div>
+  </div>
+</div>
+
+<div id="admin-toast"></div>
+
+<script>
+const SUPABASE_URL='https://ktrbbaakmlwmhyvpufcs.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
+const API_BASE='https://legalpack-backend-production.up.railway.app';
+const ADMIN_EMAIL='aliahmedv2005@gmail.com';
+
+// Real costs from Anthropic CSV — update monthly
+const REAL_API_COSTS={
+  total:38.62,
+  byDay:{'01 May':3.23,'03 May':2.77,'05 May':3.24,'06 May':7.02,'07 May':6.77,'08 May':2.35,'09 May':11.68,'10 May':0.96,'11 May':0.60},
+  byType:{'Input Tokens':23.92,'Output Tokens':11.37,'Web Search':2.66,'Cache Write':0.65,'Cache Read':0.02}
+};
+
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let authToken=null, allUsers=[], allAnalyses=[];
+
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){window.location.href='/';return;}
+  if(session.user.email!==ADMIN_EMAIL){document.getElementById('access-denied').style.display='flex';return;}
+  authToken=session.access_token;
+  document.getElementById('admin-app').style.display='block';
+  await loadAll();
+}
+
+async function loadAll(){
+  document.getElementById('last-refresh').textContent='Refreshing...';
+  await Promise.all([loadUsers(),loadAnalyses()]);
+  renderAll();
+  document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en-GB');
+}
+
+async function loadUsers(){
+  try{const r=await fetch(API_BASE+'/admin/users',{headers:{Authorization:'Bearer '+authToken}});const d=await r.json();allUsers=d.users||[];}
+  catch(e){console.error(e);}
+}
+
+async function loadAnalyses(){
+  try{const r=await fetch(API_BASE+'/admin/analyses',{headers:{Authorization:'Bearer '+authToken}});const d=await r.json();allAnalyses=d.analyses||[];}
+  catch(e){console.error(e);}
+}
+
+function renderAll(){
+  renderOverview();renderUsersPanel();renderRevenue();renderAnalyses();renderUsageChart();renderCostPanel();renderBroadcastUsers();populateUserSelects();
+}
+
+function renderOverview(){
+  const mrr=calcMRR();
+  const margin=mrr-REAL_API_COSTS.total;
+  const weekAgo=new Date(Date.now()-7*24*60*60*1000);
+  const newU=allUsers.filter(u=>new Date(u.created_at)>weekAgo).length;
+  document.getElementById('s-users').textContent=allUsers.length;
+  document.getElementById('s-mrr').textContent='£'+mrr.toFixed(0);
+  document.getElementById('s-analyses').textContent=allAnalyses.length;
+  document.getElementById('s-margin').textContent=(margin>=0?'+':'')+Math.round(margin);
+  document.getElementById('overview-sub').textContent=allUsers.length+' users · '+allAnalyses.length+' analyses · '+newU+' new this week';
+
+  const recent=[...allUsers].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,6);
+  document.getElementById('recent-signups').innerHTML=recent.length?`<table><thead><tr><th>Email</th><th>Plan</th><th>Joined</th></tr></thead><tbody>${recent.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${fmtDate(u.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No users</div>';
+
+  const recentA=[...allAnalyses].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,6);
+  document.getElementById('recent-analyses-overview').innerHTML=recentA.length?`<table><thead><tr><th>Property</th><th>Flags</th><th>Date</th></tr></thead><tbody>${recentA.map(a=>`<tr><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.pack_name||'Unknown'}</td><td><span class="badge ${a.high_count>0?'red':'amber'}">${a.issues_count||0}</span></td><td class="mono">${fmtDate(a.created_at)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No analyses</div>';
+
+  const plans={pay_as_you_go:0,standard:0,pro:0};
+  allUsers.forEach(u=>{const p=u.plan||'pay_as_you_go';if(plans[p]!==undefined)plans[p]++;else plans.pay_as_you_go++;});
+  const tot=allUsers.length||1;
+  document.getElementById('plan-distribution').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;text-align:center;">${[['Pay As You Go',plans.pay_as_you_go,'payg','var(--t3)'],['Standard',plans.standard,'standard','var(--blue)'],['Pro',plans.pro,'pro','var(--purple)']].map(([lbl,cnt,cls,col])=>`<div><div style="font-size:1.5rem;font-weight:800;font-family:'DM Mono',monospace;margin-bottom:5px;">${cnt}</div><span class="badge ${cls}">${lbl}</span><div style="margin-top:8px;background:var(--bg4);border-radius:3px;height:5px;overflow:hidden;"><div style="height:100%;width:${Math.round((cnt/tot)*100)}%;background:${col};border-radius:3px;"></div></div><div style="font-size:0.62rem;color:var(--t3);margin-top:4px;">${Math.round((cnt/tot)*100)}%</div></div>`).join('')}</div>`;
+}
+
+function renderUsersPanel(){
+  const subs=allUsers.filter(u=>u.plan==='standard'||u.plan==='pro').length;
+  const payg=allUsers.filter(u=>!u.plan||u.plan==='pay_as_you_go').length;
+  const week=allUsers.filter(u=>new Date(u.created_at)>new Date(Date.now()-7*24*60*60*1000)).length;
+  document.getElementById('u-total').textContent=allUsers.length;
+  document.getElementById('u-subs').textContent=subs;
+  document.getElementById('u-payg').textContent=payg;
+  document.getElementById('u-week').textContent=week;
+  renderUsersTable(allUsers);
+}
+
+function renderUsersTable(users){
+  if(!users.length){document.getElementById('users-table').innerHTML='<div class="empty">No users found</div>';return;}
+  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Analyses</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td class="mono">${u.analyses_total||0}</td><td class="mono">${fmtDate(u.created_at)}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button><button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`;
+}
+
+function filterUsers(){
+  const q=document.getElementById('user-search').value.toLowerCase();
+  const p=document.getElementById('user-plan-filter').value;
+  renderUsersTable(allUsers.filter(u=>(!q||(u.email||'').toLowerCase().includes(q)||(u.name||'').toLowerCase().includes(q))&&(!p||(u.plan||'pay_as_you_go')===p)));
+}
+
+function renderRevenue(){
+  const mrr=calcMRR();const arr=mrr*12;const cost=REAL_API_COSTS.total;const margin=mrr-cost;
+  document.getElementById('r-mrr').textContent='£'+mrr.toFixed(2);
+  document.getElementById('r-arr').textContent='£'+arr.toFixed(0);
+  document.getElementById('r-margin').textContent=(margin>=0?'+':'')+margin.toFixed(2);
+  const plans={pay_as_you_go:0,standard:0,pro:0};
+  allUsers.forEach(u=>{const p=u.plan||'pay_as_you_go';if(plans[p]!==undefined)plans[p]++;});
+  document.getElementById('revenue-breakdown').innerHTML=`<table><thead><tr><th>Plan</th><th>Users</th><th>Price</th><th>MRR</th></tr></thead><tbody><tr><td>Pay As You Go</td><td class="mono">${plans.pay_as_you_go}</td><td class="mono">£9.99/pack</td><td class="mono" style="color:var(--t3);">—</td></tr><tr><td>Standard</td><td class="mono">${plans.standard}</td><td class="mono">£69.99/mo</td><td class="mono" style="color:var(--green);">£${(plans.standard*69.99).toFixed(2)}</td></tr><tr><td>Pro</td><td class="mono">${plans.pro}</td><td class="mono">£119.99/mo</td><td class="mono" style="color:var(--green);">£${(plans.pro*119.99).toFixed(2)}</td></tr><tr><td style="font-weight:800;">Total</td><td class="mono" style="font-weight:800;">${allUsers.length}</td><td></td><td class="mono" style="color:var(--green);font-weight:800;font-size:1rem;">£${mrr.toFixed(2)}</td></tr></tbody></table>`;
+  const mrrUSD=mrr*1.27;const costPct=Math.min(100,(cost/(mrrUSD||1))*100);
+  document.getElementById('cost-vs-revenue').innerHTML=`<div class="metric-row"><span class="metric-label">MRR (est. USD)</span><span class="metric-value" style="color:var(--green);">$${mrrUSD.toFixed(2)}</span></div><div class="metric-row"><span class="metric-label">API Cost (May)</span><span class="metric-value" style="color:var(--red);">$${cost.toFixed(2)}</span></div><div class="metric-row"><span class="metric-label">Cost % of MRR</span><span class="metric-value" style="color:${costPct>80?'var(--red)':costPct>50?'var(--amber)':'var(--green)'};">${costPct.toFixed(0)}%</span></div><div style="margin-top:12px;"><div style="background:var(--bg4);border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${costPct}%;background:${costPct>80?'var(--red)':costPct>50?'var(--amber)':'var(--green)'};border-radius:4px;transition:width 0.6s;"></div></div></div><div style="margin-top:10px;font-size:0.68rem;color:var(--t3);">As subscribers grow, cost % of MRR decreases.</div>`;
+}
+
+function renderAnalyses(list){
+  const analyses=list||allAnalyses;
+  const totalIn=analyses.reduce((s,a)=>s+(a.tokens_input||0),0);
+  const totalOut=analyses.reduce((s,a)=>s+(a.tokens_output||0),0);
+  const avgCrit=analyses.length?(analyses.reduce((s,a)=>s+(a.high_count||0),0)/analyses.length).toFixed(1):'—';
+  const avgTok=analyses.length?Math.round(totalIn/analyses.length):0;
+  const estPer=analyses.length?((totalIn/1e6*3+totalOut/1e6*15)/analyses.length):0;
+  document.getElementById('a-total').textContent=analyses.length;
+  document.getElementById('a-avg-crit').textContent=avgCrit;
+  document.getElementById('a-avg-tokens').textContent=avgTok>1000?(avgTok/1000).toFixed(0)+'K':avgTok;
+  document.getElementById('a-avg-cost').textContent='$'+estPer.toFixed(3);
+  if(!analyses.length){document.getElementById('analyses-table').innerHTML='<div class="empty">No analyses</div>';return;}
+  document.getElementById('analyses-table').innerHTML=`<table><thead><tr><th>Property</th><th>User</th><th>Flags</th><th>Critical</th><th>Tokens In</th><th>Tokens Out</th><th>Est. Cost</th><th>Date</th></tr></thead><tbody>${analyses.slice(0,100).map(a=>{const cost=((a.tokens_input||0)/1e6*3)+((a.tokens_output||0)/1e6*15);return `<tr><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.pack_name||'Unknown'}</td><td class="mono" style="font-size:0.66rem;color:var(--t3);">${a.user_email||(a.user_id||'').substring(0,8)+'...'}</td><td><span class="badge ${a.issues_count>5?'amber':'payg'}">${a.issues_count||0}</span></td><td><span class="badge ${a.high_count>0?'red':'payg'}">${a.high_count||0}</span></td><td class="mono">${((a.tokens_input||0)/1000).toFixed(1)}K</td><td class="mono">${((a.tokens_output||0)/1000).toFixed(1)}K</td><td class="mono" style="color:var(--green);">$${cost.toFixed(3)}</td><td class="mono">${fmtDate(a.created_at)}</td></tr>`;}).join('')}</tbody></table>`;
+}
+
+function filterAnalyses(){
+  const q=document.getElementById('analysis-search').value.toLowerCase();
+  renderAnalyses(q?allAnalyses.filter(a=>(a.pack_name||'').toLowerCase().includes(q)):allAnalyses);
+}
+
+function renderUsageChart(){
+  const totalIn=allAnalyses.reduce((s,a)=>s+(a.tokens_input||0),0);
+  const totalOut=allAnalyses.reduce((s,a)=>s+(a.tokens_output||0),0);
+  const avgIn=allAnalyses.length?Math.round(totalIn/allAnalyses.length):0;
+  document.getElementById('uc-input').textContent=totalIn>1e6?(totalIn/1e6).toFixed(1)+'M':(totalIn/1000).toFixed(0)+'K';
+  document.getElementById('uc-output').textContent=totalOut>1e6?(totalOut/1e6).toFixed(1)+'M':(totalOut/1000).toFixed(0)+'K';
+  document.getElementById('uc-avg').textContent=avgIn>1000?(avgIn/1000).toFixed(0)+'K':avgIn;
+  const byDay={};
+  allAnalyses.forEach(a=>{const d=a.created_at?a.created_at.substring(0,10):null;if(d)byDay[d]=(byDay[d]||0)+1;});
+  const days=Object.keys(byDay).sort().slice(-14);
+  const maxV=Math.max(...days.map(d=>byDay[d]),1);
+  document.getElementById('analyses-per-day-chart').innerHTML=`<div style="display:flex;gap:5px;align-items:flex-end;height:110px;">${days.map(d=>{const v=byDay[d];const h=Math.max(4,Math.round((v/maxV)*100));return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:0.58rem;color:var(--t2);font-family:'DM Mono',monospace;">${v}</div><div style="width:100%;height:${h}px;background:var(--purple);border-radius:3px 3px 0 0;opacity:0.8;" title="${d}: ${v}"></div><div style="font-size:0.5rem;color:var(--t3);font-family:'DM Mono',monospace;">${d.substring(5)}</div></div>`;}).join('')}</div>`;
+  const r20=[...allAnalyses].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,20);
+  document.getElementById('token-usage-table').innerHTML=`<table><thead><tr><th>Property</th><th>Tokens In</th><th>Tokens Out</th><th>Total</th><th>Date</th></tr></thead><tbody>${r20.map(a=>`<tr><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.pack_name||'Unknown'}</td><td class="mono">${((a.tokens_input||0)/1000).toFixed(1)}K</td><td class="mono">${((a.tokens_output||0)/1000).toFixed(1)}K</td><td class="mono" style="color:var(--purple);">${(((a.tokens_input||0)+(a.tokens_output||0))/1000).toFixed(1)}K</td><td class="mono">${fmtDate(a.created_at)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderCostPanel(){
+  const total=REAL_API_COSTS.total;
+  const colors={'Input Tokens':'var(--blue)','Output Tokens':'var(--purple)','Web Search':'var(--amber)','Cache Write':'var(--cyan)','Cache Read':'var(--green)'};
+  document.getElementById('cost-breakdown-chart').innerHTML=Object.entries(REAL_API_COSTS.byType).map(([lbl,cost])=>{const pct=(cost/total)*100;const col=colors[lbl]||'var(--t3)';return `<div class="cost-row"><div class="cost-dot" style="background:${col};"></div><div class="cost-label">${lbl}</div><div class="cost-bar-wrap"><div class="cost-bar" style="width:${pct}%;background:${col};"></div></div><div class="cost-amount">$${cost.toFixed(2)}</div><div class="cost-pct">${pct.toFixed(0)}%</div></div>`;}).join('');
+  const days=Object.keys(REAL_API_COSTS.byDay);
+  const maxC=Math.max(...Object.values(REAL_API_COSTS.byDay));
+  document.getElementById('daily-cost-chart').innerHTML=days.map(d=>{const c=REAL_API_COSTS.byDay[d];const h=Math.max(4,Math.round((c/maxC)*100));return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:0.56rem;color:var(--t2);font-family:'DM Mono',monospace;">$${c.toFixed(0)}</div><div style="width:100%;height:${h}px;background:var(--red);border-radius:3px 3px 0 0;opacity:0.8;" title="${d}: $${c.toFixed(2)}"></div></div>`;}).join('');
+  document.getElementById('daily-cost-labels').innerHTML=days.map(d=>`<div style="flex:1;text-align:center;font-size:0.5rem;color:var(--t3);font-family:'DM Mono',monospace;">${d.replace(' May','')}</div>`).join('');
+}
+
+function renderBroadcastUsers(){filterBroadcastUsers();}
+function filterBroadcastUsers(){
+  const q=(document.getElementById('broadcast-search')||{}).value||'';
+  const users=q?allUsers.filter(u=>(u.email||'').toLowerCase().includes(q.toLowerCase())):allUsers.slice(0,15);
+  const el=document.getElementById('broadcast-users-list');
+  if(!el)return;
+  el.innerHTML=users.length?`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button><button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No users found</div>';
+}
+
+function populateUserSelects(){
+  const opts=allUsers.map(u=>`<option value="${u.id}">${u.email} (${planLabel(u.plan)})</option>`).join('');
+  document.getElementById('grant-user-select').innerHTML=opts;
+  document.getElementById('plan-user-select').innerHTML=opts;
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function quickGrant(userId,email){
+  const sel=document.getElementById('grant-user-select');
+  if(sel)sel.value=userId;
+  openModal('modal-grant');
+}
+function quickPlan(userId,email,currentPlan){
+  const sel=document.getElementById('plan-user-select');
+  const ps=document.getElementById('plan-new-plan');
+  if(sel)sel.value=userId;
+  if(ps)ps.value=currentPlan||'pay_as_you_go';
+  openModal('modal-plan');
+}
+
+async function submitGrantCredits(){
+  const userId=document.getElementById('grant-user-select').value;
+  const credits=parseInt(document.getElementById('grant-credits').value)||1;
+  const user=allUsers.find(u=>u.id===userId);
+  closeModal('modal-grant');
+  try{
+    for(let i=0;i<credits;i++){
+      await fetch(API_BASE+'/admin/grant-credit',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({userId})});
+    }
+    toast('✓ Granted '+credits+' credit'+(credits>1?'s':'')+' to '+(user?.email||userId));
+    await loadUsers();renderAll();
+  }catch(e){toast('Failed to grant credits');}
+}
+
+async function submitChangePlan(){
+  const userId=document.getElementById('plan-user-select').value;
+  const plan=document.getElementById('plan-new-plan').value;
+  const user=allUsers.find(u=>u.id===userId);
+  closeModal('modal-plan');
+  try{
+    const r=await fetch(API_BASE+'/admin/change-plan',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({userId,plan})});
+    const d=await r.json();
+    if(d.ok){toast('✓ Plan updated for '+(user?.email||userId));await loadUsers();renderAll();}
+    else toast('Failed: '+(d.error||'Unknown'));
+  }catch(e){toast('Failed to change plan');}
+}
+
+function showPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function calcMRR(){return allUsers.reduce((s,u)=>{if(u.plan==='standard')return s+69.99;if(u.plan==='pro')return s+119.99;return s;},0);}
+function planLabel(p){if(p==='standard')return 'Standard';if(p==='pro')return 'Pro';return 'PAYG';}
+function planClass(p){if(p==='standard')return 'standard';if(p==='pro')return 'pro';return 'payg';}
+function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function toast(msg){const t=document.getElementById('admin-toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
+init();
+</script>
+</body>
+</html>

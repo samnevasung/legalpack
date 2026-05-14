@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /admin.html
+Disallow: /legal-pack-ai.html
+
+Sitemap: https://legalpackai.com/sitemap.xml
