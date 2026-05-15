@@ -2128,7 +2128,25 @@ function renderResult(result, packName) {
 
     ${ia.cautionaryNote ? `
     <div style="margin-top:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:11px;">
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">Investor Assessment</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Investor Assessment</div>
+
+      <!-- Verdict pills -->
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
+        ${(()=>{
+          const pills=[];
+          const mtg=mortgage||'';
+          if(mtg==='Standard')       pills.push(['✅','Standard Mortgage Possible','#f0fdf4','#15803d','#bbf7d0']);
+          else if(mtg==='Restricted')pills.push(['⚠️','Restricted Mortgage','#fffbeb','#92400e','#fef3c7']);
+          else if(mtg==='Bridging Only') pills.push(['🟠','Bridging / Specialist Finance','#fff7ed','#c2410c','#fed7aa']);
+          else if(mtg==='Cash Only'||ia.mortgageable===false) pills.push(['❌','Standard Mortgage Unlikely','#fef2f2','#dc2626','#fecaca']);
+          if(mtg==='Cash Only'||mtg==='Bridging Only') pills.push(['✅','Cash Buyer Possible','#f0fdf4','#15803d','#bbf7d0']);
+          if(critical>0)             pills.push(['⚠️','Solicitor Review Required','#fffbeb','#92400e','#fef3c7']);
+          if(ia.resaleable===false)  pills.push(['🟠','Resale Risk','#fff7ed','#c2410c','#fed7aa']);
+          return pills.map(([icon,label,bg,col,border])=>`<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid ${border};background:${bg};font-size:0.75rem;font-weight:700;color:${col};">${icon} ${label}</span>`).join('');
+        })()}
+      </div>
+
+      <!-- ✅/❌ grid -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
         ${[['Mortgageable',ia.mortgageable],['Resaleable',ia.resaleable],['Tenantable',ia.tenantable]].map(([l,v])=>`<div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:1.2rem;margin-bottom:3px;">${v?'✅':'❌'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">${l}</div></div>`).join('')}
         <div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:0.82rem;font-weight:800;color:var(--t1);margin-bottom:3px;">${ia.insurable||'—'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">Insurable</div></div>
@@ -2141,6 +2159,25 @@ function renderResult(result, packName) {
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:7px;">What the Buyer Cannot Do</div>
       <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${result.titleAnalysis.whatBuyerCannotDo}</div>
     </div>` : ''}
+
+    <!-- Before Bidding Verify -->
+    ${(()=>{
+      const checks=[]
+        .concat(result.mortgageability!=='Standard'?['Verify lender acceptability with a mortgage broker before bidding']:[])
+        .concat(result.leaseYears&&result.leaseYears<85?['Get a lease extension quote — budget £5k–£20k+ for short leases']:[])
+        .concat(critical>0?['Instruct a solicitor to review the full legal pack before placing a bid']:[])
+        .concat(result.missingDocuments?.length?['Obtain missing documents: '+result.missingDocuments.slice(0,2).map(d=>typeof d==='string'?d:d.document).join(', ')]:[])
+        .concat(['Confirm the seller has legal authority to sell at auction','Set your maximum bid limit before auction day — do not exceed it','Calculate total budget including SDLT, solicitor fees and any renovation']);
+      return `<div style="margin-top:16px;padding:16px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:13px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:11px;">Before Bidding, Verify:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${checks.slice(0,5).map(item=>`<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-radius:9px;cursor:pointer;user-select:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-bg,#f5f3ff)'" onmouseout="this.style.borderColor='var(--b1)';this.style.background='var(--bg)'">
+            <input type="checkbox" style="margin-top:2px;flex-shrink:0;accent-color:var(--accent);width:14px;height:14px;">
+            <span style="font-size:0.84rem;color:var(--t1);line-height:1.5;">${item}</span>
+          </label>`).join('')}
+        </div>
+      </div>`;
+    })()}
 
     <!-- Property Intel prompt — populated after background fetch -->
     <div id="intel-prompt-card" style="margin-top:14px;"></div>
@@ -2238,14 +2275,14 @@ function renderResult(result, packName) {
             const crit = docFlags.filter(f=>f.severity==='critical'||f.severity==='high').length;
             const warn = docFlags.filter(f=>f.severity==='warning'||f.severity==='medium').length;
             return `<div style="background:var(--bg);border:1px solid var(--b1);border-radius:11px;overflow:hidden;">
-              <div style="padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="const d=this.nextElementSibling;d.style.display=d.style.display==='none'?'block':'none'">
+              <div style="padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="const d=this.nextElementSibling;const ch=this.querySelector('.doc-chev');const open=d.style.display==='none';d.style.display=open?'block':'none';ch.textContent=open?'▴':'▾';">
                 <span>📄</span>
                 <div style="flex:1;"><div style="font-size:0.86rem;font-weight:700;color:var(--t1);">${doc.document}</div>${doc.evidence?`<div style="font-size:0.68rem;color:var(--t3);margin-top:1px;">${doc.evidence}</div>`:''}</div>
                 <div style="display:flex;gap:5px;align-items:center;">
                   ${crit?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:#fef2f2;color:#dc2626;">${crit} critical</span>`:''}
                   ${warn?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:#fffbeb;color:#d97706;">${warn} warning</span>`:''}
                   ${!crit&&!warn?`<span style="font-size:0.6rem;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--okbg);color:var(--ok);">✓ clear</span>`:''}
-                  <span style="color:var(--t3);font-size:0.75rem;">▾</span>
+                  <span class="doc-chev" style="color:var(--t3);font-size:0.75rem;">▾</span>
                 </div>
               </div>
               <div style="display:none;border-top:1px solid var(--b1);padding:12px 14px;">
@@ -2360,9 +2397,10 @@ function renderFlagCard(f, index) {
 
   return `<div id="flag-${index||0}" style="padding:18px 20px;background:var(--bg);border:1px solid var(--b1);border-left:4px solid ${borderColor};border-radius:0 14px 14px 0;margin-bottom:12px;transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow=''">
 
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
       <span style="font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:4px;background:${sevBg};color:${sevColor};letter-spacing:0.5px;">${sevLabel}</span>
       ${f.category ? `<span style="font-size:0.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">${f.category}</span>` : ''}
+      ${impTagsHtml}
     </div>
 
     <div style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:10px;line-height:1.3;">${f.title}</div>
