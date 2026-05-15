@@ -2183,11 +2183,16 @@ function renderResult(result, packName) {
         </div>
       </div>
       <div style="background:#fffdf5;padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
-        ${summary.unquantifiedLiabilities.map(l=>`
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff;border:1px solid #fde68a;border-radius:9px;">
-          <span style="color:#d97706;font-size:0.85rem;font-weight:700;flex-shrink:0;margin-top:1px;">!</span>
-          <div style="font-size:0.85rem;color:#78350f;line-height:1.55;font-weight:500;">${l}</div>
-        </div>`).join('')}
+        ${summary.unquantifiedLiabilities.map(l=>{
+          const dotIdx = l.indexOf('.');
+          const hasTitle = dotIdx > 0 && dotIdx < 80;
+          const title = hasTitle ? l.slice(0, dotIdx).trim() : null;
+          const desc  = hasTitle ? l.slice(dotIdx + 1).trim() : l;
+          return `<div style="padding:11px 14px;background:#fff;border:1px solid #fde68a;border-radius:9px;">
+            ${title ? `<div style="font-size:0.8rem;font-weight:700;color:#92400e;margin-bottom:4px;">⚠ ${title}</div>` : `<div style="font-size:0.72rem;font-weight:700;color:#d97706;margin-bottom:3px;">⚠ Unquantified Liability</div>`}
+            ${desc ? `<div style="font-size:0.83rem;color:#78350f;line-height:1.55;font-weight:500;">${desc}</div>` : ''}
+          </div>`;
+        }).join('')}
       </div>
     </div>` : ''}
     <div style="font-size:0.68rem;color:var(--t3);font-style:italic;line-height:1.6;">${summary?.costWarning||'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>
@@ -2326,6 +2331,18 @@ function renderFlagCard(f, index) {
   const sevBg = isCritical?'#fef2f2':isWarning?'#fffbeb':'#f8fafc';
   const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'#64748b';
   const highlightColor = isCritical?'rgba(220,38,38,0.08)':isWarning?'rgba(245,158,11,0.08)':'rgba(100,116,139,0.06)';
+
+  // Derive impact-level pills from category, title and buyerImpact text
+  const _t = ((f.category||'') + ' ' + (f.title||'') + ' ' + (f.buyerImpact||'')).toLowerCase();
+  const _impTags = [];
+  if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  '#fef2f2','#b91c1c']);
+  if (/resale|re-sale|sell on|saleability|unmarketable/.test(_t))                              _impTags.push(['🟠','Resale Risk',    '#fff7ed','#c2410c']);
+  if (/covenant|dispute|adverse|possessory|easement|right of way|chancel|overriding|title/.test(_t)) _impTags.push(['🟡','Legal Risk',     '#fefce8','#92400e']);
+  if (/completion|timescale|short lease|deadline|notice|vacant possession|delay/.test(_t))     _impTags.push(['🔵','Time Risk',      '#eff6ff','#1e40af']);
+  if (/\bcost\b|fee|charge|sdlt|payment|contribution|levy|ground rent|service charge/.test(_t)) _impTags.push(['💷','Cost Risk',      '#f0fdf4','#15803d']);
+  if (/structural|survey|planning|repair|asbestos|damp|subsidence|drainage|condition|defect/.test(_t)) _impTags.push(['🏚','Condition Risk','#fdf4ff','#6d28d9']);
+  const impTagsHtml = _impTags.map(([icon,label,bg,col]) =>
+    `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};white-space:nowrap;">${icon} ${label}</span>`).join('');
 
   // Split detail into sentences for better readability
   const detail = f.detail || f.description || '';
