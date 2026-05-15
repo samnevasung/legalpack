@@ -2098,9 +2098,9 @@ function renderResult(result, packName) {
 
     <!-- Key Property Facts — two grouped blocks -->
     ${(() => {
-      const card = ([lbl,val,col]) => `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;">
-        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">${lbl}</div>
-        <div style="font-size:0.9rem;font-weight:700;color:${col||'var(--t1)'};">${val}</div>
+      const card = ([lbl,val,col]) => `<div style="padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;">
+        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:7px;">${lbl}</div>
+        <div style="font-size:0.97rem;font-weight:700;color:${col||'var(--t1)'};line-height:1.3;">${val}</div>
       </div>`;
       const propFacts = [
         result.tenure ? ['Tenure', result.tenure, null] : null,
@@ -2173,9 +2173,22 @@ function renderResult(result, packName) {
         </div>
       </div>`).join('')}
     </div>` : `<div style="padding:20px;text-align:center;color:var(--t3);">No confirmed buyer cost figures found in documents</div>`}
-    ${summary?.unquantifiedLiabilities?.length ? `<div style="padding:12px 14px;background:#fffbeb;border:1px solid #fef3c7;border-radius:10px;margin-bottom:10px;">
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d97706;margin-bottom:6px;">Also Mentioned — No Figure Stated</div>
-      ${summary.unquantifiedLiabilities.map(l=>`<div style="font-size:0.8rem;color:var(--t2);padding:2px 0;line-height:1.5;">• ${l}</div>`).join('')}
+    ${summary?.unquantifiedLiabilities?.length ? `
+    <div style="margin-top:18px;border:1.5px solid #f59e0b;border-radius:13px;overflow:hidden;">
+      <div style="padding:13px 18px;background:#fffbeb;border-bottom:1px solid #fef3c7;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1rem;">⚠️</span>
+        <div>
+          <div style="font-size:0.82rem;font-weight:800;color:#92400e;">Potential Buyer Liabilities — No Figure Stated</div>
+          <div style="font-size:0.7rem;color:#b45309;margin-top:2px;">These obligations were identified in the documents but no cost figure was given. They may represent significant financial exposure.</div>
+        </div>
+      </div>
+      <div style="background:#fffdf5;padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
+        ${summary.unquantifiedLiabilities.map(l=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff;border:1px solid #fde68a;border-radius:9px;">
+          <span style="color:#d97706;font-size:0.85rem;font-weight:700;flex-shrink:0;margin-top:1px;">!</span>
+          <div style="font-size:0.85rem;color:#78350f;line-height:1.55;font-weight:500;">${l}</div>
+        </div>`).join('')}
+      </div>
     </div>` : ''}
     <div style="font-size:0.68rem;color:var(--t3);font-style:italic;line-height:1.6;">${summary?.costWarning||'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>
   </div>
