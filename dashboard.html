@@ -1000,14 +1000,13 @@ body {
               <input id="listing-url-input" type="url" placeholder="https://www.sdlauctions.co.uk/property/..." style="flex:1;background:var(--bg);border:1px solid var(--b1);border-radius:9px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:9px 13px;transition:border-color 0.15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'" placeholder="https://www.sdlauctions.co.uk/property/...">
               <span style="font-size:0.7rem;color:var(--t3);white-space:nowrap;">Auto-fetched on analyse</span>
             </div>
-            <!-- Scrape result area — slim confirmation only, full details appear in report -->
-            <div id="scrape-result" style="display:none;border-top:1px solid var(--b1);padding:10px 16px;display:flex;align-items:center;gap:10px;">
-              <span style="font-size:1rem;flex-shrink:0;">✅</span>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:0.76rem;font-weight:700;color:var(--ok);">Listing fetched — details will appear in your report</div>
-                <div id="scrape-summary-line" style="font-size:0.69rem;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <!-- Scrape result area — read-only info card, auto-included in report -->
+            <div id="scrape-result" style="display:none;border-top:1px solid var(--b1);">
+              <div id="scrape-fields" style="padding:10px 16px 6px;display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+              <div style="padding:4px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:0.68rem;color:var(--ok);font-weight:600;">✓ Details included in your report automatically</span>
+                <span onclick="clearListingData()" style="font-size:0.68rem;color:var(--t3);cursor:pointer;text-decoration:underline;">Remove</span>
               </div>
-              <button onclick="clearListingData()" style="flex-shrink:0;padding:4px 10px;background:none;border:1px solid var(--b1);color:var(--t3);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.72rem;cursor:pointer;">✕ Remove</button>
             </div>
             <div id="scrape-loading" style="display:none;padding:14px;text-align:center;font-size:0.76rem;color:var(--t3);">
               <div style="margin-bottom:4px;">🔍 Fetching listing...</div>
@@ -1693,21 +1692,12 @@ function removeFile(i) {
 async function startAnalysis() {
   if (!selectedFiles.length) return;
 
-  // Auto-fetch listing URL if provided and not yet scraped
+  // Auto-fetch listing URL if provided — always re-scrape to ensure fresh data
   const listingUrl = document.getElementById('listing-url-input')?.value?.trim();
-  if (listingUrl && listingUrl.startsWith('http') && !scrapedListingData) {
-    try {
-      document.getElementById('analyse-btn').disabled = true;
-      document.getElementById('analyse-btn').textContent = 'Fetching listing...';
-      await scrapeListing(true); // silent mode
-    } catch(e) { /* continue even if scrape fails */ }
-    document.getElementById('analyse-btn').textContent = 'Analyse Legal Pack →';
+  if (listingUrl && listingUrl.startsWith('http')) {
+    try { await scrapeListing(true); } catch(e) {}
   }
-
-  // Auto-apply scraped listing data if present but not yet manually applied
-  if (scrapedListingData && !window._listingMeta) {
-    window._listingMeta = scrapedListingData;
-  }
+  if (scrapedListingData) window._listingMeta = scrapedListingData;
 
   // Check permission
   try {
@@ -2088,26 +2078,35 @@ function renderResult(result, packName) {
       <div style="font-size:0.8rem;color:var(--t2);margin-top:4px;">Standard due diligence applies — see Flags tab for any warnings</div>
     </div>`}
 
-    <!-- Key Property Facts -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
-      ${[
+    <!-- Key Property Facts — two grouped blocks -->
+    ${(() => {
+      const card = ([lbl,val,col]) => `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;">
+        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">${lbl}</div>
+        <div style="font-size:0.9rem;font-weight:700;color:${col||'var(--t1)'};">${val}</div>
+      </div>`;
+      const propFacts = [
         result.tenure ? ['Tenure', result.tenure, null] : null,
         result.leaseYears ? ['Lease Remaining', result.leaseYears+' years', result.leaseYears<85?'#dc2626':null] : null,
         result.groundRent&&result.groundRent!=='N/A' ? ['Ground Rent', result.groundRent, null] : null,
         result.serviceCharge&&result.serviceCharge!=='N/A' ? ['Service Charge', result.serviceCharge, null] : null,
-        (result.guidePrice || result._listingMeta?.guidePrice) ? ['Guide Price', result.guidePrice || result._listingMeta?.guidePrice, null] : null,
         result.titleNumber ? ['Title Number', result.titleNumber, null] : null,
+        result.seller ? ['Seller', result.seller, null] : null,
+      ].filter(Boolean);
+      const auctionFacts = [
+        (result.guidePrice || result._listingMeta?.guidePrice) ? ['Guide Price', result.guidePrice || result._listingMeta?.guidePrice, null] : null,
         (result.auctionHouse || result._listingMeta?.auctionHouse) ? ['Auction House', result.auctionHouse || result._listingMeta?.auctionHouse, null] : null,
         result._listingMeta?.auctionDate ? ['Auction Date', result._listingMeta.auctionDate, null] : null,
         result._listingMeta?.auctionTime ? ['Auction Time', result._listingMeta.auctionTime, null] : null,
         result._listingMeta?.auctionVenue ? ['Venue', result._listingMeta.auctionVenue, null] : null,
         result._listingMeta?.lotNumber ? ['Lot Number', result._listingMeta.lotNumber, null] : null,
-        result.seller ? ['Seller', result.seller, null] : null,
-      ].filter(Boolean).map(([lbl,val,col]) => `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;">
-        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">${lbl}</div>
-        <div style="font-size:0.9rem;font-weight:700;color:${col||'var(--t1)'};">${val}</div>
-      </div>`).join('')}
-    </div>
+      ].filter(Boolean);
+      const sectionLabel = txt => `<div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">${txt}</div>`;
+      const grid = cards => `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">${cards.map(card).join('')}</div>`;
+      return [
+        propFacts.length ? sectionLabel('Property') + grid(propFacts) : '',
+        auctionFacts.length ? `<div style="margin-top:${propFacts.length?'14px':'0'};">` + sectionLabel('Auction') + grid(auctionFacts) + '</div>' : '',
+      ].join('');
+    })()}
 
     ${ia.cautionaryNote ? `
     <div style="margin-top:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:11px;">
@@ -2449,7 +2448,6 @@ async function scrapeListing(silent = false) {
     loadingEl.style.display = 'block';
     resultEl.style.display = 'none';
     errorEl.style.display = 'none';
-    document.getElementById('scrape-applied-badge').style.display = 'none';
   }
 
   try {
@@ -2462,7 +2460,7 @@ async function scrapeListing(silent = false) {
     if (!r.ok) throw new Error(d.error || 'Failed to fetch listing');
 
     scrapedListingData = d.extracted;
-    window._listingMeta = d.extracted; // auto-apply — no manual "Include in report" needed
+    window._listingMeta = d.extracted;
     loadingEl.style.display = 'none';
 
     const extracted = d.extracted || {};
@@ -2471,10 +2469,25 @@ async function scrapeListing(silent = false) {
     if (!hasData) {
       if (!silent) showToast('Could not extract listing data — the site may block scrapers');
     } else {
-      // Build a compact one-line summary for the confirmation strip
-      const parts = [extracted.auctionHouse, extracted.auctionDate, extracted.guidePrice ? extracted.guidePrice + (extracted.guidePrice.startsWith('£') ? '' : '') : null].filter(Boolean);
-      document.getElementById('scrape-summary-line').textContent = parts.join(' · ');
-      resultEl.style.display = 'flex';
+      const fieldDefs = [
+        { key: 'auctionHouse',   label: 'Auction House' },
+        { key: 'auctionDate',    label: 'Auction Date'  },
+        { key: 'auctionTime',    label: 'Time'          },
+        { key: 'auctionVenue',   label: 'Venue'         },
+        { key: 'propertyAddress',label: 'Property'      },
+        { key: 'guidePrice',     label: 'Guide Price'   },
+        { key: 'lotNumber',      label: 'Lot Number'    },
+        { key: 'propertyType',   label: 'Type'          },
+        { key: 'tenure',         label: 'Tenure'        },
+        { key: 'description',    label: 'Description'   },
+      ];
+      document.getElementById('scrape-fields').innerHTML = fieldDefs
+        .filter(f => extracted[f.key])
+        .map(f => `<div style="background:var(--bg);border:1px solid var(--b1);border-radius:8px;padding:9px 12px;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;">${f.label}</div>
+          <div style="font-size:0.78rem;font-weight:600;color:var(--t1);line-height:1.4;">${extracted[f.key]}</div>
+        </div>`).join('');
+      resultEl.style.display = 'block';
     }
 
     if (d.fallback && !silent) showToast('Screenshot unavailable — extracted from page text only');
