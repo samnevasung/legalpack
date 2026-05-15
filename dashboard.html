@@ -1409,6 +1409,8 @@ let allReports = [];
 let portfolio = JSON.parse(localStorage.getItem('lp_portfolio') || '[]');
 let countdowns = JSON.parse(localStorage.getItem('lp_countdowns') || '[]');
 let selectedFiles = [];
+let analysisInProgress = false;
+let lastAnalysedSignature = null;
 let countdownInterval = null;
 
 const PLANS = {
@@ -1690,7 +1692,21 @@ function removeFile(i) {
 }
 
 async function startAnalysis() {
+  if (analysisInProgress) return;
   if (!selectedFiles.length) return;
+
+  // Fix 3: block re-analysis of the exact same file set
+  const currentSig = selectedFiles.map(f => f.name + ':' + f.size).sort().join('|');
+  if (currentSig === lastAnalysedSignature) {
+    showToast('This pack has already been analysed. Upload a new file to run another analysis.');
+    return;
+  }
+
+  // Fix 1 & 2: lock immediately + instant visual feedback before any async work
+  analysisInProgress = true;
+  const btn = document.getElementById('analyse-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analysing...';
 
   // Auto-fetch listing URL if provided — always re-scrape to ensure fresh data
   const listingUrl = document.getElementById('listing-url-input')?.value?.trim();
@@ -1700,18 +1716,18 @@ async function startAnalysis() {
   if (scrapedListingData) window._listingMeta = scrapedListingData;
 
   // Check permission
+  const resetBtn = () => { analysisInProgress = false; btn.disabled = false; btn.textContent = 'Analyse Legal Pack →'; };
   try {
     const checkR = await fetch(API_BASE + '/analyse/check', { method: 'POST', headers: { Authorization: 'Bearer ' + authToken } });
     const checkD = await checkR.json();
     if (!checkR.ok) {
-      if (checkD.noCredits) { handleUpgrade('pay_as_you_go'); return; }
-      if (checkD.limitReached) { openAccountModal(); return; }
-      showToast(checkD.error || 'Cannot run analysis'); return;
+      if (checkD.noCredits) { resetBtn(); handleUpgrade('pay_as_you_go'); return; }
+      if (checkD.limitReached) { resetBtn(); openAccountModal(); return; }
+      resetBtn(); showToast(checkD.error || 'Cannot run analysis'); return;
     }
-  } catch(e) { showToast('Connection error'); return; }
+  } catch(e) { resetBtn(); showToast('Connection error'); return; }
 
   setProgress(true, 'Processing files...');
-  document.getElementById('analyse-btn').disabled = true;
 
   try {
     setProgress(true, 'Extracting text from documents...', 5);
@@ -1767,9 +1783,12 @@ async function startAnalysis() {
     if (finalResult && selectedFiles?.length) finalResult._uploadedFiles = selectedFiles.map(f => f.name);
     renderResult(finalResult, finalPackName);
     currentReportId = null; // fresh analysis - id set after loadReports
+    lastAnalysedSignature = currentSig; // prevent re-analysis of same files
+    analysisInProgress = false;
     selectedFiles = [];
     renderFileList();
-    document.getElementById('analyse-btn').disabled = true;
+    btn.textContent = 'Analyse Legal Pack →';
+    btn.disabled = true; // no files loaded yet
 
     // Auto-fill Property Intel input and kick off background fetch
     const extractedAddress = finalResult.address;
@@ -1786,7 +1805,7 @@ async function startAnalysis() {
   } catch(e) {
     setProgress(false);
     showToast(e.message || 'Analysis failed');
-    document.getElementById('analyse-btn').disabled = false;
+    resetBtn();
   }
 }
 
