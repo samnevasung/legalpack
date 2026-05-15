@@ -1325,11 +1325,11 @@ body {
             <button onclick="handleUpgrade('pay_as_you_go')" class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;background:var(--amber);border-color:var(--amber);">⚡ Top Up</button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;">
-            <div><div style="font-size:0.82rem;font-weight:700;">Standard <span style="font-size:0.58rem;background:var(--redmid);color:var(--red);padding:1px 5px;border-radius:6px;margin-left:3px;">POPULAR</span></div><div style="font-size:0.7rem;color:var(--t2);">£69.99/mo · 50 analyses</div></div>
+            <div><div style="font-size:0.82rem;font-weight:700;">Standard <span style="font-size:0.58rem;background:var(--redmid);color:var(--red);padding:1px 5px;border-radius:6px;margin-left:3px;">POPULAR</span></div><div style="font-size:0.7rem;color:var(--t2);">£69.99/mo · 30 analyses</div></div>
             <button onclick="handleUpgrade('standard')" class="btn btn-primary" style="font-size:0.72rem;padding:5px 10px;">Upgrade</button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;">
-            <div><div style="font-size:0.82rem;font-weight:700;">Pro</div><div style="font-size:0.7rem;color:var(--t2);">£119.99/mo · 120 analyses</div></div>
+            <div><div style="font-size:0.82rem;font-weight:700;">Pro</div><div style="font-size:0.7rem;color:var(--t2);">£149.99/mo · 100 analyses</div></div>
             <button onclick="handleUpgrade('pro')" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;">Upgrade</button>
           </div>
         </div>
@@ -1771,14 +1771,13 @@ async function startAnalysis() {
     renderFileList();
     document.getElementById('analyse-btn').disabled = true;
 
-    // Auto-fill Property Intel with extracted address
+    // Auto-fill Property Intel input and kick off background fetch
     const extractedAddress = finalResult.address;
     const badValues = ['legal pack', 'legal-pack', 'pack', 'unknown', 'null', ''];
     if (extractedAddress && !badValues.includes(String(extractedAddress).toLowerCase().trim())) {
       document.getElementById('intel-address').value = extractedAddress;
-      showToast('Address extracted: ' + extractedAddress.substring(0, 50));
+      fetchIntelBackground(extractedAddress);
     } else {
-      // Don't set anything — leave box empty so user types it
       document.getElementById('intel-address').value = '';
     }
 
@@ -2123,6 +2122,9 @@ function renderResult(result, packName) {
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:7px;">What the Buyer Cannot Do</div>
       <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${result.titleAnalysis.whatBuyerCannotDo}</div>
     </div>` : ''}
+
+    <!-- Property Intel prompt — populated after background fetch -->
+    <div id="intel-prompt-card" style="margin-top:14px;"></div>
   </div>
 
   <!-- ④ TAB: FLAGS -->
@@ -2786,6 +2788,36 @@ async function fetchPropertyIntel() {
   } catch(e) {
     el.innerHTML = `<div class="intel-placeholder"><div class="intel-placeholder-icon">⚠️</div><div class="intel-placeholder-text">Search failed: ${e.message}</div></div>`;
   }
+}
+
+async function fetchIntelBackground(address) {
+  try {
+    const cached = getIntelFromCache(address);
+    const data = cached || await (async () => {
+      const resp = await fetch(API_BASE + '/intel/property', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken },
+        body: JSON.stringify({ address })
+      });
+      if (!resp.ok) return null;
+      const d = await resp.json();
+      if (d.intel) { saveIntelToCache(address, d); saveIntelSearch(address); renderIntelSavedSearches(); }
+      return d;
+    })();
+    if (!data?.intel) return;
+
+    const card = document.getElementById('intel-prompt-card');
+    if (!card) return;
+    card.innerHTML = `
+      <div style="padding:15px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:13px;display:flex;align-items:center;gap:14px;animation:fadeIn 0.4s ease;">
+        <div style="font-size:1.4rem;flex-shrink:0;">🏡</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--t1);margin-bottom:3px;">Property Intel ready</div>
+          <div style="font-size:0.75rem;color:var(--t2);line-height:1.5;">Comparable sales, flood risk, EPC and planning history for this address.</div>
+        </div>
+        <button onclick="(function(){switchPanel('intel',document.querySelector('[data-panel=intel]'));setTimeout(()=>fetchPropertyIntel(),80);})()" style="flex-shrink:0;padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.76rem;font-weight:700;cursor:pointer;white-space:nowrap;">View Property Intel →</button>
+      </div>`;
+  } catch(e) { /* silent — never surface intel errors */ }
 }
 
 function renderPropertyIntel(intel, address) {
@@ -3761,8 +3793,8 @@ const STRIPE_PUBLISHABLE_KEY = 'pk_live_51TSEV2RBJ2u6aMzQ4DgIUnQSWZvc3TDl3fcR1AX
 
 const PLAN_INFO = {
   pay_as_you_go: { name: 'Pay As You Go', desc: 'Single analysis credit', price: '£9.99', amount: '£9.99' },
-  standard: { name: 'Standard', desc: '50 analyses per month', price: '£69.99/mo', amount: '£69.99' },
-  pro: { name: 'Pro', desc: '120 analyses per month', price: '£119.99/mo', amount: '£119.99' }
+  standard: { name: 'Standard', desc: '30 analyses per month', price: '£69.99/mo', amount: '£69.99' },
+  pro: { name: 'Pro', desc: '100 analyses per month', price: '£149.99/mo', amount: '£149.99' }
 };
 
 let stripeInstance = null;
