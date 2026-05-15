@@ -218,8 +218,8 @@ async function ensureStripeCustomer(user) {
 // ── PLAN LIMITS ───────────────────────────────────────────────────────────────
 const PLANS = {
   pay_as_you_go: { analysesPerMonth: null, pricePerAnalysis: 999 },
-  standard:      { analysesPerMonth: 50,   monthlyPrice: 2999 },
-  pro:           { analysesPerMonth: 120,  monthlyPrice: 9999 },
+  standard:      { analysesPerMonth: 30,   monthlyPrice: 6999 },
+  pro:           { analysesPerMonth: 100,  monthlyPrice: 14999 },
 };
 
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
@@ -1361,11 +1361,12 @@ app.post('/scrape-listing', requireAuth, async (req, res) => {
 
   let puppeteer;
   try { puppeteer = require('puppeteer'); } catch(e) {
-    return res.status(500).json({ error: 'Puppeteer not installed. Run: npm install puppeteer' });
+    puppeteer = null; // not installed — will use HTTP fallback below
   }
 
   let browser;
   try {
+    if (!puppeteer) throw new Error('Puppeteer not available, using fallback');
     browser = await puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu']

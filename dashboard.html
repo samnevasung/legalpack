@@ -997,8 +997,8 @@ body {
           <!-- Collapsible body -->
           <div id="listing-scraper-body" style="display:none;border-top:1px solid var(--b1);">
             <div style="padding:10px 16px;display:flex;gap:8px;align-items:center;">
-              <input id="listing-url-input" type="url" placeholder="https://www.sdlauctions.co.uk/property/..." style="flex:1;background:var(--bg);border:1px solid var(--b1);border-radius:9px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:9px 13px;transition:border-color 0.15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'" onkeydown="if(event.key==='Enter')scrapeListing()">
-              <button onclick="scrapeListing()" id="scrape-btn" style="padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Fetch →</button>
+              <input id="listing-url-input" type="url" placeholder="https://www.sdlauctions.co.uk/property/..." style="flex:1;background:var(--bg);border:1px solid var(--b1);border-radius:9px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.82rem;padding:9px 13px;transition:border-color 0.15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'" placeholder="https://www.sdlauctions.co.uk/property/...">
+              <span style="font-size:0.7rem;color:var(--t3);white-space:nowrap;">Auto-fetched on analyse</span>
             </div>
             <!-- Scrape result area -->
             <div id="scrape-result" style="display:none;border-top:1px solid var(--b1);">
@@ -1696,6 +1696,17 @@ function removeFile(i) {
 
 async function startAnalysis() {
   if (!selectedFiles.length) return;
+
+  // Auto-fetch listing URL if provided and not yet scraped
+  const listingUrl = document.getElementById('listing-url-input')?.value?.trim();
+  if (listingUrl && listingUrl.startsWith('http') && !scrapedListingData) {
+    try {
+      document.getElementById('analyse-btn').disabled = true;
+      document.getElementById('analyse-btn').textContent = 'Fetching listing...';
+      await scrapeListing(true); // silent mode
+    } catch(e) { /* continue even if scrape fails */ }
+    document.getElementById('analyse-btn').textContent = 'Analyse Legal Pack →';
+  }
 
   // Auto-apply scraped listing data if present but not yet manually applied
   if (scrapedListingData && !window._listingMeta) {
@@ -2430,20 +2441,20 @@ function toggleListingScraper() {
   chevron.style.transform = open ? 'rotate(180deg)' : '';
 }
 
-async function scrapeListing() {
+async function scrapeListing(silent = false) {
   const url = document.getElementById('listing-url-input').value.trim();
-  if (!url || !url.startsWith('http')) { showToast('Enter a valid URL starting with http'); return; }
+  if (!url || !url.startsWith('http')) { if (!silent) showToast('Enter a valid URL starting with http'); return; }
 
-  const btn = document.getElementById('scrape-btn');
   const loadingEl = document.getElementById('scrape-loading');
   const resultEl = document.getElementById('scrape-result');
   const errorEl = document.getElementById('scrape-error');
 
-  btn.disabled = true; btn.textContent = 'Fetching...';
-  loadingEl.style.display = 'block';
-  resultEl.style.display = 'none';
-  errorEl.style.display = 'none';
-  document.getElementById('scrape-applied-badge').style.display = 'none';
+  if (!silent) {
+    loadingEl.style.display = 'block';
+    resultEl.style.display = 'none';
+    errorEl.style.display = 'none';
+    document.getElementById('scrape-applied-badge').style.display = 'none';
+  }
 
   try {
     const r = await fetch(API_BASE + '/scrape-listing', {
@@ -2495,14 +2506,16 @@ async function scrapeListing() {
           </div>`).join('');
     }
 
-    if (d.fallback) showToast('Screenshot unavailable — extracted from page text only');
+    if (d.fallback && !silent) showToast('Screenshot unavailable — extracted from page text only');
 
   } catch(e) {
-    loadingEl.style.display = 'none';
-    errorEl.style.display = 'block';
-    errorEl.textContent = '⚠️ ' + (e.message || 'Could not fetch listing');
+    if (!silent) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      errorEl.textContent = '⚠️ ' + (e.message || 'Could not fetch listing');
+    }
   } finally {
-    btn.disabled = false; btn.textContent = 'Fetch Listing →';
+    if (!silent) loadingEl.style.display = 'none';
   }
 }
 

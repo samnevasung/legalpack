@@ -52,8 +52,8 @@
       "operatingSystem": "Web",
       "offers": [
         { "@type": "Offer", "name": "Pay As You Go", "price": "9.99", "priceCurrency": "GBP", "description": "Single legal pack analysis" },
-        { "@type": "Offer", "name": "Standard", "price": "69.99", "priceCurrency": "GBP", "description": "50 analyses per month" },
-        { "@type": "Offer", "name": "Pro", "price": "119.99", "priceCurrency": "GBP", "description": "120 analyses per month" }
+        { "@type": "Offer", "name": "Standard", "price": "69.99", "priceCurrency": "GBP", "description": "30 analyses per month" },
+        { "@type": "Offer", "name": "Pro", "price": "149.99", "priceCurrency": "GBP", "description": "100 analyses per month" }
       ],
       "featureList": ["Full legal pack analysis in 3–4 minutes","Hidden cost detection","Title defect flagging","Mortgageability assessment","Missing document detection","Special conditions analysis","Before-bidding checklist"],
       "inLanguage": "en-GB",
@@ -84,7 +84,7 @@
         {
           "@type": "Question",
           "name": "How much does LegalPack AI cost?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Pay As You Go is £9.99 per legal pack. Standard subscription is £69.99/month for 50 analyses. Pro is £119.99/month for 120 analyses. No hidden fees." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Pay As You Go is £9.99 per legal pack. Standard subscription is £69.99/month for 30 analyses. Pro is £149.99/month for 100 analyses. No hidden fees." }
         },
         {
           "@type": "Question",
@@ -368,7 +368,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 /* ─── PRICING ─── */
 .pricing-section{padding:88px 56px;background:var(--surface);border-top:1px solid var(--b1);}
 .pricing-inner{max-width:1140px;margin:0 auto;text-align:center;}
-.pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;max-width:1040px;margin:52px auto 0;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1040px;margin:52px auto 0;}
 .price-card{padding:34px;border-radius:20px;background:var(--bg);border:1px solid var(--b1);display:flex;flex-direction:column;transition:all 0.22s;position:relative;}
 .price-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.07);}
 .price-card.featured{border-color:rgba(109,40,217,0.4);background:var(--purplebg);box-shadow:0 16px 52px rgba(109,40,217,0.14);}
@@ -887,10 +887,10 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
         <div class="price-name">Standard</div>
         <div class="price-amount"><sup>£</sup>69<span style="font-size:22px;letter-spacing:0">.99</span></div>
         <div class="price-period">per month</div>
-        <div class="price-value">50 packs/mo — less than £1.40 per pack</div>
+        <div class="price-value">30 packs/mo — less than £2.34 per pack</div>
         <div class="price-desc">Ideal for active investors bidding regularly at auction.</div>
         <div class="price-feats">
-          <div class="price-feat">50 legal pack analyses per month</div>
+          <div class="price-feat">30 legal pack analyses per month</div>
           <div class="price-feat">Everything in Pay As You Go</div>
           <div class="price-feat">Priority processing</div>
           <div class="price-feat">PDF report export</div>
@@ -900,18 +900,33 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
       </div>
       <div class="price-card reveal reveal-delay-3">
         <div class="price-name">Pro</div>
-        <div class="price-amount"><sup>£</sup>119<span style="font-size:22px;letter-spacing:0">.99</span></div>
+        <div class="price-amount"><sup>£</sup>149<span style="font-size:22px;letter-spacing:0">.99</span></div>
         <div class="price-period">per month</div>
-        <div class="price-value">120 packs/mo for sourcing agents</div>
+        <div class="price-value">100 packs/mo for sourcing agents</div>
         <div class="price-desc">For high-volume investors and sourcing agents.</div>
         <div class="price-feats">
-          <div class="price-feat">120 analyses per month</div>
+          <div class="price-feat">100 analyses per month</div>
           <div class="price-feat">Everything in Standard</div>
           <div class="price-feat">BTL mortgage stress test</div>
           <div class="price-feat">Property Intel per report</div>
           <div class="price-feat">Comparable sales data</div>
         </div>
         <button onclick="openPricingModal('pro')" class="price-cta">Get Started →</button>
+      </div>
+      <div class="price-card reveal reveal-delay-4" style="grid-column:1/-1;max-width:340px;margin:0 auto;">
+        <div class="price-name">Enterprise</div>
+        <div class="price-amount" style="font-size:2.2rem;letter-spacing:-1px;">Custom</div>
+        <div class="price-period">tailored to your volume</div>
+        <div class="price-value">Unlimited analyses · white-label options</div>
+        <div class="price-desc">For agencies, sourcing networks, and large operations needing custom volume, branding or integrations.</div>
+        <div class="price-feats">
+          <div class="price-feat">Unlimited analyses</div>
+          <div class="price-feat">Everything in Pro</div>
+          <div class="price-feat">White-label reports</div>
+          <div class="price-feat">Custom integrations</div>
+          <div class="price-feat">Dedicated account support</div>
+        </div>
+        <a href="mailto:adminlegalpackai@gmail.com?subject=Enterprise%20Enquiry%20—%20LegalPack%20AI&body=Hi%2C%0A%0AI'd%20like%20to%20find%20out%20more%20about%20the%20Enterprise%20plan.%0A%0ACompany%3A%20%0AMonthly%20volume%20(approx)%3A%20%0AUse%20case%3A%20" class="price-cta" style="display:block;text-align:center;text-decoration:none;padding:15px;">Contact Us →</a>
       </div>
     </div>
   </div>
@@ -968,16 +983,16 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
         <div style="font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'DM Mono',monospace;">£69.99</div>
         <div style="font-size:11px;color:var(--t2);">per month</div>
         <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--t2);flex:1;">
-          <div>✓ 50 analyses/month</div><div>✓ Priority processing</div><div>✓ PDF export</div><div>✓ Saved dashboard</div>
+          <div>✓ 30 analyses/month</div><div>✓ Priority processing</div><div>✓ PDF export</div><div>✓ Saved dashboard</div>
         </div>
         <button onclick="openPricingModal('standard')" style="width:100%;padding:10px;margin-top:10px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(109,40,217,0.3);">Upgrade →</button>
       </div>
       <div style="padding:20px;border-radius:14px;background:var(--bg);border:1px solid var(--b1);display:flex;flex-direction:column;gap:6px;">
         <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">Pro</div>
-        <div style="font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'DM Mono',monospace;">£119.99</div>
+        <div style="font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'DM Mono',monospace;">£149.99</div>
         <div style="font-size:11px;color:var(--t2);">per month</div>
         <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--t2);flex:1;">
-          <div>✓ 120 analyses/month</div><div>✓ Everything in Standard</div><div>✓ BTL stress test</div><div>✓ Property Intel</div>
+          <div>✓ 100 analyses/month</div><div>✓ Everything in Standard</div><div>✓ BTL stress test</div><div>✓ Property Intel</div>
         </div>
         <button onclick="openPricingModal('pro')" style="width:100%;padding:10px;margin-top:10px;border-radius:9px;border:1px solid var(--b1);background:#fff;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.borderColor='var(--purple)';this.style.color='var(--purple)'" onmouseout="this.style.borderColor='var(--b1)';this.style.color='var(--t1)'">Upgrade →</button>
       </div>
@@ -1061,7 +1076,7 @@ function openAuthModal(plan){
   document.getElementById('auth-modal').style.display='flex';
   document.body.style.overflow='hidden';
   if(_selectedPlan && _selectedPlan !== null) {
-    var planNames = {pay_as_you_go:'Pay As You Go (£9.99/pack)', standard:'Standard (£69.99/mo)', pro:'Pro (£119.99/mo)'};
+    var planNames = {pay_as_you_go:'Pay As You Go (£9.99/pack)', standard:'Standard (£69.99/mo)', pro:'Pro (£149.99/mo)'};
     var sub = document.getElementById('auth-modal-sub');
     if(sub) sub.textContent = 'Create account to continue with ' + (planNames[_selectedPlan] || _selectedPlan);
   }
