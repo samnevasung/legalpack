@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buy-to-Let Yield Calculator UK | Rental Yield Calculator | LegalPack AI</title>
+<meta name="description" content="Free buy-to-let yield calculator for UK property investors. Calculate gross yield, net yield, monthly cashflow and cash-on-cash return on any rental property.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://legalpackai.com/btl-yield-calculator">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://legalpackai.com/btl-yield-calculator">
+<meta property="og:title" content="Buy-to-Let Yield Calculator UK | LegalPack AI">
+<meta property="og:description" content="Calculate gross yield, net yield, monthly cashflow and cash-on-cash return on any UK rental property — free, instant, no login required.">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a good rental yield for buy-to-let in the UK?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A gross yield of 6–8% or above is generally considered strong for UK buy-to-let. Yields below 4% are difficult to make work with mortgage finance once costs are included. In London, yields are typically 3–5% gross; in northern cities (Manchester, Liverpool, Leeds) 6–9% is achievable. For auction purchases, target at least 7–8% gross to allow for refurbishment costs and the higher acquisition expenses typical at auction."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between gross yield and net yield?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Gross yield is annual rent divided by purchase price, expressed as a percentage. It ignores all costs. Net yield deducts all annual operating costs (mortgage, insurance, management fees, maintenance, void periods) from the annual rent before dividing by purchase price. Net yield is a far more accurate measure of actual returns. A property with a 7% gross yield might only return 3–4% net once costs are deducted."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does a BTL mortgage stress test affect auction purchases?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Most BTL lenders require the monthly rent to cover at least 125–145% of the monthly mortgage interest at a stressed rate (typically 5.5%). This is calculated on an interest-only basis. If the rental income does not meet this threshold, the lender will not advance the full loan amount, or may decline entirely. Always run the stress test calculation before setting your maximum auction bid."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Should I buy BTL through a limited company?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on your tax position. Since Section 24 removed mortgage interest relief for individual landlords, many higher-rate taxpayers now purchase through a limited company (SPV) to retain the ability to deduct mortgage interest as a business expense and pay corporation tax (currently 25%) rather than income tax (40–45%). However, company mortgages carry higher rates and fees, and extracting profit as salary or dividend incurs personal tax. Take specialist landlord tax advice before deciding."
+      }
+    }
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7ff;--bg2:#f2f1fc;--surface:#ffffff;
+  --t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;
+  --b1:#e2e0f0;--b2:#d4d1ec;
+  --purple:#6d28d9;--purple2:#7c3aed;--purplelight:#8b5cf6;
+  --purplebg:#f5f0ff;--purplemid:#ddd6fe;--purpledeep:#4c1d95;
+  --green:#15803d;--greenbg:#f0fdf4;--greenmid:#bbf7d0;
+  --red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;
+  --amber:#b45309;--amberbg:#fffbeb;--ambermid:#fef3c7;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;background:rgba(248,247,255,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(109,40,217,0.1);}
+.nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
+.nav-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 12px rgba(109,40,217,0.35);}
+.btn-nav{padding:9px 20px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.18s;box-shadow:0 3px 14px rgba(109,40,217,0.3);}
+.btn-nav:hover{background:var(--purpledeep);transform:translateY(-1px);}
+.page-hero{padding:56px 48px 48px;text-align:center;background:var(--surface);border-bottom:1px solid var(--b1);}
+.page-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-bottom:20px;padding:5px 13px;border-radius:20px;border:1px solid var(--purplemid);background:var(--purplebg);}
+.page-hero h1{font-size:44px;font-weight:800;letter-spacing:-2px;line-height:1.08;margin-bottom:14px;color:var(--t1);}
+.page-hero h1 em{color:var(--purple);font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;}
+.page-hero p{font-size:17px;color:var(--t2);line-height:1.7;max-width:560px;margin:0 auto;}
+.tool-wrap{max-width:900px;margin:0 auto;padding:48px 24px;}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+.tool-card{background:var(--surface);border:1px solid var(--b1);border-radius:18px;padding:28px;}
+.tool-card h2{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--b1);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--t2);margin-bottom:6px;}
+.field-hint{font-size:11px;color:var(--t3);margin-top:3px;}
+.input-wrap{position:relative;}
+.input-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:var(--t3);font-family:'DM Mono',monospace;pointer-events:none;}
+.input-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:var(--t3);pointer-events:none;}
+input[type=number]{width:100%;padding:10px 12px 10px 28px;background:var(--bg);border:1.5px solid var(--b1);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--t1);outline:none;transition:border-color 0.15s;-moz-appearance:textfield;}
+input[type=number].has-suffix{padding-right:32px;}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{border-color:var(--purple);}
+.section-divider{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin:20px 0 14px;padding-top:16px;border-top:1px solid var(--b1);}
+.yield-display{border-radius:14px;padding:18px 20px;margin-bottom:14px;text-align:center;}
+.yield-display.primary{background:var(--purplebg);border:2px solid var(--purplemid);}
+.yield-display.good{background:var(--greenbg);border:2px solid var(--greenmid);}
+.yield-display.warn{background:var(--amberbg);border:2px solid var(--ambermid);}
+.yield-display.bad{background:var(--redbg);border:2px solid var(--redmid);}
+.yield-label{font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.yield-value{font-size:36px;font-weight:800;letter-spacing:-1.5px;color:var(--t1);font-family:'DM Mono',monospace;line-height:1;}
+.yield-sub{font-size:11.5px;color:var(--t3);margin-top:4px;}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bg2);}
+.result-row:last-child{border-bottom:none;}
+.result-label{font-size:13.5px;color:var(--t2);}
+.result-value{font-size:14px;font-weight:700;color:var(--t1);font-family:'DM Mono',monospace;}
+.result-value.pos{color:var(--green);}
+.result-value.neg{color:var(--red);}
+.benchmark-box{background:var(--bg2);border-radius:12px;padding:14px 16px;margin-top:16px;}
+.benchmark-box p{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:8px;}
+.benchmark-box p:last-child{margin-bottom:0;}
+.benchmark-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.bm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.bm-label{font-size:12px;color:var(--t2);}
+.stress-box{background:var(--amberbg);border:1px solid var(--ambermid);border-radius:12px;padding:14px 16px;margin-top:16px;}
+.stress-box p{font-size:12.5px;color:var(--amber);line-height:1.6;margin:0;}
+.cta-section{background:linear-gradient(135deg,var(--purple),var(--purplelight));padding:56px 48px;text-align:center;}
+.cta-section h2{font-size:34px;font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;}
+.cta-section p{font-size:16px;color:rgba(255,255,255,0.85);margin-bottom:28px;line-height:1.6;max-width:560px;margin-left:auto;margin-right:auto;}
+.btn-cta{display:inline-block;padding:16px 36px;background:#fff;color:var(--purple);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;text-decoration:none;transition:all 0.18s;box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+.cta-note{margin-top:14px;font-size:13px;color:rgba(255,255,255,0.65);}
+.faq-wrap{max-width:780px;margin:0 auto;padding:48px 24px 12px;}
+.faq-wrap h2{font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--t1);margin-bottom:20px;}
+.faq-item{background:var(--surface);border:1px solid var(--b1);border-radius:14px;margin-bottom:10px;overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;user-select:none;gap:12px;}
+.faq-q:hover{background:var(--bg);}
+.faq-q-text{font-size:15px;font-weight:700;color:var(--t1);line-height:1.4;}
+.faq-chev{font-size:12px;color:var(--t3);flex-shrink:0;transition:transform 0.2s;}
+.faq-a{display:none;padding:0 20px 18px;}
+.faq-a p{font-size:14px;color:var(--t2);line-height:1.75;}
+.related-section{padding:48px;background:var(--surface);border-top:1px solid var(--b1);}
+.related-section h3{font-size:14px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;text-align:center;}
+.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:700px;margin:0 auto;}
+.related-card{display:block;padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;text-decoration:none;transition:all 0.18s;}
+.related-card:hover{border-color:var(--purplemid);background:var(--purplebg);}
+.related-card-title{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.related-card-sub{font-size:12px;color:var(--t3);}
+.disclaimer{padding:20px 48px;text-align:center;border-top:1px solid var(--b1);}
+.disclaimer p{font-size:11.5px;color:var(--t3);line-height:1.6;}
+footer{padding:28px 48px;border-top:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+.footer-brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--t1);}
+.footer-brand-icon{width:24px;height:24px;background:var(--purple);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-size:12px;color:var(--t3);text-decoration:none;}
+.footer-links a:hover{color:var(--purple);}
+@media(max-width:720px){
+  nav{padding:0 20px;}
+  .page-hero{padding:40px 20px 36px;}
+  .page-hero h1{font-size:30px;letter-spacing:-1px;}
+  .tool-wrap{padding:28px 16px;}
+  .tool-grid{grid-template-columns:1fr;}
+  .related-grid{grid-template-columns:1fr;}
+  .cta-section{padding:40px 20px;}
+  .cta-section h2{font-size:26px;}
+  .related-section{padding:32px 20px;}
+  .faq-wrap{padding:32px 16px 12px;}
+  .disclaimer{padding:16px 20px;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:20px;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="https://legalpackai.com" class="nav-logo">
+    <div class="nav-logo-icon">⚖</div>
+    LegalPack AI
+  </a>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-nav">Analyse a Legal Pack →</a>
+</nav>
+<div class="page-hero">
+  <div class="page-eyebrow">📊 Free Tool</div>
+  <h1>BTL <em>Yield Calculator</em></h1>
+  <p>Calculate gross yield, net yield, monthly cashflow and cash-on-cash return on any UK buy-to-let property. Includes BTL mortgage stress test.</p>
+</div>
+<div class="tool-wrap">
+  <div class="tool-grid">
+    <div class="tool-card">
+      <h2>📥 Property Details</h2>
+      <div class="field">
+        <label>Purchase Price</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="price" placeholder="150000" oninput="calculate()"></div>
+      </div>
+      <div class="field">
+        <label>Monthly Rent</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="rent" placeholder="850" oninput="calculate()"></div>
+        <p class="field-hint">Use achievable market rent, not optimistic projections</p>
+      </div>
+      <div class="section-divider">Annual Operating Costs</div>
+      <div class="field">
+        <label>Annual Mortgage Interest</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="mortgage" placeholder="5500" oninput="calculate()"></div>
+        <p class="field-hint">Interest-only payments only. Enter 0 if cash purchase.</p>
+      </div>
+      <div class="field">
+        <label>Buildings Insurance (annual)</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="insurance" placeholder="400" oninput="calculate()"></div>
+      </div>
+      <div class="field">
+        <label>Maintenance &amp; Repairs (annual)</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="maintenance" placeholder="1000" oninput="calculate()"></div>
+        <p class="field-hint">Rule of thumb: 1% of property value per year</p>
+      </div>
+      <div class="field">
+        <label>Letting Agent Management Fee</label>
+        <div class="input-wrap"><input type="number" id="mgmt" placeholder="10" class="has-suffix" style="padding-left:12px;" oninput="calculate()"><span class="input-suffix">%</span></div>
+        <p class="field-hint">Of monthly rent. Enter 0 if self-managing.</p>
+      </div>
+      <div class="field">
+        <label>Void Periods</label>
+        <div class="input-wrap"><input type="number" id="voids" placeholder="2" class="has-suffix" style="padding-left:12px;" oninput="calculate()"><span class="input-suffix">wks/yr</span></div>
+        <p class="field-hint">Industry average is 2–3 weeks per year</p>
+      </div>
+      <div class="section-divider">Cash Invested (for ROI)</div>
+      <div class="field">
+        <label>Deposit / Cash Invested</label>
+        <div class="input-wrap"><span class="input-prefix">£</span><input type="number" id="deposit" placeholder="37500" oninput="calculate()"></div>
+        <p class="field-hint">For cash purchases, enter the full purchase price</p>
+      </div>
+    </div>
+    <div class="tool-card">
+      <h2>📊 Your Returns</h2>
+      <div class="yield-display primary" id="gross-display">
+        <div class="yield-label">Gross Yield</div>
+        <div class="yield-value" id="gross-val">—</div>
+        <div class="yield-sub">Annual rent ÷ purchase price</div>
+      </div>
+      <div class="yield-display primary" id="net-display">
+        <div class="yield-label">Net Yield</div>
+        <div class="yield-value" id="net-val">—</div>
+        <div class="yield-sub">After all costs, before tax</div>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Annual Rent (with voids)</span>
+        <span class="result-value" id="r-rent">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Total Annual Costs</span>
+        <span class="result-value" id="r-costs">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Annual Net Profit</span>
+        <span class="result-value" id="r-profit">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Monthly Cashflow</span>
+        <span class="result-value" id="r-monthly">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Cash-on-Cash Return</span>
+        <span class="result-value" id="r-coc">—%</span>
+      </div>
+      <div class="benchmark-box">
+        <p style="font-weight:700;color:var(--t1);margin-bottom:10px;">Gross yield benchmarks</p>
+        <div class="benchmark-row"><div class="bm-dot" style="background:var(--red)"></div><span class="bm-label">Below 4% — hard to cash flow with mortgage</span></div>
+        <div class="benchmark-row"><div class="bm-dot" style="background:var(--amber)"></div><span class="bm-label">4–6% — marginal; depends on financing</span></div>
+        <div class="benchmark-row"><div class="bm-dot" style="background:var(--green)"></div><span class="bm-label">6–8% — solid; positive cashflow likely</span></div>
+        <div class="benchmark-row" style="margin-bottom:0"><div class="bm-dot" style="background:var(--purple)"></div><span class="bm-label">8%+ — strong; common at auction</span></div>
+      </div>
+      <div class="stress-box" id="stress-box" style="display:none;">
+        <p id="stress-text"></p>
+      </div>
+    </div>
+  </div>
+</div>
+<section class="cta-section">
+  <h2>Before you bid, check the legal pack</h2>
+  <p>High yield means nothing if there are legal issues that make the property unmortgageable, unlettable, or burdened with hidden liabilities. Upload your auction legal pack for an instant AI-powered BTL risk assessment.</p>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-cta">Analyse Legal Pack for BTL Viability →</a>
+  <p class="cta-note">No subscription required · Pay per analysis · Results in minutes</p>
+</section>
+<div class="faq-wrap">
+  <h2>Frequently asked questions</h2>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">What is a good rental yield for buy-to-let in the UK?</span><span class="faq-chev">▾</span></div>
+    <div class="faq-a"><p>A gross yield of 6–8% or above is generally considered strong for UK buy-to-let. Yields below 4% are difficult to make work with mortgage finance once all costs are included. In London, yields are typically 3–5% gross; in northern cities (Manchester, Liverpool, Leeds) 6–9% is achievable. For auction purchases, target at least 7–8% gross to account for refurbishment costs and higher acquisition expenses.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">What is the difference between gross yield and net yield?</span><span class="faq-chev">▾</span></div>
+    <div class="faq-a"><p>Gross yield is annual rent ÷ purchase price as a percentage — it ignores all costs. Net yield deducts all annual operating costs (mortgage, insurance, management fees, maintenance, void periods) before dividing by purchase price. Net yield is a far more accurate measure of actual returns. A 7% gross yield property might only return 3–4% net once costs are deducted — which could mean negative cashflow with a mortgage.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Does a BTL mortgage stress test affect auction purchases?</span><span class="faq-chev">▾</span></div>
+    <div class="faq-a"><p>Yes. Most BTL lenders require the monthly rent to cover at least 125–145% of the monthly mortgage interest at a stressed rate (typically 5.5%). If the rental income does not meet this threshold, the lender will not advance the full loan, or may decline entirely. Always run the stress test before setting your maximum auction bid — an overpriced purchase may be unfundable at BTL rates even if the yield looks attractive.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Should I buy buy-to-let through a limited company?</span><span class="faq-chev">▾</span></div>
+    <div class="faq-a"><p>It depends on your tax position. Since Section 24 removed mortgage interest relief for individual landlords, many higher-rate taxpayers now purchase through a limited company (SPV) to deduct mortgage interest as a business expense and pay corporation tax rather than income tax. However, company mortgages carry higher rates and fees, and extracting profit incurs additional tax. Take specialist landlord tax advice before deciding — the right answer varies significantly by individual circumstance.</p></div>
+  </div>
+</div>
+<div class="related-section">
+  <h3>More free tools</h3>
+  <div class="related-grid">
+    <a href="/buy-to-let-auction-property-guide" class="related-card">
+      <div class="related-card-title">BTL Auction Guide</div>
+      <div class="related-card-sub">Complete guide for BTL investors at auction</div>
+    </a>
+    <a href="/max-bid-calculator" class="related-card">
+      <div class="related-card-title">Max Bid Calculator</div>
+      <div class="related-card-sub">Work out your maximum bid price</div>
+    </a>
+    <a href="/sdlt-calculator" class="related-card">
+      <div class="related-card-title">SDLT Calculator</div>
+      <div class="related-card-sub">Stamp duty including BTL surcharge</div>
+    </a>
+  </div>
+</div>
+<div class="disclaimer">
+  <p><strong>Disclaimer:</strong> This calculator is for illustrative purposes only and does not constitute financial or investment advice. Figures are estimates; actual returns will vary. Always obtain independent financial advice before investing. LegalPack AI accepts no liability for investment decisions based on this tool.</p>
+</div>
+<footer>
+  <div class="footer-brand"><div class="footer-brand-icon">⚖</div>LegalPack AI</div>
+  <p>© 2025 LegalPack AI · legalpackai.com</p>
+  <div class="footer-links"><a href="https://legalpackai.com/privacy.html">Privacy</a><a href="https://legalpackai.com/terms.html">Terms</a><a href="https://legalpackai.com/dashboard.html">Dashboard</a></div>
+</footer>
+<script>
+function fmt(n){return'£'+Math.round(n).toLocaleString('en-GB');}
+function fmtPct(n){return n.toFixed(2)+'%';}
+function calculate(){
+  const price=parseFloat(document.getElementById('price').value)||0;
+  const rent=parseFloat(document.getElementById('rent').value)||0;
+  const mortgage=parseFloat(document.getElementById('mortgage').value)||0;
+  const insurance=parseFloat(document.getElementById('insurance').value)||0;
+  const maintenance=parseFloat(document.getElementById('maintenance').value)||0;
+  const mgmt=parseFloat(document.getElementById('mgmt').value)||0;
+  const voids=parseFloat(document.getElementById('voids').value)||0;
+  const deposit=parseFloat(document.getElementById('deposit').value)||0;
+  if(!price||!rent){reset();return;}
+  const annualRent=rent*12*(1-voids/52);
+  const annualMgmt=annualRent*(mgmt/100);
+  const totalCosts=mortgage+insurance+maintenance+annualMgmt;
+  const netAnnual=annualRent-totalCosts;
+  const grossYield=rent*12/price*100;
+  const netYield=netAnnual/price*100;
+  const coc=deposit>0?netAnnual/deposit*100:null;
+  const monthly=netAnnual/12;
+  document.getElementById('r-rent').textContent=fmt(annualRent);
+  document.getElementById('r-costs').textContent=fmt(totalCosts);
+  const profitEl=document.getElementById('r-profit');
+  profitEl.textContent=fmt(netAnnual);
+  profitEl.className='result-value '+(netAnnual>=0?'pos':'neg');
+  const monthlyEl=document.getElementById('r-monthly');
+  monthlyEl.textContent=(monthly>=0?'+':'')+fmt(monthly)+'/mo';
+  monthlyEl.className='result-value '+(monthly>=0?'pos':'neg');
+  document.getElementById('r-coc').textContent=coc!==null?fmtPct(coc):'—';
+  const gEl=document.getElementById('gross-val');
+  gEl.textContent=fmtPct(grossYield);
+  const gBox=document.getElementById('gross-display');
+  gBox.className='yield-display '+(grossYield>=8?'good':grossYield>=6?'primary':grossYield>=4?'warn':'bad');
+  const nEl=document.getElementById('net-val');
+  nEl.textContent=fmtPct(netYield);
+  const nBox=document.getElementById('net-display');
+  nBox.className='yield-display '+(netYield>=5?'good':netYield>=3?'primary':netYield>=0?'warn':'bad');
+  if(mortgage>0&&rent>0){
+    const stressRate=0.055;
+    const stressMonthly=mortgage/12;
+    const needed=stressMonthly*1.45;
+    const stressBox=document.getElementById('stress-box');
+    const stressText=document.getElementById('stress-text');
+    stressBox.style.display='block';
+    if(rent>=needed){
+      stressText.innerHTML='✅ <strong>Stress test passed.</strong> Monthly rent of '+fmt(rent)+' covers 145% of mortgage at 5.5% ('+fmt(needed)+' required).';
+    } else {
+      stressText.innerHTML='⚠️ <strong>Stress test warning.</strong> Most BTL lenders require rent of at least '+fmt(needed)+'/mo (145% of mortgage at 5.5%). Your rent of '+fmt(rent)+' may not qualify for full BTL financing.';
+    }
+  } else {
+    document.getElementById('stress-box').style.display='none';
+  }
+}
+function reset(){
+  ['gross-val','net-val','r-rent','r-costs','r-profit','r-monthly'].forEach(id=>{document.getElementById(id).textContent='—';});
+  document.getElementById('r-coc').textContent='—%';
+  document.getElementById('stress-box').style.display='none';
+}
+function toggleFaq(el){
+  const a=el.nextElementSibling,c=el.querySelector('.faq-chev'),open=a.style.display==='block';
+  a.style.display=open?'none':'block';c.style.transform=open?'':'rotate(180deg)';
+}
+</script>
+</body>
+</html>
