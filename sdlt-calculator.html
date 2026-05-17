@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDLT Calculator UK | Stamp Duty Calculator | LegalPack AI</title>
+<meta name="description" content="Free SDLT calculator for UK property buyers, landlords and auction investors. Calculates stamp duty for first-time buyers, main residence and additional properties.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://legalpackai.com/sdlt-calculator.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://legalpackai.com/sdlt-calculator.html">
+<meta property="og:title" content="SDLT Calculator UK | Stamp Duty Calculator | LegalPack AI">
+<meta property="og:description" content="Free SDLT calculator for UK property buyers, landlords and auction investors.">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7ff;--bg2:#f2f1fc;--surface:#ffffff;
+  --t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;
+  --b1:#e2e0f0;--b2:#d4d1ec;
+  --purple:#6d28d9;--purple2:#7c3aed;--purplelight:#8b5cf6;
+  --purplebg:#f5f0ff;--purplemid:#ddd6fe;--purpledeep:#4c1d95;
+  --green:#15803d;--greenbg:#f0fdf4;--greenmid:#bbf7d0;
+  --red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;
+  --amber:#b45309;--amberbg:#fffbeb;--ambermid:#fef3c7;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;background:rgba(248,247,255,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(109,40,217,0.1);}
+.nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
+.nav-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 12px rgba(109,40,217,0.35);}
+.btn-nav{padding:9px 20px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.18s;box-shadow:0 3px 14px rgba(109,40,217,0.3);}
+.btn-nav:hover{background:var(--purpledeep);transform:translateY(-1px);}
+
+.page-hero{padding:56px 48px 48px;text-align:center;background:var(--surface);border-bottom:1px solid var(--b1);}
+.page-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-bottom:20px;padding:5px 13px;border-radius:20px;border:1px solid var(--purplemid);background:var(--purplebg);}
+.page-hero h1{font-size:44px;font-weight:800;letter-spacing:-2px;line-height:1.08;margin-bottom:14px;color:var(--t1);}
+.page-hero h1 em{color:var(--purple);font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;}
+.page-hero p{font-size:17px;color:var(--t2);line-height:1.7;max-width:560px;margin:0 auto;}
+
+.tool-wrap{max-width:820px;margin:0 auto;padding:48px 24px;}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+.tool-card{background:var(--surface);border:1px solid var(--b1);border-radius:18px;padding:28px;}
+.tool-card h2{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--b1);}
+
+.field{margin-bottom:18px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--t2);margin-bottom:6px;}
+.field-hint{font-size:11px;color:var(--t3);margin-bottom:6px;display:block;}
+.input-wrap{position:relative;}
+.input-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:var(--t3);font-family:'DM Mono',monospace;pointer-events:none;}
+input[type=number]{width:100%;padding:10px 12px 10px 28px;background:var(--bg);border:1.5px solid var(--b1);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--t1);outline:none;transition:border-color 0.15s;-moz-appearance:textfield;}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{border-color:var(--purple);}
+
+/* BUYER TYPE TOGGLE */
+.buyer-type{display:flex;flex-direction:column;gap:8px;}
+.buyer-option{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--b1);border-radius:10px;cursor:pointer;transition:all 0.15s;background:var(--bg);}
+.buyer-option:hover{border-color:var(--purplemid);background:var(--purplebg);}
+.buyer-option input[type=radio]{margin-top:2px;accent-color:var(--purple);width:15px;height:15px;flex-shrink:0;}
+.buyer-option.selected{border-color:var(--purple);background:var(--purplebg);}
+.buyer-option-text strong{display:block;font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.buyer-option-text span{font-size:11.5px;color:var(--t3);line-height:1.4;}
+
+/* RESULT */
+.sdlt-display{background:var(--purplebg);border:2px solid var(--purplemid);border-radius:14px;padding:20px 22px;margin-bottom:20px;text-align:center;}
+.sdlt-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-bottom:8px;}
+.sdlt-value{font-size:40px;font-weight:800;letter-spacing:-2px;color:var(--t1);font-family:'DM Mono',monospace;}
+
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--bg2);}
+.result-row:last-child{border-bottom:none;}
+.result-label{font-size:13.5px;color:var(--t2);}
+.result-value{font-size:14px;font-weight:700;color:var(--t1);font-family:'DM Mono',monospace;}
+
+/* BAND BREAKDOWN */
+.band-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:12.5px;}
+.band-table th{text-align:left;padding:7px 10px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);border-bottom:1px solid var(--b1);}
+.band-table td{padding:8px 10px;border-bottom:1px solid var(--bg2);color:var(--t2);font-family:'DM Mono',monospace;}
+.band-table tr.active td{background:var(--purplebg);color:var(--purple);font-weight:700;}
+.band-table td:last-child{text-align:right;font-weight:600;color:var(--t1);}
+.band-table tfoot td{padding-top:10px;font-weight:800;color:var(--t1);border-top:2px solid var(--b1);}
+
+.info-box{background:var(--amberbg);border:1px solid var(--ambermid);border-radius:12px;padding:14px 16px;margin-top:16px;}
+.info-box p{font-size:12.5px;color:var(--amber);line-height:1.65;}
+
+.region-note{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+.region-note p{font-size:12.5px;color:var(--t2);line-height:1.6;}
+.region-note strong{color:var(--t1);}
+
+.cta-section{background:linear-gradient(135deg,var(--purple),var(--purplelight));padding:56px 48px;text-align:center;}
+.cta-section h2{font-size:34px;font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;}
+.cta-section p{font-size:16px;color:rgba(255,255,255,0.85);margin-bottom:28px;line-height:1.6;}
+.btn-cta{display:inline-block;padding:16px 36px;background:#fff;color:var(--purple);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;text-decoration:none;transition:all 0.18s;box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+
+.related-section{padding:48px;background:var(--surface);border-top:1px solid var(--b1);}
+.related-section h3{font-size:14px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;text-align:center;}
+.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;margin:0 auto;}
+.related-card{display:block;padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;text-decoration:none;transition:all 0.18s;}
+.related-card:hover{border-color:var(--purplemid);background:var(--purplebg);}
+.related-card-title{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.related-card-sub{font-size:12px;color:var(--t3);}
+
+.disclaimer{padding:20px 48px;text-align:center;border-top:1px solid var(--b1);}
+.disclaimer p{font-size:11.5px;color:var(--t3);line-height:1.6;}
+
+footer{padding:28px 48px;border-top:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+.footer-brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--t1);}
+.footer-brand-icon{width:24px;height:24px;background:var(--purple);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-size:12px;color:var(--t3);text-decoration:none;}
+.footer-links a:hover{color:var(--purple);}
+
+@media(max-width:720px){
+  nav{padding:0 20px;}
+  .page-hero{padding:40px 20px 36px;}
+  .page-hero h1{font-size:30px;letter-spacing:-1px;}
+  .tool-wrap{padding:28px 16px;}
+  .tool-grid{grid-template-columns:1fr;}
+  .related-grid{grid-template-columns:1fr;}
+  .cta-section{padding:40px 20px;}
+  .cta-section h2{font-size:26px;}
+  .related-section{padding:32px 20px;}
+  .disclaimer{padding:16px 20px;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:20px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://legalpackai.com">
+    <div class="nav-logo-icon">🔨</div>
+    LegalPack AI
+  </a>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-nav">Go to Dashboard →</a>
+</nav>
+
+<div class="page-hero">
+  <div class="page-eyebrow">📋 Free Tool</div>
+  <h1>SDLT <em>Calculator</em></h1>
+  <p>Calculate your estimated Stamp Duty Land Tax before bidding at auction. Covers first-time buyers, main residence and additional properties in England and Northern Ireland.</p>
+</div>
+
+<div class="tool-wrap">
+
+  <div class="region-note">
+    <p><strong>England & Northern Ireland only.</strong> Scotland uses Land and Buildings Transaction Tax (LBTT). Wales uses Land Transaction Tax (LTT). Rates shown are effective from 1 April 2025. Always verify with your solicitor before exchanging.</p>
+  </div>
+
+  <div class="tool-grid">
+
+    <!-- INPUTS -->
+    <div class="tool-card">
+      <h2>📥 Property Details</h2>
+
+      <div class="field">
+        <label>Purchase Price</label>
+        <div class="input-wrap">
+          <span class="input-prefix">£</span>
+          <input type="number" id="price" placeholder="250000" min="0" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Buyer Type</label>
+        <div class="buyer-type">
+          <label class="buyer-option selected" id="opt-main">
+            <input type="radio" name="buyer" value="main" checked onchange="selectBuyer(this)">
+            <div class="buyer-option-text">
+              <strong>Main Residence</strong>
+              <span>Replacing or buying your only home</span>
+            </div>
+          </label>
+          <label class="buyer-option" id="opt-ftb">
+            <input type="radio" name="buyer" value="ftb" onchange="selectBuyer(this)">
+            <div class="buyer-option-text">
+              <strong>First-Time Buyer</strong>
+              <span>Never owned residential property before. Relief applies up to £500,000.</span>
+            </div>
+          </label>
+          <label class="buyer-option" id="opt-additional">
+            <input type="radio" name="buyer" value="additional" onchange="selectBuyer(this)">
+            <div class="buyer-option-text">
+              <strong>Additional Property / Buy-to-Let</strong>
+              <span>You already own another property. 3% surcharge applies.</span>
+            </div>
+          </label>
+          <label class="buyer-option" id="opt-company">
+            <input type="radio" name="buyer" value="company" onchange="selectBuyer(this)">
+            <div class="buyer-option-text">
+              <strong>Company Purchase</strong>
+              <span>Purchasing through a limited company. 3% surcharge applies on most purchases.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="tool-card">
+      <h2>📊 Your SDLT Estimate</h2>
+
+      <div class="sdlt-display">
+        <div class="sdlt-label">Estimated SDLT</div>
+        <div class="sdlt-value" id="sdlt-display">£—</div>
+      </div>
+
+      <div class="result-row">
+        <span class="result-label">Purchase Price</span>
+        <span class="result-value" id="r-price">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">SDLT</span>
+        <span class="result-value" id="r-sdlt">£—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Effective Rate</span>
+        <span class="result-value" id="r-rate">—%</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Total Cost (Purchase + SDLT)</span>
+        <span class="result-value" id="r-total">£—</span>
+      </div>
+
+      <table class="band-table" id="band-table">
+        <thead>
+          <tr>
+            <th>Band</th>
+            <th>Rate</th>
+            <th>Tax on band</th>
+          </tr>
+        </thead>
+        <tbody id="band-tbody"></tbody>
+        <tfoot>
+          <tr><td colspan="2">Total SDLT</td><td id="band-total">£—</td></tr>
+        </tfoot>
+      </table>
+
+      <div class="info-box" id="company-note" style="display:none;">
+        <p>⚠️ <strong>Company purchases are complex.</strong> Residential properties purchased through a company may be subject to the Annual Tax on Enveloped Dwellings (ATED) and higher SDLT rates. Properties over £500k purchased by a company attract a flat 15% SDLT rate in some circumstances. Obtain specialist tax advice before proceeding.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="cta-section">
+  <h2>Hidden fees can dwarf your stamp duty</h2>
+  <p>Auction properties often carry seller legal fees, buyer premiums, and special condition obligations that aren't in the guide price. Upload your legal pack and we'll find them all.</p>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-cta">Upload Your Legal Pack for a Full AI Analysis →</a>
+</section>
+
+<div class="related-section">
+  <h3>Related Free Tools</h3>
+  <div class="related-grid">
+    <a href="/max-bid-calculator.html" class="related-card">
+      <div class="related-card-title">🧮 Max Bid Calculator</div>
+      <div class="related-card-sub">Work out your safe maximum bid</div>
+    </a>
+    <a href="/auction-checklist.html" class="related-card">
+      <div class="related-card-title">☑ Auction Checklist</div>
+      <div class="related-card-sub">Pre-bid checklist for UK auction buyers</div>
+    </a>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <p>For informational purposes only. Not legal, tax or financial advice. SDLT rates and thresholds are subject to change by HMRC. Always obtain advice from a qualified solicitor or accountant before completing a property purchase. LegalPack AI accepts no liability for decisions made using this calculator.</p>
+</div>
+
+<footer>
+  <div class="footer-brand"><div class="footer-brand-icon">🔨</div> LegalPack AI</div>
+  <p>© 2026 LegalPack AI · Built for UK property investors</p>
+  <div class="footer-links">
+    <a href="https://legalpackai.com">Home</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+  </div>
+</footer>
+
+<script>
+function fmt(n){
+  if(isNaN(n)||n===null)return'£—';
+  return'£'+Math.round(n).toLocaleString('en-GB');
+}
+function pct(n,dp=2){
+  if(isNaN(n)||!isFinite(n))return'—%';
+  return n.toFixed(dp)+'%';
+}
+
+let buyerType = 'main';
+
+function selectBuyer(radio) {
+  buyerType = radio.value;
+  ['main','ftb','additional','company'].forEach(t => {
+    document.getElementById('opt-'+t).classList.remove('selected');
+  });
+  document.getElementById('opt-'+buyerType).classList.add('selected');
+  document.getElementById('company-note').style.display = buyerType === 'company' ? 'block' : 'none';
+  calculate();
+}
+
+// SDLT rates from 1 April 2025 — England & Northern Ireland
+// Standard: 0% to £125k, 2% £125k-£250k, 5% £250k-£925k, 10% £925k-£1.5m, 12% above
+// FTB relief: 0% to £300k, 5% £300k-£500k (if price ≤ £500k; otherwise standard)
+// Additional/company: +3% surcharge on each band (3% applies even on first band)
+
+function calcMain(price) {
+  if (price <= 0) return { tax: 0, bands: [] };
+  const bands = [
+    { from: 0,       to: 125000,  rate: 0.00, label: 'Up to £125,000' },
+    { from: 125000,  to: 250000,  rate: 0.02, label: '£125,001–£250,000' },
+    { from: 250000,  to: 925000,  rate: 0.05, label: '£250,001–£925,000' },
+    { from: 925000,  to: 1500000, rate: 0.10, label: '£925,001–£1,500,000' },
+    { from: 1500000, to: Infinity,rate: 0.12, label: 'Above £1,500,000' },
+  ];
+  return calcBands(price, bands);
+}
+
+function calcFTB(price) {
+  if (price <= 0) return { tax: 0, bands: [] };
+  if (price <= 500000) {
+    const bands = [
+      { from: 0,      to: 300000,  rate: 0.00, label: 'Up to £300,000 (FTB relief)' },
+      { from: 300000, to: 500000,  rate: 0.05, label: '£300,001–£500,000 (FTB relief)' },
+    ];
+    return calcBands(price, bands);
+  }
+  // Above £500k: FTB relief does not apply — standard rates
+  return calcMain(price);
+}
+
+function calcAdditional(price) {
+  if (price <= 40000) return { tax: 0, bands: [] };
+  const bands = [
+    { from: 0,       to: 125000,  rate: 0.03, label: 'Up to £125,000 (+3% surcharge)' },
+    { from: 125000,  to: 250000,  rate: 0.05, label: '£125,001–£250,000 (+3% surcharge)' },
+    { from: 250000,  to: 925000,  rate: 0.08, label: '£250,001–£925,000 (+3% surcharge)' },
+    { from: 925000,  to: 1500000, rate: 0.13, label: '£925,001–£1,500,000 (+3% surcharge)' },
+    { from: 1500000, to: Infinity,rate: 0.15, label: 'Above £1,500,000 (+3% surcharge)' },
+  ];
+  return calcBands(price, bands);
+}
+
+function calcBands(price, bands) {
+  let tax = 0;
+  const result = [];
+  for (const b of bands) {
+    if (price <= b.from) break;
+    const taxable = Math.min(price, b.to) - b.from;
+    const bandTax = taxable * b.rate;
+    tax += bandTax;
+    result.push({ label: b.label, rate: b.rate, taxable, bandTax, active: price > b.from });
+  }
+  return { tax, bands: result };
+}
+
+function calculate() {
+  const price = parseFloat(document.getElementById('price').value) || 0;
+  const display = document.getElementById('sdlt-display');
+
+  if (price === 0) {
+    display.textContent = '£—';
+    document.getElementById('r-price').textContent = '£—';
+    document.getElementById('r-sdlt').textContent = '£—';
+    document.getElementById('r-rate').textContent = '—%';
+    document.getElementById('r-total').textContent = '£—';
+    document.getElementById('band-tbody').innerHTML = '';
+    document.getElementById('band-total').textContent = '£—';
+    return;
+  }
+
+  let result;
+  if (buyerType === 'ftb') result = calcFTB(price);
+  else if (buyerType === 'additional' || buyerType === 'company') result = calcAdditional(price);
+  else result = calcMain(price);
+
+  const { tax, bands } = result;
+  const effectiveRate = price > 0 ? (tax / price) * 100 : 0;
+
+  display.textContent = fmt(tax);
+  document.getElementById('r-price').textContent = fmt(price);
+  document.getElementById('r-sdlt').textContent = fmt(tax);
+  document.getElementById('r-rate').textContent = pct(effectiveRate);
+  document.getElementById('r-total').textContent = fmt(price + tax);
+  document.getElementById('band-total').textContent = fmt(tax);
+
+  const tbody = document.getElementById('band-tbody');
+  tbody.innerHTML = bands.map(b => `
+    <tr class="${b.active && b.bandTax > 0 ? 'active' : ''}">
+      <td>${b.label}</td>
+      <td>${(b.rate*100).toFixed(0)}%</td>
+      <td>${b.bandTax > 0 ? fmt(b.bandTax) : '£0'}</td>
+    </tr>`).join('');
+}
+
+calculate();
+</script>
+</body>
+</html>

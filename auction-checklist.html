@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Property Auction Checklist | Before You Bid | LegalPack AI</title>
+<meta name="description" content="Free interactive checklist for UK property auction buyers. 10 sections covering legal pack, title, special conditions, fees, searches, planning, leasehold, finance, tenancies and insurance. Tick off before you bid.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://legalpackai.com/auction-checklist">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://legalpackai.com/auction-checklist">
+<meta property="og:title" content="UK Property Auction Checklist | Before You Bid | LegalPack AI">
+<meta property="og:description" content="Free interactive pre-bid checklist for UK property auction buyers. 10 sections, 60+ checks, saves your progress automatically.">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "UK Property Auction Checklist — Before You Bid",
+  "description": "A comprehensive pre-bid checklist for UK property auction buyers covering legal pack review, title checks, fees, searches, planning, leasehold, finance and more.",
+  "publisher": { "@type": "Organization", "name": "LegalPack AI", "url": "https://legalpackai.com" }
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7ff;--bg2:#f2f1fc;--surface:#ffffff;
+  --t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;
+  --b1:#e2e0f0;--b2:#d4d1ec;
+  --purple:#6d28d9;--purple2:#7c3aed;--purplelight:#8b5cf6;
+  --purplebg:#f5f0ff;--purplemid:#ddd6fe;--purpledeep:#4c1d95;
+  --green:#15803d;--greenbg:#f0fdf4;--greenmid:#bbf7d0;
+  --red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;
+  --amber:#b45309;--amberbg:#fffbeb;--ambermid:#fef3c7;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:68px;background:rgba(248,247,255,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(109,40,217,0.1);}
+.nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
+.nav-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 12px rgba(109,40,217,0.35);}
+.btn-nav{padding:9px 20px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.18s;box-shadow:0 3px 14px rgba(109,40,217,0.3);}
+.btn-nav:hover{background:var(--purpledeep);transform:translateY(-1px);}
+
+.page-hero{padding:56px 48px 48px;text-align:center;background:var(--surface);border-bottom:1px solid var(--b1);}
+.page-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);margin-bottom:20px;padding:5px 13px;border-radius:20px;border:1px solid var(--purplemid);background:var(--purplebg);}
+.page-hero h1{font-size:44px;font-weight:800;letter-spacing:-2px;line-height:1.08;margin-bottom:14px;color:var(--t1);}
+.page-hero h1 em{color:var(--purple);font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;}
+.page-hero p{font-size:17px;color:var(--t2);line-height:1.7;max-width:560px;margin:0 auto;}
+
+/* PROGRESS BAR */
+.progress-wrap{max-width:860px;margin:0 auto;padding:28px 24px 0;}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.progress-label{font-size:13px;font-weight:600;color:var(--t2);}
+.progress-count{font-size:13px;font-weight:700;color:var(--purple);font-family:'DM Mono',monospace;}
+.progress-bar-bg{width:100%;height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--purplelight));border-radius:99px;transition:width 0.3s ease;}
+.progress-actions{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.btn-reset{padding:8px 16px;border-radius:8px;border:1.5px solid var(--b2);background:var(--surface);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.btn-reset:hover{border-color:var(--red);color:var(--red);}
+.progress-complete-badge{display:none;align-items:center;gap:6px;padding:7px 14px;background:var(--greenbg);border:1px solid var(--greenmid);border-radius:20px;font-size:12.5px;font-weight:700;color:var(--green);}
+
+/* CHECKLIST */
+.checklist-wrap{max-width:860px;margin:0 auto;padding:20px 24px 48px;}
+
+.section-card{background:var(--surface);border:1px solid var(--b1);border-radius:18px;margin-bottom:16px;overflow:hidden;}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.section-header:hover{background:var(--bg);}
+.section-header-left{display:flex;align-items:center;gap:12px;}
+.section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.section-title{font-size:15px;font-weight:700;color:var(--t1);}
+.section-sub{font-size:12px;color:var(--t3);margin-top:2px;}
+.section-header-right{display:flex;align-items:center;gap:10px;}
+.section-badge{font-size:11px;font-weight:700;color:var(--t3);font-family:'DM Mono',monospace;white-space:nowrap;}
+.section-badge.done{color:var(--green);}
+.section-chev{font-size:12px;color:var(--t3);transition:transform 0.2s;}
+.section-body{border-top:1px solid var(--b1);padding:0 22px 8px;}
+
+.checklist-item{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-bottom:1px solid var(--bg2);}
+.checklist-item:last-child{border-bottom:none;}
+.checklist-item input[type=checkbox]{margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:var(--purple);cursor:pointer;}
+.checklist-item label{font-size:14px;color:var(--t2);line-height:1.55;cursor:pointer;flex:1;}
+.checklist-item label strong{color:var(--t1);font-weight:700;}
+.checklist-item.checked label{color:var(--t3);text-decoration:line-through;text-decoration-color:var(--b2);}
+
+/* RISK TAG */
+.risk-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle;white-space:nowrap;}
+.risk-high{background:var(--redbg);color:var(--red);}
+.risk-med{background:var(--amberbg);color:var(--amber);}
+
+/* SECTION COMPLETE BANNER */
+.section-complete{display:none;align-items:center;gap:7px;padding:10px 14px;background:var(--greenbg);border-radius:10px;margin:8px 0;font-size:13px;font-weight:700;color:var(--green);}
+
+/* CTA ALERT INSIDE CHECKLIST */
+.ai-nudge{background:var(--purplebg);border:1.5px solid var(--purplemid);border-radius:12px;padding:16px 20px;margin:12px 0 4px;display:flex;align-items:center;gap:14px;}
+.ai-nudge-text{flex:1;}
+.ai-nudge-text strong{display:block;font-size:13.5px;font-weight:700;color:var(--purple);margin-bottom:3px;}
+.ai-nudge-text span{font-size:12.5px;color:var(--t2);line-height:1.5;}
+.btn-nudge{flex-shrink:0;padding:9px 16px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;transition:all 0.18s;}
+.btn-nudge:hover{background:var(--purpledeep);}
+
+/* CTA SECTION */
+.cta-section{background:linear-gradient(135deg,var(--purple),var(--purplelight));padding:56px 48px;text-align:center;}
+.cta-section h2{font-size:34px;font-weight:800;letter-spacing:-1.5px;color:#fff;margin-bottom:12px;}
+.cta-section p{font-size:16px;color:rgba(255,255,255,0.85);margin-bottom:28px;line-height:1.6;}
+.btn-cta{display:inline-block;padding:16px 36px;background:#fff;color:var(--purple);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:800;text-decoration:none;transition:all 0.18s;box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.btn-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+.cta-note{margin-top:14px;font-size:13px;color:rgba(255,255,255,0.65);}
+
+.related-section{padding:48px;background:var(--surface);border-top:1px solid var(--b1);}
+.related-section h3{font-size:14px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;text-align:center;}
+.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;margin:0 auto;}
+.related-card{display:block;padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;text-decoration:none;transition:all 0.18s;}
+.related-card:hover{border-color:var(--purplemid);background:var(--purplebg);}
+.related-card-title{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.related-card-sub{font-size:12px;color:var(--t3);}
+
+.disclaimer{padding:20px 48px;text-align:center;border-top:1px solid var(--b1);}
+.disclaimer p{font-size:11.5px;color:var(--t3);line-height:1.6;}
+
+footer{padding:28px 48px;border-top:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;background:var(--bg);}
+.footer-brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--t1);}
+.footer-brand-icon{width:24px;height:24px;background:var(--purple);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-size:12px;color:var(--t3);text-decoration:none;}
+.footer-links a:hover{color:var(--purple);}
+
+@media(max-width:720px){
+  nav{padding:0 20px;}
+  .page-hero{padding:40px 20px 36px;}
+  .page-hero h1{font-size:30px;letter-spacing:-1px;}
+  .progress-wrap,.checklist-wrap{padding-left:16px;padding-right:16px;}
+  .section-body{padding:0 14px 8px;}
+  .section-header{padding:14px 16px;}
+  .cta-section{padding:40px 20px;}
+  .cta-section h2{font-size:26px;}
+  .related-section{padding:32px 20px;}
+  .related-grid{grid-template-columns:1fr;}
+  .disclaimer{padding:16px 20px;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:20px;}
+  .ai-nudge{flex-direction:column;gap:10px;}
+  .btn-nudge{width:100%;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://legalpackai.com" class="nav-logo">
+    <div class="nav-logo-icon">⚖</div>
+    LegalPack AI
+  </a>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-nav">Go to Dashboard →</a>
+</nav>
+
+<div class="page-hero">
+  <div class="page-eyebrow">✓ Free Interactive Tool</div>
+  <h1>UK Auction <em>Checklist</em></h1>
+  <p>Tick off every critical check before you bid at auction. 10 sections covering legal, financial, and physical due diligence. Progress is saved automatically.</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-header">
+    <span class="progress-label">Your progress</span>
+    <span class="progress-count" id="progress-count">0 / 0 checks complete</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+  <div class="progress-actions">
+    <button class="btn-reset" onclick="resetChecklist()">Reset checklist</button>
+    <div class="progress-complete-badge" id="complete-badge">🎉 All checks complete — ready to bid!</div>
+  </div>
+</div>
+
+<div class="checklist-wrap">
+
+  <!-- SECTION 1: LEGAL PACK -->
+  <div class="section-card" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#f5f0ff;color:#6d28d9;">📄</div>
+        <div>
+          <div class="section-title">Legal Pack Review</div>
+          <div class="section-sub">Confirm the pack is complete and legible</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s1-badge">0 / 6</span>
+        <span class="section-chev" id="s1-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s1-body">
+      <div class="ai-nudge">
+        <div class="ai-nudge-text">
+          <strong>Let AI review the legal pack for you</strong>
+          <span>Upload your ZIP or PDF and LegalPack AI reads it like a cautious solicitor — flagging risks, missing docs and hidden costs in seconds.</span>
+        </div>
+        <a href="https://legalpackai.com/dashboard.html" class="btn-nudge">Analyse Pack →</a>
+      </div>
+      <label class="checklist-item" id="c-s1-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-0"><strong>Legal pack is available</strong> — the pack has been released by the auctioneer and you have downloaded it in full. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s1-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-1"><strong>All documents are legible</strong> — no scanned pages are blurry, cut off, or unreadable.</label>
+      </label>
+      <label class="checklist-item" id="c-s1-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-2"><strong>Solicitor's report on title</strong> (if provided) has been read and understood.</label>
+      </label>
+      <label class="checklist-item" id="c-s1-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-3"><strong>No last-minute addendum</strong> — checked the auctioneer's website on the day of the auction for any late addenda or amendments to the pack. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s1-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-4"><strong>Missing documents identified</strong> — noted any documents listed in the index but not included, and obtained or requested them.</label>
+      </label>
+      <label class="checklist-item" id="c-s1-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s1-5"><strong>Pack reviewed by a solicitor</strong> — a qualified UK conveyancing solicitor has reviewed the full pack before the auction date. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 2: TITLE CHECKS -->
+  <div class="section-card" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#fef2f2;color:#dc2626;">🏛</div>
+        <div>
+          <div class="section-title">Title Checks</div>
+          <div class="section-sub">Ownership, restrictions and burdens on the title</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s2-badge">0 / 7</span>
+        <span class="section-chev" id="s2-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s2-body">
+      <label class="checklist-item" id="c-s2-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-0"><strong>Title is registered</strong> at HM Land Registry. If possessory or qualified title, understand the implications for mortgageability and resale. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s2-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-1"><strong>Seller has legal authority to sell</strong> — confirmed the seller is the registered owner or has authority (e.g. executor, administrator, receiver, mortgagee in possession).</label>
+      </label>
+      <label class="checklist-item" id="c-s2-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-2"><strong>Restrictive covenants reviewed</strong> — any covenants restricting use, extension, or development have been identified and assessed for relevance to your plans. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s2-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-3"><strong>Rights of way and easements checked</strong> — any third-party rights over the property (access, drainage, utilities) are understood.</label>
+      </label>
+      <label class="checklist-item" id="c-s2-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-4"><strong>Chancel repair liability assessed</strong> — indemnity insurance obtained if chancel repair risk is present. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s2-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-5"><strong>Overriding interests identified</strong> — aware of any interests that bind you even if not on the register (e.g. occupiers' rights, prescriptive easements).</label>
+      </label>
+      <label class="checklist-item" id="c-s2-6">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s2-6"><strong>Adverse possession risk assessed</strong> — no indication that a third party could claim ownership of any part of the property through long use.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SPECIAL CONDITIONS -->
+  <div class="section-card" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#fffbeb;color:#b45309;">📋</div>
+        <div>
+          <div class="section-title">Special Conditions of Sale</div>
+          <div class="section-sub">Hidden costs and obligations in the contract</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s3-badge">0 / 6</span>
+        <span class="section-chev" id="s3-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s3-body">
+      <label class="checklist-item" id="c-s3-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-0"><strong>Special conditions read in full</strong> — every special condition has been read, not just skimmed. Solicitor has confirmed understanding of each one. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s3-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-1"><strong>Completion period confirmed</strong> — standard is 20 business days; any shorter or longer deadline is noted and finance is in place to meet it. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s3-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-2"><strong>No unusual obligations on the buyer</strong> — no conditions requiring the buyer to carry out works, pay outstanding bills, or take on third-party liabilities. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s3-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-3"><strong>Deposit amount confirmed</strong> — typically 10% of the purchase price, payable immediately on the fall of the hammer. Funds are available on auction day.</label>
+      </label>
+      <label class="checklist-item" id="c-s3-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-4"><strong>Sold as seen / no warranties</strong> — understood that auction property is sold as seen with no vendor warranties on condition, planning, or services.</label>
+      </label>
+      <label class="checklist-item" id="c-s3-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s3-5"><strong>Overage or clawback clauses</strong> — any clause requiring payment back to the seller on future development or sale has been identified and valued.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 4: BUYER FEES -->
+  <div class="section-card" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#f0fdf4;color:#15803d;">💷</div>
+        <div>
+          <div class="section-title">Buyer Fees &amp; Total Costs</div>
+          <div class="section-sub">All costs added on top of the hammer price</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s4-badge">0 / 7</span>
+        <span class="section-chev" id="s4-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s4-body">
+      <label class="checklist-item" id="c-s4-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-0"><strong>Buyer's premium / administration fee</strong> — confirmed the auctioneer's buyer's fee (often £1,000–£5,000 + VAT or a % of the hammer price). Added to budget. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s4-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-1"><strong>SDLT / stamp duty calculated</strong> — calculated at the hammer price including surcharges for additional properties. Funds available. <a href="/sdlt-calculator" style="color:var(--purple);font-weight:600;text-decoration:none;">Use SDLT Calculator →</a></label>
+      </label>
+      <label class="checklist-item" id="c-s4-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-2"><strong>Legal / conveyancing fees budgeted</strong> — solicitor's fees for the purchase (typically £1,000–£2,500 + disbursements) are accounted for.</label>
+      </label>
+      <label class="checklist-item" id="c-s4-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-3"><strong>Survey or valuation costs included</strong> — cost of any structural survey, RICS valuation, or specialist reports (asbestos, drainage) added to budget.</label>
+      </label>
+      <label class="checklist-item" id="c-s4-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-4"><strong>Refurbishment budget estimated</strong> — realistic estimate of immediate works required, with contingency. Use a builder's quote where possible. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s4-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-5"><strong>Finance costs included</strong> — if using bridging or a mortgage, all arrangement fees, interest, and exit fees are in the total cost calculation.</label>
+      </label>
+      <label class="checklist-item" id="c-s4-6">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s4-6"><strong>Maximum bid set and fixed</strong> — calculated a hard maximum bid using total costs, desired profit, and after-repair value. Will not exceed it at auction. <a href="/max-bid-calculator" style="color:var(--purple);font-weight:600;text-decoration:none;">Use Max Bid Calculator →</a> <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 5: SEARCHES -->
+  <div class="section-card" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#eff6ff;color:#1e40af;">🔍</div>
+        <div>
+          <div class="section-title">Searches &amp; Environmental</div>
+          <div class="section-sub">Local authority, drainage, environmental and other searches</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s5-badge">0 / 6</span>
+        <span class="section-chev" id="s5-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s5-body">
+      <label class="checklist-item" id="c-s5-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-0"><strong>Local authority search included</strong> — confirms planning history, enforcement notices, road proposals, and any charges registered against the property. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s5-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-1"><strong>Water and drainage search included</strong> — confirms whether public sewers cross the land and whether the property is connected to mains water and drainage. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s5-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-2"><strong>Environmental search reviewed</strong> — no contaminated land, flood risk, or landfill within proximity that would affect value, insurability, or mortgage availability.</label>
+      </label>
+      <label class="checklist-item" id="c-s5-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-3"><strong>Flood risk assessed</strong> — checked the Environment Agency flood map. If in a flood zone, confirmed insurance is obtainable at a reasonable premium.</label>
+      </label>
+      <label class="checklist-item" id="c-s5-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-4"><strong>Mining or ground stability search</strong> — obtained if property is in a former mining area or a region with known subsidence risk (e.g. chalk, clay, former collieries).</label>
+      </label>
+      <label class="checklist-item" id="c-s5-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s5-5"><strong>Searches are recent</strong> — any searches in the pack were obtained within the last 6 months. Older searches may not reflect current planning or enforcement activity.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PLANNING & BUILDING REGS -->
+  <div class="section-card" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#fdf4ff;color:#6d28d9;">🏗</div>
+        <div>
+          <div class="section-title">Planning &amp; Building Regulations</div>
+          <div class="section-sub">Consents, compliance and permitted development</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s6-badge">0 / 6</span>
+        <span class="section-chev" id="s6-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s6-body">
+      <label class="checklist-item" id="c-s6-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-0"><strong>Planning permission in place</strong> — any extensions, conversions, or changes of use have valid planning permission, and it has not lapsed. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s6-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-1"><strong>Building regulations completion certificates</strong> — works completed in the last 12 years have a building regs completion certificate, or indemnity insurance is in place. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s6-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-2"><strong>No open enforcement notices</strong> — the local authority search shows no live planning enforcement notices or listed building consent breaches.</label>
+      </label>
+      <label class="checklist-item" id="c-s6-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-3"><strong>Listed building or conservation area status</strong> — if the property is listed or in a conservation area, the additional restrictions on alterations are understood. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s6-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-4"><strong>HMO licence status checked</strong> — if buying as an HMO investment, confirmed whether a licence is in place, required, or will need to be applied for.</label>
+      </label>
+      <label class="checklist-item" id="c-s6-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s6-5"><strong>Permitted development rights</strong> — confirmed whether PD rights have been removed by an Article 4 direction, which could affect refurbishment or conversion plans.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 7: LEASEHOLD -->
+  <div class="section-card" id="s7">
+    <div class="section-header" onclick="toggleSection('s7')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#fff7ed;color:#c2410c;">🏢</div>
+        <div>
+          <div class="section-title">Leasehold Checks</div>
+          <div class="section-sub">Lease length, ground rent, service charge and freeholder</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s7-badge">0 / 7</span>
+        <span class="section-chev" id="s7-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s7-body">
+      <label class="checklist-item" id="c-s7-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-0"><strong>Lease length is sufficient</strong> — at least 85 years remaining after purchase. Below 80 years, lease extension becomes expensive; below 70 years, most mortgage lenders decline. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s7-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-1"><strong>Ground rent reviewed</strong> — ground rent is not onerous (ideally peppercorn or under £250/year), does not double periodically, and does not trigger the Housing Act 1988 assured tenancy risk. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s7-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-2"><strong>Service charge assessed</strong> — recent service charge accounts reviewed. Level is reasonable and no major upcoming works are planned that will result in a large section 20 notice.</label>
+      </label>
+      <label class="checklist-item" id="c-s7-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-3"><strong>Freeholder / management company checked</strong> — the freeholder or managing agent is reputable, responsive, and there are no ongoing disputes.</label>
+      </label>
+      <label class="checklist-item" id="c-s7-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-4"><strong>Lease extension viability confirmed</strong> — if lease is short, cost of extending has been estimated and factored into the maximum bid.</label>
+      </label>
+      <label class="checklist-item" id="c-s7-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-5"><strong>Forfeiture and breach clauses reviewed</strong> — any unusual forfeiture conditions or restrictions on subletting, pets, or alterations in the lease are understood.</label>
+      </label>
+      <label class="checklist-item" id="c-s7-6">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s7-6"><strong>Not applicable (freehold property)</strong> — tick this if the property is freehold and leasehold checks are not relevant.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 8: FINANCE & MORTGAGEABILITY -->
+  <div class="section-card" id="s8">
+    <div class="section-header" onclick="toggleSection('s8')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#f0fdf4;color:#15803d;">🏦</div>
+        <div>
+          <div class="section-title">Finance &amp; Mortgageability</div>
+          <div class="section-sub">Funding confirmed and lender acceptability checked</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s8-badge">0 / 6</span>
+        <span class="section-chev" id="s8-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s8-body">
+      <label class="checklist-item" id="c-s8-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-0"><strong>Finance is in place and confirmed</strong> — either proof of cash funds, or a decision in principle / bridging facility letter is available before auction day. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s8-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-1"><strong>Lender acceptability verified</strong> — if using a mortgage, the lender has confirmed they will lend on this specific property (construction type, tenure, condition). <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s8-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-2"><strong>Non-standard construction checked</strong> — if the property is timber frame, concrete, steel, or ex-council, aware that most standard lenders decline and specialist finance is required. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s8-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-3"><strong>Uninhabitable condition check</strong> — if the property lacks a functioning kitchen or bathroom, it may be classed as uninhabitable and unmortgageable until works are complete.</label>
+      </label>
+      <label class="checklist-item" id="c-s8-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-4"><strong>Deposit funds available on auction day</strong> — 10% deposit (in cleared funds) is accessible on the day. Personal cheques are not accepted; bank transfer or debit card required.</label>
+      </label>
+      <label class="checklist-item" id="c-s8-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s8-5"><strong>BTL stress test passed</strong> — if buying as a buy-to-let, rental income at market rate covers the mortgage at the lender's stress-test rate (usually 145% at 5.5%+).</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 9: OCCUPANCY & TENANCIES -->
+  <div class="section-card" id="s9">
+    <div class="section-header" onclick="toggleSection('s9')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#f0fdf4;color:#0f766e;">🔑</div>
+        <div>
+          <div class="section-title">Occupancy &amp; Tenancies</div>
+          <div class="section-sub">Vacant possession, sitting tenants and occupation rights</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s9-badge">0 / 6</span>
+        <span class="section-chev" id="s9-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s9-body">
+      <label class="checklist-item" id="c-s9-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-0"><strong>Vacant possession or tenanted — confirmed</strong> — the special conditions clearly state whether the property is sold with vacant possession or subject to a tenancy. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s9-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-1"><strong>Tenancy agreement reviewed</strong> — if tenanted, the full tenancy agreement has been read: rent, term, break clauses, and any arrears confirmed. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s9-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-2"><strong>Rent arrears status confirmed</strong> — if tenanted, confirmed whether the tenant is in arrears. Arrears do not transfer to the buyer automatically but can indicate a problem tenant.</label>
+      </label>
+      <label class="checklist-item" id="c-s9-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-3"><strong>Protected or regulated tenancy risk</strong> — if property was rented before 1989, confirmed whether a regulated (Rent Act) tenancy exists, which significantly restricts possession and rent increases.</label>
+      </label>
+      <label class="checklist-item" id="c-s9-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-4"><strong>Squatters or unauthorised occupiers</strong> — confirmed the property is not occupied by squatters or unauthorised persons. Understand the process to gain lawful possession if so. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s9-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s9-5"><strong>Deposit protection status</strong> — if taking over an existing tenancy, confirm the tenant's deposit is held in a government-approved scheme; otherwise you inherit the liability.</label>
+      </label>
+    </div>
+  </div>
+
+  <!-- SECTION 10: INSURANCE & RISK -->
+  <div class="section-card" id="s10">
+    <div class="section-header" onclick="toggleSection('s10')">
+      <div class="section-header-left">
+        <div class="section-icon" style="background:#fef2f2;color:#dc2626;">🛡</div>
+        <div>
+          <div class="section-title">Insurance &amp; Risk</div>
+          <div class="section-sub">Buildings insurance, structural issues and physical condition</div>
+        </div>
+      </div>
+      <div class="section-header-right">
+        <span class="section-badge" id="s10-badge">0 / 6</span>
+        <span class="section-chev" id="s10-chev">▾</span>
+      </div>
+    </div>
+    <div class="section-body" id="s10-body">
+      <label class="checklist-item" id="c-s10-0">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-0"><strong>Buildings insurance arranged from exchange</strong> — at auction, exchange and completion often happen simultaneously (or within 28 days). Buildings insurance must be in place from exchange. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s10-1">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-1"><strong>Property inspected in person</strong> — physically visited the property before auction day. Photos in the brochure can be misleading and condition problems are not always in the legal pack. <span class="risk-tag risk-high">⚠ High Risk</span></label>
+      </label>
+      <label class="checklist-item" id="c-s10-2">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-2"><strong>Structural survey obtained</strong> — an independent RICS-qualified surveyor has inspected the property and any structural issues are costed and factored into the maximum bid. <span class="risk-tag risk-med">⚡ Medium</span></label>
+      </label>
+      <label class="checklist-item" id="c-s10-3">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-3"><strong>Asbestos and hazardous materials</strong> — aware that properties built before 2000 may contain asbestos. Specialist survey obtained if any evidence of ACMs.</label>
+      </label>
+      <label class="checklist-item" id="c-s10-4">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-4"><strong>Subsidence, damp and structural defects</strong> — no visible signs of subsidence, severe damp, or major structural cracking. If present, specialist reports obtained and repair costs estimated.</label>
+      </label>
+      <label class="checklist-item" id="c-s10-5">
+        <input type="checkbox" onchange="tick(this)">
+        <label for="c-s10-5"><strong>Insurance is obtainable at a reasonable cost</strong> — buildings insurance is available for this property type, location, and condition at a cost that does not materially impact investment returns.</label>
+      </label>
+    </div>
+  </div>
+
+</div><!-- /.checklist-wrap -->
+
+<div class="cta-section">
+  <h2>Don't bid blind — let AI read the legal pack</h2>
+  <p>Upload your legal pack ZIP or PDF and LegalPack AI analyses it in minutes. Risk flags, hidden costs, mortgageability verdict, missing documents, and a before-bidding checklist — generated automatically.</p>
+  <a href="https://legalpackai.com/dashboard.html" class="btn-cta">Analyse My Legal Pack →</a>
+  <p class="cta-note">No subscription required · Pay per analysis · Instant results</p>
+</div>
+
+<div class="related-section">
+  <h3>More free tools</h3>
+  <div class="related-grid">
+    <a href="/max-bid-calculator" class="related-card">
+      <div class="related-card-title">Max Bid Calculator</div>
+      <div class="related-card-sub">Work out your maximum bid price before auction</div>
+    </a>
+    <a href="/sdlt-calculator" class="related-card">
+      <div class="related-card-title">SDLT Calculator</div>
+      <div class="related-card-sub">Calculate stamp duty for any buyer type</div>
+    </a>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <p><strong>Disclaimer:</strong> This checklist is for general guidance only and does not constitute legal or financial advice. Property auction purchases are legally binding from the fall of the hammer. Always instruct a qualified UK conveyancing solicitor before bidding. LegalPack AI accepts no liability for decisions made based on this checklist.</p>
+</div>
+
+<footer>
+  <div class="footer-brand">
+    <div class="footer-brand-icon">⚖</div>
+    LegalPack AI
+  </div>
+  <p>© 2025 LegalPack AI · legalpackai.com</p>
+  <div class="footer-links">
+    <a href="https://legalpackai.com/privacy.html">Privacy</a>
+    <a href="https://legalpackai.com/terms.html">Terms</a>
+    <a href="https://legalpackai.com/dashboard.html">Dashboard</a>
+  </div>
+</footer>
+
+<script>
+const SECTIONS = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10'];
+const STORAGE_KEY = 'lp_auction_checklist_v1';
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveState(state) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function getAllCheckboxes() {
+  return document.querySelectorAll('.checklist-item input[type=checkbox]');
+}
+function getCheckboxId(cb) {
+  return cb.closest('.checklist-item').id;
+}
+
+function tick(cb) {
+  const id = getCheckboxId(cb);
+  const state = getState();
+  if (cb.checked) state[id] = true; else delete state[id];
+  saveState(state);
+  cb.closest('.checklist-item').classList.toggle('checked', cb.checked);
+  updateProgress();
+  updateSectionBadges();
+}
+
+function updateProgress() {
+  const all = getAllCheckboxes();
+  const total = all.length;
+  const done = Array.from(all).filter(c => c.checked).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-count').textContent = done + ' / ' + total + ' checks complete';
+  const badge = document.getElementById('complete-badge');
+  badge.style.display = (done === total && total > 0) ? 'flex' : 'none';
+}
+
+function updateSectionBadges() {
+  SECTIONS.forEach(sid => {
+    const body = document.getElementById(sid + '-body');
+    const cbs = body.querySelectorAll('input[type=checkbox]');
+    const total = cbs.length;
+    const done = Array.from(cbs).filter(c => c.checked).length;
+    const badge = document.getElementById(sid + '-badge');
+    badge.textContent = done + ' / ' + total;
+    badge.className = 'section-badge' + (done === total ? ' done' : '');
+  });
+}
+
+function toggleSection(sid) {
+  const body = document.getElementById(sid + '-body');
+  const chev = document.getElementById(sid + '-chev');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.style.transform = open ? 'rotate(-90deg)' : '';
+}
+
+function resetChecklist() {
+  if (!confirm('Reset all checks? This cannot be undone.')) return;
+  saveState({});
+  getAllCheckboxes().forEach(cb => {
+    cb.checked = false;
+    cb.closest('.checklist-item').classList.remove('checked');
+  });
+  updateProgress();
+  updateSectionBadges();
+}
+
+function loadState() {
+  const state = getState();
+  getAllCheckboxes().forEach(cb => {
+    const id = getCheckboxId(cb);
+    if (state[id]) {
+      cb.checked = true;
+      cb.closest('.checklist-item').classList.add('checked');
+    }
+  });
+  updateProgress();
+  updateSectionBadges();
+}
+
+loadState();
+</script>
+</body>
+</html>
