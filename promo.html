@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Claim Your Free Credit — LegalPack AI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--purple:#6d28d9;--purple-light:#7c3aed;--purple-pale:#f3f0ff;--purple-mid:rgba(109,40,217,0.15);--t1:#1a1333;--t2:#4b4369;--t3:#8b7fb5;--bg:#f8f7ff;--white:#ffffff;--green:#16a34a;--green-bg:#f0fdf4;--red:#dc2626;--red-bg:#fef2f2;--amber:#d97706;--amber-bg:#fffbeb;}
+html{font-size:16px;scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--white);border-bottom:1px solid rgba(109,40,217,0.1);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-size:1.05rem;font-weight:800;letter-spacing:-0.5px;color:var(--t1);text-decoration:none;}
+.logo em{color:var(--purple);font-style:normal;}
+.btn-text{background:none;border:none;color:var(--purple);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;text-decoration:none;}
+.btn-text:hover{text-decoration:underline;}
+
+.hero{flex:1;display:flex;align-items:center;justify-content:center;padding:48px 24px;}
+.card{background:var(--white);border:1px solid rgba(109,40,217,0.12);border-radius:20px;box-shadow:0 4px 32px rgba(109,40,217,0.08);padding:48px 44px;max-width:480px;width:100%;text-align:center;}
+
+.gift-icon{width:72px;height:72px;background:var(--purple-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 24px;}
+.eyebrow{font-size:0.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--purple);margin-bottom:10px;}
+.headline{font-family:'Instrument Serif',serif;font-size:2rem;line-height:1.2;color:var(--t1);margin-bottom:12px;}
+.subhead{font-size:0.95rem;color:var(--t2);line-height:1.6;margin-bottom:32px;}
+
+.code-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:0.9rem;font-weight:500;background:var(--purple-pale);color:var(--purple);border:1px solid var(--purple-mid);padding:6px 16px;border-radius:999px;margin-bottom:28px;}
+
+.btn-primary{display:block;width:100%;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity 0.15s;text-decoration:none;text-align:center;}
+.btn-primary:hover{opacity:0.88;}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-secondary{display:block;width:100%;padding:13px;background:none;color:var(--purple);border:1.5px solid var(--purple-mid);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;margin-top:10px;transition:background 0.12s;}
+.btn-secondary:hover{background:var(--purple-pale);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--t3);font-size:0.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(109,40,217,0.1);}
+
+/* Auth form */
+.auth-field{margin-bottom:14px;text-align:left;}
+.auth-label{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
+.auth-input{width:100%;background:var(--bg);border:1px solid rgba(109,40,217,0.15);border-radius:8px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.92rem;padding:10px 13px;transition:border-color 0.12s;}
+.auth-input:focus{outline:none;border-color:var(--purple);}
+.auth-switch{font-size:0.8rem;color:var(--t3);margin-top:14px;}
+.auth-switch a{color:var(--purple);cursor:pointer;font-weight:600;}
+
+/* States */
+.state{display:none;}
+.state.active{display:block;}
+
+/* Success */
+.success-icon{width:72px;height:72px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 20px;}
+.success-headline{font-family:'Instrument Serif',serif;font-size:1.85rem;color:var(--t1);margin-bottom:10px;}
+.success-sub{font-size:0.9rem;color:var(--t2);line-height:1.6;margin-bottom:28px;}
+
+/* Alert states */
+.alert{padding:14px 16px;border-radius:10px;font-size:0.85rem;font-weight:600;line-height:1.5;margin-bottom:0;}
+.alert.error{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,0.2);}
+.alert.warn{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,0.2);}
+
+/* Value props */
+.props{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:left;}
+.prop{display:flex;align-items:flex-start;gap:10px;font-size:0.85rem;color:var(--t2);}
+.prop-dot{width:20px;height:20px;background:var(--purple-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:0.7rem;}
+
+.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.small-note{font-size:0.72rem;color:var(--t3);margin-top:12px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="/" class="logo">Legal<em>Pack</em> AI</a>
+  <a href="/dashboard" class="btn-text">Sign in →</a>
+</nav>
+
+<div class="hero">
+  <div class="card">
+
+    <!-- STATE: Loading (initial) -->
+    <div class="state active" id="state-loading">
+      <div class="gift-icon">⏳</div>
+      <div class="headline" style="font-size:1.3rem;">Checking offer...</div>
+    </div>
+
+    <!-- STATE: Invalid / missing code -->
+    <div class="state" id="state-invalid">
+      <div class="gift-icon" style="background:#fef2f2;">❌</div>
+      <div class="eyebrow">Offer Not Found</div>
+      <div class="headline">This link isn't valid</div>
+      <div class="subhead">The promo code in this link doesn't exist. Check the URL and try again, or head to the dashboard.</div>
+      <a href="/" class="btn-primary" style="margin-top:8px;">Go to LegalPack AI →</a>
+    </div>
+
+    <!-- STATE: Inactive code -->
+    <div class="state" id="state-inactive">
+      <div class="gift-icon" style="background:#fffbeb;">⏸</div>
+      <div class="eyebrow">Offer Expired</div>
+      <div class="headline">This offer is no longer available</div>
+      <div class="subhead">This promo has ended. You can still analyse a legal pack for £9.99 — the fastest way to spot hidden risks before you bid.</div>
+      <a href="/" class="btn-primary" style="margin-top:8px;">Explore LegalPack AI →</a>
+    </div>
+
+    <!-- STATE: Claim (not logged in) — show offer then auth -->
+    <div class="state" id="state-claim">
+      <div class="gift-icon">🎁</div>
+      <div class="eyebrow">You've been offered</div>
+      <div class="headline">One free legal pack analysis</div>
+      <div class="subhead">Stop bidding blind. Know every risk before the hammer falls.</div>
+      <div class="code-pill" id="display-code">CODE</div>
+      <div class="props">
+        <div class="prop"><div class="prop-dot">✓</div><span>AI reads the entire legal pack — title register, searches, planning, leases</span></div>
+        <div class="prop"><div class="prop-dot">✓</div><span>Flags unmortgageable issues, short leases, overage clauses &amp; hidden costs</span></div>
+        <div class="prop"><div class="prop-dot">✓</div><span>Report in under 60 seconds — before your solicitor even opens the file</span></div>
+      </div>
+      <button class="btn-primary" id="btn-claim-cta" onclick="showAuth()">Claim Free Credit →</button>
+      <p class="small-note">No card required. One credit per person.</p>
+    </div>
+
+    <!-- STATE: Auth (shown after clicking CTA) -->
+    <div class="state" id="state-auth">
+      <div class="eyebrow">Create your account</div>
+      <div class="headline" style="font-size:1.5rem;">Sign up to claim</div>
+      <div class="subhead" style="margin-bottom:20px;">Your free credit will be added instantly on sign-up.</div>
+
+      <!-- Sign up form (default) -->
+      <div id="auth-signup">
+        <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="su-email" type="email" placeholder="you@example.com"></div>
+        <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="su-password" type="password" placeholder="At least 8 characters"></div>
+        <button class="btn-primary" id="btn-signup" onclick="doSignUp()">Create Account &amp; Claim →</button>
+        <p class="auth-switch">Already have an account? <a onclick="toggleAuth('login')">Sign in instead</a></p>
+      </div>
+
+      <!-- Sign in form -->
+      <div id="auth-login" style="display:none;">
+        <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="si-email" type="email" placeholder="you@example.com"></div>
+        <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="si-password" type="password" placeholder="Your password"></div>
+        <button class="btn-primary" id="btn-signin" onclick="doSignIn()">Sign In &amp; Claim →</button>
+        <p class="auth-switch">No account yet? <a onclick="toggleAuth('signup')">Create one free</a></p>
+      </div>
+
+      <div id="auth-error" style="display:none;margin-top:14px;"></div>
+      <button class="btn-text" onclick="showState('state-claim')" style="margin-top:14px;font-size:0.78rem;color:var(--t3);">← Back</button>
+    </div>
+
+    <!-- STATE: Already claimed -->
+    <div class="state" id="state-already-claimed">
+      <div class="gift-icon" style="background:#fffbeb;">👋</div>
+      <div class="eyebrow">Already claimed</div>
+      <div class="headline">You've already got this one</div>
+      <div class="subhead">You've already claimed this offer. Head to your dashboard to use your credit.</div>
+      <a href="/dashboard" class="btn-primary" style="margin-top:8px;">Go to Dashboard →</a>
+    </div>
+
+    <!-- STATE: Success -->
+    <div class="state" id="state-success">
+      <div class="success-icon">✓</div>
+      <div class="eyebrow" style="color:var(--green);">Credit added</div>
+      <div class="success-headline">You're ready to go</div>
+      <div class="success-sub">1 free analysis credit has been added to your account. Upload a legal pack and get your risk report in under 60 seconds.</div>
+      <a href="/dashboard" class="btn-primary">Go to Dashboard →</a>
+      <p class="small-note">Need more credits? Packs are £9.99 each, or subscribe for unlimited.</p>
+    </div>
+
+    <!-- STATE: Error (generic) -->
+    <div class="state" id="state-error">
+      <div class="gift-icon" style="background:#fef2f2;">⚠️</div>
+      <div class="eyebrow" style="color:var(--red);">Something went wrong</div>
+      <div class="headline" style="font-size:1.4rem;">Couldn't claim your credit</div>
+      <div class="subhead" id="error-message">An unexpected error occurred. Please try again.</div>
+      <button class="btn-primary" onclick="location.reload()">Try Again</button>
+      <a href="/" class="btn-secondary">Go Home</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://ktrbbaakmlwmhyvpufcs.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
+const API_BASE='https://legalpack-backend-production.up.railway.app';
+
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const params=new URLSearchParams(location.search);
+const promoCode=(params.get('code')||'').trim().toUpperCase();
+let authToken=null;
+
+function showState(id){
+  document.querySelectorAll('.state').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);
+  if(el)el.classList.add('active');
+}
+
+function toggleAuth(mode){
+  document.getElementById('auth-signup').style.display=mode==='signup'?'block':'none';
+  document.getElementById('auth-login').style.display=mode==='login'?'block':'none';
+  document.getElementById('auth-error').style.display='none';
+}
+
+function showAuth(){showState('state-auth');}
+
+function authError(msg){
+  const el=document.getElementById('auth-error');
+  el.innerHTML=`<div class="alert error">${msg}</div>`;
+  el.style.display='block';
+}
+
+async function claimPromo(){
+  try{
+    const r=await fetch(API_BASE+'/promo/claim',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},
+      body:JSON.stringify({code:promoCode})
+    });
+    const d=await r.json();
+    if(d.ok){showState('state-success');return;}
+    if(d.error==='already_claimed'){showState('state-already-claimed');return;}
+    if(d.error==='inactive'){showState('state-inactive');return;}
+    if(d.error==='not_found'){showState('state-invalid');return;}
+    document.getElementById('error-message').textContent=d.error||'An unexpected error occurred.';
+    showState('state-error');
+  }catch(e){
+    document.getElementById('error-message').textContent='Could not reach the server. Check your connection and try again.';
+    showState('state-error');
+  }
+}
+
+async function doSignUp(){
+  const email=document.getElementById('su-email').value.trim();
+  const password=document.getElementById('su-password').value;
+  if(!email||!password){authError('Please enter your email and a password.');return;}
+  if(password.length<8){authError('Password must be at least 8 characters.');return;}
+  const btn=document.getElementById('btn-signup');
+  btn.disabled=true;
+  btn.innerHTML='<span class="loading-spinner"></span>Creating account...';
+  const {data,error}=await sb.auth.signUp({email,password});
+  if(error){btn.disabled=false;btn.textContent='Create Account & Claim →';authError(error.message);return;}
+  authToken=data.session?.access_token;
+  if(!authToken){authError('Account created — please check your email to confirm, then sign in.');btn.disabled=false;btn.textContent='Create Account & Claim →';return;}
+  await claimPromo();
+}
+
+async function doSignIn(){
+  const email=document.getElementById('si-email').value.trim();
+  const password=document.getElementById('si-password').value;
+  if(!email||!password){authError('Please enter your email and password.');return;}
+  const btn=document.getElementById('btn-signin');
+  btn.disabled=true;
+  btn.innerHTML='<span class="loading-spinner"></span>Signing in...';
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){btn.disabled=false;btn.textContent='Sign In & Claim →';authError(error.message);return;}
+  authToken=data.session.access_token;
+  await claimPromo();
+}
+
+async function init(){
+  if(!promoCode){showState('state-invalid');return;}
+  document.getElementById('display-code').textContent=promoCode;
+
+  // Check if already logged in
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){
+    authToken=session.access_token;
+    // Already logged in — go straight to claim
+    showState('state-loading');
+    await claimPromo();
+    return;
+  }
+
+  // Not logged in — show offer card
+  showState('state-claim');
+}
+
+init();
+</script>
+</body>
+</html>

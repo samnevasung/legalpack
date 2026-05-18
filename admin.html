@@ -136,6 +136,8 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   <div class="sidebar-item" onclick="showPanel('usage',this)">📈 Usage Chart</div>
   <div class="sidebar-section">Tools</div>
   <div class="sidebar-item" onclick="showPanel('broadcast',this)">📣 User Tools</div>
+  <div class="sidebar-section">Promos</div>
+  <div class="sidebar-item" onclick="showPanel('promo',this)">🎟 Promo Codes</div>
 </div>
 
 <div class="main">
@@ -276,6 +278,10 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
         <div style="flex:1;"><div style="font-size:0.8rem;font-weight:700;margin-bottom:2px;">Change Plan</div><div style="font-size:0.68rem;color:var(--t3);">Manually upgrade or downgrade any user</div></div>
         <button class="btn-primary" onclick="openModal('modal-plan')">Change Plan</button>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:13px;background:var(--bg3);border-radius:9px;border:1px solid var(--b1);">
+        <div style="flex:1;"><div style="font-size:0.8rem;font-weight:700;margin-bottom:2px;">Remove Credits</div><div style="font-size:0.68rem;color:var(--t3);">Subtract PAYG credits from any user (floor: 0)</div></div>
+        <button class="btn-primary" style="background:var(--red);" onclick="openModal('modal-remove-credit')">Remove Credits</button>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -284,6 +290,18 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
       <input class="search-input" id="broadcast-search" placeholder="Search by email..." oninput="filterBroadcastUsers()" style="width:280px;">
     </div>
     <div id="broadcast-users-list"><div class="loading">Loading...</div></div>
+  </div>
+</div>
+
+<!-- PROMO CODES -->
+<div class="panel" id="panel-promo">
+  <div class="page-title">Promo Codes</div><div class="page-sub">QR code credit giveaways — each claim gives 1 free analysis credit</div>
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">All Promo Codes</div><div class="card-sub">Share legalpackai.com/promo?code=CODENAME on business cards or QR codes</div></div>
+      <button class="btn-primary" onclick="openModal('modal-promo-create')">+ New Code</button>
+    </div>
+    <div id="promo-codes-table"><div class="loading">Loading...</div></div>
   </div>
 </div>
 
@@ -320,6 +338,30 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-promo-create" onclick="if(event.target===this)closeModal('modal-promo-create')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">New Promo Code</div><button class="modal-close" onclick="closeModal('modal-promo-create')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label class="modal-label">Code Name</label><input class="modal-input" id="promo-code-input" placeholder="e.g. BCARD25" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase();document.getElementById('promo-preview').textContent=this.value||'CODE'"></div>
+      <div class="modal-field"><label class="modal-label">Description (optional)</label><input class="modal-input" id="promo-desc-input" placeholder="e.g. Business card giveaway – May 2026"></div>
+      <div style="padding:10px 12px;background:var(--bg3);border-radius:7px;font-size:0.68rem;color:var(--t3);line-height:1.6;">QR code URL: <span style="color:var(--purple);font-family:'DM Mono',monospace;">legalpackai.com/promo?code=<span id="promo-preview">CODE</span></span></div>
+    </div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-promo-create')">Cancel</button><button class="btn-primary" onclick="submitCreatePromoCode()">Create Code</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-remove-credit" onclick="if(event.target===this)closeModal('modal-remove-credit')">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Remove Credits</div><button class="modal-close" onclick="closeModal('modal-remove-credit')">✕</button></div>
+    <div class="modal-body">
+      <div class="modal-field"><label class="modal-label">User</label><select class="modal-select" id="remove-credit-user-select"></select></div>
+      <div class="modal-field"><label class="modal-label">Credits to Remove</label><input class="modal-input" id="remove-credit-amount" type="number" min="1" max="100" value="1"></div>
+      <div style="padding:10px 12px;background:var(--redbg);border:1px solid var(--redmid);border-radius:7px;font-size:0.68rem;color:var(--red);">Credits are floored at 0 — you cannot set a user below zero.</div>
+    </div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModal('modal-remove-credit')">Cancel</button><button class="btn-primary" style="background:var(--red);" onclick="submitRemoveCredit()">Remove Credits</button></div>
+  </div>
+</div>
+
 <div id="admin-toast"></div>
 
 <script>
@@ -349,7 +391,7 @@ async function init(){
 
 async function loadAll(){
   document.getElementById('last-refresh').textContent='Refreshing...';
-  await Promise.all([loadUsers(),loadAnalyses()]);
+  await Promise.all([loadUsers(),loadAnalyses(),loadPromoCodes()]);
   renderAll();
   document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en-GB');
 }
@@ -365,7 +407,7 @@ async function loadAnalyses(){
 }
 
 function renderAll(){
-  renderOverview();renderUsersPanel();renderRevenue();renderAnalyses();renderUsageChart();renderCostPanel();renderBroadcastUsers();populateUserSelects();
+  renderOverview();renderUsersPanel();renderRevenue();renderAnalyses();renderUsageChart();renderCostPanel();renderBroadcastUsers();renderPromoCodes();populateUserSelects();
 }
 
 function renderOverview(){
@@ -404,7 +446,7 @@ function renderUsersPanel(){
 
 function renderUsersTable(users){
   if(!users.length){document.getElementById('users-table').innerHTML='<div class="empty">No users found</div>';return;}
-  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Analyses</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td class="mono">${u.analyses_total||0}</td><td class="mono">${fmtDate(u.created_at)}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button><button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Analyses</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td class="mono">${u.analyses_total||0}</td><td class="mono">${fmtDate(u.created_at)}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button>${(u.pay_as_you_go_credits||0)>0?`<button class="action-btn" style="border-color:var(--red);color:var(--red);" onclick="quickRemoveCredit('${u.id}','${u.email}')">- Credit</button>`:''}<button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`;
 }
 
 function filterUsers(){
@@ -477,13 +519,14 @@ function filterBroadcastUsers(){
   const users=q?allUsers.filter(u=>(u.email||'').toLowerCase().includes(q.toLowerCase())):allUsers.slice(0,15);
   const el=document.getElementById('broadcast-users-list');
   if(!el)return;
-  el.innerHTML=users.length?`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button><button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No users found</div>';
+  el.innerHTML=users.length?`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button>${(u.pay_as_you_go_credits||0)>0?`<button class="action-btn" style="border-color:var(--red);color:var(--red);" onclick="quickRemoveCredit('${u.id}','${u.email}')">- Credit</button>`:''}<button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No users found</div>';
 }
 
 function populateUserSelects(){
   const opts=allUsers.map(u=>`<option value="${u.id}">${u.email} (${planLabel(u.plan)})</option>`).join('');
   document.getElementById('grant-user-select').innerHTML=opts;
   document.getElementById('plan-user-select').innerHTML=opts;
+  document.getElementById('remove-credit-user-select').innerHTML=opts;
 }
 
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -541,6 +584,65 @@ function planLabel(p){if(p==='standard')return 'Standard';if(p==='pro')return 'P
 function planClass(p){if(p==='standard')return 'standard';if(p==='pro')return 'pro';return 'payg';}
 function fmtDate(d){if(!d)return '—';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
 function toast(msg){const t=document.getElementById('admin-toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+let allPromoCodes=[];
+
+async function loadPromoCodes(){
+  try{
+    const r=await fetch(API_BASE+'/admin/promo-codes',{headers:{Authorization:'Bearer '+authToken}});
+    const d=await r.json();
+    allPromoCodes=d.codes||[];
+  }catch(e){console.error(e);}
+}
+
+function renderPromoCodes(){
+  const el=document.getElementById('promo-codes-table');
+  if(!el)return;
+  if(!allPromoCodes.length){el.innerHTML='<div class="empty">No promo codes yet — create one to start handing out free credits via QR codes</div>';return;}
+  el.innerHTML=`<table><thead><tr><th>Code</th><th>Description</th><th>Status</th><th>Claims</th><th>Created</th><th>Action</th></tr></thead><tbody>${allPromoCodes.map(c=>`<tr><td class="mono" style="font-weight:700;color:var(--t1);">${c.code}</td><td style="color:var(--t2);">${c.description||'—'}</td><td><span class="badge ${c.active?'green':'red'}">${c.active?'Active':'Inactive'}</span></td><td class="mono">${c.claims_count||0}</td><td class="mono">${fmtDate(c.created_at)}</td><td><button class="action-btn ${c.active?'':'success'}" onclick="togglePromoCode('${c.id}',${c.active})">${c.active?'Deactivate':'Activate'}</button></td></tr>`).join('')}</tbody></table>`;
+}
+
+async function togglePromoCode(id,currentActive){
+  try{
+    const r=await fetch(API_BASE+'/admin/promo-codes/'+id,{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({active:!currentActive})});
+    const d=await r.json();
+    if(d.ok){toast(currentActive?'Code deactivated':'Code activated');await loadPromoCodes();renderPromoCodes();}
+    else toast('Failed: '+(d.error||'Unknown'));
+  }catch(e){toast('Failed to toggle promo code');}
+}
+
+async function submitCreatePromoCode(){
+  const code=document.getElementById('promo-code-input').value.trim().toUpperCase();
+  const desc=document.getElementById('promo-desc-input').value.trim();
+  if(!code){toast('Code name required');return;}
+  closeModal('modal-promo-create');
+  try{
+    const r=await fetch(API_BASE+'/admin/promo-codes',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({code,description:desc})});
+    const d=await r.json();
+    if(d.ok){toast('✓ Promo code created: '+code);document.getElementById('promo-code-input').value='';document.getElementById('promo-desc-input').value='';await loadPromoCodes();renderPromoCodes();}
+    else toast('Failed: '+(d.error||'Unknown'));
+  }catch(e){toast('Failed to create promo code');}
+}
+
+function quickRemoveCredit(userId,email){
+  const sel=document.getElementById('remove-credit-user-select');
+  if(sel)sel.value=userId;
+  document.getElementById('remove-credit-amount').value='1';
+  openModal('modal-remove-credit');
+}
+
+async function submitRemoveCredit(){
+  const userId=document.getElementById('remove-credit-user-select').value;
+  const amount=parseInt(document.getElementById('remove-credit-amount').value)||1;
+  const user=allUsers.find(u=>u.id===userId);
+  closeModal('modal-remove-credit');
+  try{
+    const r=await fetch(API_BASE+'/admin/remove-credit',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({userId,amount})});
+    const d=await r.json();
+    if(d.ok){toast('✓ Removed '+amount+' credit'+(amount>1?'s':'')+' from '+(user?.email||userId)+' (balance: '+d.newBalance+')');await loadUsers();renderAll();}
+    else toast('Failed: '+(d.error||'Unknown'));
+  }catch(e){toast('Failed to remove credits');}
+}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
 init();
