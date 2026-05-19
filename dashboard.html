@@ -1750,6 +1750,7 @@ async function startAnalysis() {
     }
 
     const batches = await buildBatches(selectedFiles);
+    const fileHash = await generateFileHash(selectedFiles);
     let finalResult = null;
     let finalPackName = 'Legal Pack';
 
@@ -1761,7 +1762,7 @@ async function startAnalysis() {
       const r = await fetch(API_BASE + '/analyse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
-        body: JSON.stringify({ batches: batches[i], batchIndex: i+1, totalBatches: batches.length, extractedText: i === 0 ? extractedText : '', listingMeta: i === 0 ? (window._listingMeta || null) : null })
+        body: JSON.stringify({ batches: batches[i], batchIndex: i+1, totalBatches: batches.length, extractedText: i === 0 ? extractedText : '', listingMeta: i === 0 ? (window._listingMeta || null) : null, fileHash })
       });
       const d = await r.json();
       if (!r.ok) {
@@ -1853,6 +1854,23 @@ function setProgress(show, label = '', pct = 30) {
       }
     });
   }
+}
+
+async function generateFileHash(files) {
+  const buffers = await Promise.all(
+    Array.from(files).map(f => f.arrayBuffer())
+  );
+  const combined = new Uint8Array(
+    buffers.reduce((acc, buf) => acc + buf.byteLength, 0)
+  );
+  let offset = 0;
+  for (const buf of buffers) {
+    combined.set(new Uint8Array(buf), offset);
+    offset += buf.byteLength;
+  }
+  const hashBuffer = await crypto.subtle.digest('SHA-256', combined);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function buildBatches(files) {
