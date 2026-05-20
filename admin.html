@@ -219,18 +219,22 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
 
 <!-- API COST -->
 <div class="panel" id="panel-apicost">
-  <div class="page-title">API Cost</div><div class="page-sub">Real costs from Anthropic billing — not estimated from token counts</div>
-  <div class="alert warn">⚠️ Old estimate ($1.53) was wrong — it used token counts × $3/$15/M rates, ignoring web search costs ($2.66), cache write costs ($0.65), and Opus model usage ($0.70). <strong>Real May total from Anthropic: $38.62</strong></div>
+  <div class="page-title">API Cost</div><div class="page-sub">Live estimate from token data + historical CSV import</div>
+
+  <div id="live-cost-stats"></div>
+  <div id="live-cost-disclaimer"></div>
+
+  <div style="font-size:0.58rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin:4px 0 10px;">Historical — May 1–11 (from Anthropic CSV)</div>
   <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
-    <div class="stat-card red"><div class="stat-label">Real Total (May)</div><div class="stat-value">$38.62</div><div class="stat-sub">Anthropic billing</div></div>
-    <div class="stat-card amber"><div class="stat-label">Input Tokens</div><div class="stat-value">$23.92</div><div class="stat-sub">62% of cost</div></div>
-    <div class="stat-card blue"><div class="stat-label">Output Tokens</div><div class="stat-value">$11.37</div><div class="stat-sub">29% of cost</div></div>
-    <div class="stat-card purple"><div class="stat-label">Web Search</div><div class="stat-value">$2.66</div><div class="stat-sub">property intel</div></div>
+    <div class="stat-card red"><div class="stat-label">Real Total (May)</div><div class="stat-value">£30.51</div><div class="stat-sub">$38.62 Anthropic billing</div></div>
+    <div class="stat-card amber"><div class="stat-label">Input Tokens</div><div class="stat-value">£18.90</div><div class="stat-sub">$23.92 — 62% of cost</div></div>
+    <div class="stat-card blue"><div class="stat-label">Output Tokens</div><div class="stat-value">£8.98</div><div class="stat-sub">$11.37 — 29% of cost</div></div>
+    <div class="stat-card purple"><div class="stat-label">Web Search</div><div class="stat-value">£2.10</div><div class="stat-sub">$2.66 property intel</div></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
     <div class="card"><div class="card-header"><div class="card-title">Cost by Type — May 2026</div></div><div id="cost-breakdown-chart"></div></div>
     <div class="card">
-      <div class="card-header"><div class="card-title">Daily Cost — May 1–11</div></div>
+      <div class="card-header"><div class="card-title">Historical — May 1–11 (from CSV)</div></div>
       <div class="card-body" style="padding:12px 16px 16px;">
         <div style="display:flex;gap:5px;align-items:flex-end;height:110px;" id="daily-cost-chart"></div>
         <div style="display:flex;gap:5px;margin-top:4px;" id="daily-cost-labels"></div>
@@ -238,15 +242,15 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><div class="card-title">Why the estimate was wrong</div></div>
+    <div class="card-header"><div class="card-title">Why CSV billing differs from token estimates</div></div>
     <div class="card-body">
-      <div class="metric-row"><span class="metric-label">Old method</span><span class="metric-value" style="color:var(--red);">DB token count × $3/$15 per million</span></div>
+      <div class="metric-row"><span class="metric-label">Old estimate method</span><span class="metric-value" style="color:var(--red);">DB token count × $3/$15 per million</span></div>
       <div class="metric-row"><span class="metric-label">Missing: web search costs</span><span class="metric-value" style="color:var(--amber);">$2.66 not captured</span></div>
       <div class="metric-row"><span class="metric-label">Missing: Opus model (higher rate)</span><span class="metric-value" style="color:var(--amber);">$0.70 difference</span></div>
       <div class="metric-row"><span class="metric-label">Missing: cache write costs</span><span class="metric-value" style="color:var(--amber);">$0.65 not captured</span></div>
-      <div class="metric-row"><span class="metric-label">Correct total (Anthropic CSV)</span><span class="metric-value" style="color:var(--green);">$38.62</span></div>
+      <div class="metric-row"><span class="metric-label">Correct total (Anthropic CSV)</span><span class="metric-value" style="color:var(--green);">$38.62 / £30.51</span></div>
       <div style="margin-top:12px;padding:11px;background:var(--bg3);border-radius:7px;font-size:0.72rem;color:var(--t2);line-height:1.6;">
-        💡 Import your Anthropic billing CSV monthly and update the REAL_API_COSTS object in this page for accurate tracking. Token count estimates will always under-count.
+        💡 Import your Anthropic billing CSV monthly and update the REAL_API_COSTS object in this page for accurate tracking. The live estimate above under-counts vs real billing.
       </div>
     </div>
   </div>
@@ -504,6 +508,23 @@ function renderUsageChart(){
 }
 
 function renderCostPanel(){
+  // Live estimate from token data
+  const GBP_RATE=0.79;
+  const INPUT_COST_PER_M=3.00;
+  const OUTPUT_COST_PER_M=15.00;
+  const totalInputTokens=allAnalyses.reduce((s,a)=>s+(a.tokens_input||0),0);
+  const totalOutputTokens=allAnalyses.reduce((s,a)=>s+(a.tokens_output||0),0);
+  const estInputUSD=totalInputTokens/1e6*INPUT_COST_PER_M;
+  const estOutputUSD=totalOutputTokens/1e6*OUTPUT_COST_PER_M;
+  const estCostUSD=estInputUSD+estOutputUSD;
+  const estCostGBP=estCostUSD*GBP_RATE;
+  const estInputGBP=estInputUSD*GBP_RATE;
+  const estOutputGBP=estOutputUSD*GBP_RATE;
+  const inK=n=>n>999?(n/1000).toFixed(0)+'K':n.toString();
+  document.getElementById('live-cost-stats').innerHTML=`<div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px;"><div class="stat-card green"><div class="stat-label">Est. Total Cost</div><div class="stat-value">£${estCostGBP.toFixed(2)}</div><div class="stat-sub">from token data</div></div><div class="stat-card blue"><div class="stat-label">Est. Total Cost</div><div class="stat-value">$${estCostUSD.toFixed(2)}</div><div class="stat-sub">USD equivalent</div></div><div class="stat-card amber"><div class="stat-label">Input Token Cost</div><div class="stat-value">£${estInputGBP.toFixed(2)}</div><div class="stat-sub">${inK(totalInputTokens)} tokens</div></div><div class="stat-card purple"><div class="stat-label">Output Token Cost</div><div class="stat-value">£${estOutputGBP.toFixed(2)}</div><div class="stat-sub">${inK(totalOutputTokens)} tokens</div></div></div>`;
+  document.getElementById('live-cost-disclaimer').innerHTML=`<div class="alert info" style="margin-bottom:16px;font-size:0.72rem;">Based on claude-sonnet-4-5 rates ($3/$15 per million tokens). Excludes web search costs (~$0.01/search) and cache costs. Actual Anthropic billing may differ — import CSV monthly for accuracy.</div>`;
+
+  // Historical CSV data
   const total=REAL_API_COSTS.total;
   const colors={'Input Tokens':'var(--blue)','Output Tokens':'var(--purple)','Web Search':'var(--amber)','Cache Write':'var(--cyan)','Cache Read':'var(--green)'};
   document.getElementById('cost-breakdown-chart').innerHTML=Object.entries(REAL_API_COSTS.byType).map(([lbl,cost])=>{const pct=(cost/total)*100;const col=colors[lbl]||'var(--t3)';return `<div class="cost-row"><div class="cost-dot" style="background:${col};"></div><div class="cost-label">${lbl}</div><div class="cost-bar-wrap"><div class="cost-bar" style="width:${pct}%;background:${col};"></div></div><div class="cost-amount">$${cost.toFixed(2)}</div><div class="cost-pct">${pct.toFixed(0)}%</div></div>`;}).join('');
