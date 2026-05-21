@@ -771,7 +771,7 @@ body {
 .report-tab:hover { color: var(--t1); }
 .report-tab.active { color: var(--red); border-bottom-color: var(--red); }
 .report-tab-panel { min-height: 200px; }
-.search-highlight { background: rgba(245,158,11,0.25); color: #92400e; border-radius: 2px; padding: 0 1px; font-weight: 600; }
+.search-highlight { background: rgba(245,158,11,0.3); color: #d97706; border-radius: 2px; padding: 0 1px; font-weight: 700; }
 .search-empty { padding: 32px; text-align: center; color: var(--t3); font-size: 0.82rem; }
 .search-doc-name { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--t3); margin: 14px 0 6px; padding-bottom: 5px; border-bottom: 1px solid var(--b1); }
 .search-result-card { padding: 10px 13px; background: var(--bg); border: 1px solid var(--b1); border-radius: 8px; margin-bottom: 7px; font-size: 0.78rem; color: var(--t2); line-height: 1.65; word-break: break-word; }
@@ -2020,21 +2020,21 @@ function renderResult(result, packName) {
   const confirmedTotal = costs.reduce((s,c) => s + (c.numericAmount || 0), 0);
   const risk = result.overallRisk || (critical > 3 ? 'SEVERE' : critical > 0 ? 'HIGH' : warnings > 0 ? 'MODERATE' : 'LOW');
   const rm = {
-    LOW:     { bg:'var(--greenmid)',border:'var(--green)',text:'var(--green)',  label:'🟢 LOW RISK' },
-    MODERATE:{ bg:'#fef9ec',        border:'#f59e0b',    text:'#d97706',       label:'🟡 MODERATE RISK' },
-    HIGH:    { bg:'var(--redbg)',   border:'var(--red)', text:'var(--red)',    label:'🔴 HIGH RISK' },
-    SEVERE:  { bg:'#fff0f0',        border:'#dc2626',    text:'#dc2626',       label:'🚨 SEVERE RISK' }
-  }[risk] || { bg:'var(--redbg)',border:'var(--red)',text:'var(--red)',label:'🔴 HIGH RISK' };
+    LOW:     { bg:'#16a34a', border:'#16a34a', text:'#ffffff', label:'🟢 LOW RISK' },
+    MODERATE:{ bg:'#d97706', border:'#d97706', text:'#ffffff', label:'🟡 MODERATE RISK' },
+    HIGH:    { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' },
+    SEVERE:  { bg:'#b91c1c', border:'#b91c1c', text:'#ffffff', label:'🚨 SEVERE RISK' }
+  }[risk] || { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' };
   const ia = result.investorAssessment || {};
   const mortgage = result.mortgageability || '—';
   const mortgageColor = (mortgage==='Cash Only'||mortgage==='Bridging Only') ? '#dc2626' : mortgage==='Restricted' ? '#d97706' : 'var(--ok)';
   const vt = critical===0&&warnings<=2
-    ? {icon:'🟢',text:'Low legal complexity',   sub:'Appears suitable for standard buyers',                        col:'var(--ok)', bg:'var(--okbg)',  border:'var(--okmid)'}
+    ? {icon:'🟢',text:'Low legal complexity',   sub:'Appears suitable for standard buyers',                        col:'var(--ok)', bg:'rgba(22,163,74,0.1)',   border:'rgba(22,163,74,0.3)'}
     : critical===0
-    ? {icon:'🟡',text:'Proceed with caution',   sub:'Warnings present — solicitor review advised',                col:'#d97706',   bg:'#fffbeb',     border:'#fef3c7'}
+    ? {icon:'🟡',text:'Proceed with caution',   sub:'Warnings present — solicitor review advised',                col:'#d97706',   bg:'rgba(245,158,11,0.1)',  border:'rgba(245,158,11,0.3)'}
     : critical<=3
-    ? {icon:'⚠️',text:'Solicitor review essential',sub:'Critical issues found — do not bid without legal advice', col:'var(--red)', bg:'var(--redbg)',border:'var(--redmid)'}
-    : {icon:'🔴',text:'Cash buyers only likely',sub:'Multiple critical issues — high risk acquisition',           col:'#dc2626',   bg:'#fff0f0',     border:'#fecaca'};
+    ? {icon:'⚠️',text:'Solicitor review essential',sub:'Critical issues found — do not bid without legal advice', col:'var(--red)', bg:'rgba(220,38,38,0.1)',   border:'rgba(220,38,38,0.3)'}
+    : {icon:'🔴',text:'Cash buyers only likely',sub:'Multiple critical issues — high risk acquisition',           col:'#dc2626',   bg:'rgba(220,38,38,0.12)',  border:'rgba(220,38,38,0.35)'};
 
   const ds = result.documentStatus || {};
   const uploadedFiles = result._uploadedFiles || [];
@@ -2044,28 +2044,28 @@ function renderResult(result, packName) {
   <!-- ① COMPACT HEADER — always visible -->
   <div style="padding:16px 20px;margin-bottom:0;background:${rm.bg};border:1.5px solid ${rm.border};border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <div style="flex:1;min-width:0;">
-      <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:${rm.text};margin-bottom:4px;">${rm.label}</div>
-      <div style="font-size:1.1rem;font-weight:800;color:var(--t1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${packName||'Legal Pack'}</div>
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ffffff;opacity:0.85;margin-bottom:4px;">${rm.label}</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${packName||'Legal Pack'}</div>
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
       <div style="display:flex;gap:6px;">
-        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.9);border-radius:8px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#dc2626'" onmouseout="this.style.borderColor='rgba(0,0,0,0.06)'">
+        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
           <div style="font-size:1.4rem;font-weight:800;color:#dc2626;line-height:1;">${critical}</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:var(--t3);letter-spacing:0.5px;">Critical ↗</div>
+          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Critical ↗</div>
         </button>
-        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.9);border-radius:8px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#d97706'" onmouseout="this.style.borderColor='rgba(0,0,0,0.06)'">
+        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
           <div style="font-size:1.4rem;font-weight:800;color:#d97706;line-height:1;">${warnings}</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:var(--t3);letter-spacing:0.5px;">Warnings ↗</div>
+          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Warnings ↗</div>
         </button>
-        ${confirmedTotal > 0 ? `<button onclick="showReportTab('costs',document.querySelectorAll('.report-tab')[0])" style="padding:7px 14px;background:rgba(255,255,255,0.9);border-radius:8px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;text-align:center;" onmouseover="this.style.borderColor='#d97706'" onmouseout="this.style.borderColor='rgba(0,0,0,0.06)'">
-          <div style="font-size:1rem;font-weight:800;color:var(--t1);line-height:1.2;">£${(confirmedTotal/1000).toFixed(0)}k</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:var(--t3);letter-spacing:0.5px;">Costs ↗</div>
+        ${confirmedTotal > 0 ? `<button onclick="showReportTab('costs',document.querySelectorAll('.report-tab')[0])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
+          <div style="font-size:1rem;font-weight:800;color:#222;line-height:1.2;">£${(confirmedTotal/1000).toFixed(0)}k</div>
+          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Costs ↗</div>
         </button>` : ''}
       </div>
       <div style="display:flex;gap:5px;">
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;" onclick="shareReport()">🔗 Share</button>
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;" onclick="showUploadArea()">+ New</button>
+        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
+        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="shareReport()">🔗 Share</button>
+        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="showUploadArea()">+ New</button>
       </div>
     </div>
   </div>
@@ -2108,9 +2108,9 @@ function renderResult(result, packName) {
 
     <!-- Biggest Problems -->
     ${criticalFlags.length ? `
-    <div style="padding:18px 20px;background:var(--bg);border:1.5px solid #fecaca;border-radius:13px;margin-bottom:16px;">
+    <div style="padding:18px 20px;background:var(--bg);border:1.5px solid rgba(220,38,38,0.35);border-radius:13px;margin-bottom:16px;">
       <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:14px;">🚨 Biggest Problems Found</div>
-      ${criticalFlags.slice(0,5).map((f,i) => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #fef2f2;cursor:pointer;" onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1]);setTimeout(()=>{const el=document.querySelectorAll('#rtab-flags [id^=flag-]')[${i}];if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100)">
+      ${criticalFlags.slice(0,5).map((f,i) => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(220,38,38,0.12);cursor:pointer;" onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1]);setTimeout(()=>{const el=document.querySelectorAll('#rtab-flags [id^=flag-]')[${i}];if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100)">
         <div style="font-size:0.95rem;font-weight:800;color:#dc2626;font-family:'DM Mono',monospace;min-width:20px;flex-shrink:0;">${i+1}.</div>
         <div style="flex:1;">
           <div style="font-size:0.92rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${f.title}</div>
@@ -2119,7 +2119,7 @@ function renderResult(result, packName) {
         </div>
       </div>`).join('')}
     </div>` : `
-    <div style="padding:16px 18px;background:var(--okbg);border:1.5px solid var(--okmid);border-radius:13px;margin-bottom:16px;text-align:center;">
+    <div style="padding:16px 18px;background:rgba(22,163,74,0.1);border:1.5px solid rgba(22,163,74,0.3);border-radius:13px;margin-bottom:16px;text-align:center;">
       <div style="font-size:1.1rem;margin-bottom:6px;">✅</div>
       <div style="font-size:0.9rem;font-weight:700;color:var(--ok);">No critical issues found</div>
       <div style="font-size:0.8rem;color:var(--t2);margin-top:4px;">Standard due diligence applies — see Flags tab for any warnings</div>
@@ -2164,13 +2164,13 @@ function renderResult(result, packName) {
         ${(()=>{
           const pills=[];
           const mtg=mortgage||'';
-          if(mtg==='Standard')       pills.push(['✅','Standard Mortgage Possible','#f0fdf4','#15803d','#bbf7d0']);
-          else if(mtg==='Restricted')pills.push(['⚠️','Restricted Mortgage','#fffbeb','#92400e','#fef3c7']);
-          else if(mtg==='Bridging Only') pills.push(['🟠','Bridging / Specialist Finance','#fff7ed','#c2410c','#fed7aa']);
-          else if(mtg==='Cash Only'||ia.mortgageable===false) pills.push(['❌','Standard Mortgage Unlikely','#fef2f2','#dc2626','#fecaca']);
-          if(mtg==='Cash Only'||mtg==='Bridging Only') pills.push(['✅','Cash Buyer Possible','#f0fdf4','#15803d','#bbf7d0']);
-          if(critical>0)             pills.push(['⚠️','Solicitor Review Required','#fffbeb','#92400e','#fef3c7']);
-          if(ia.resaleable===false)  pills.push(['🟠','Resale Risk','#fff7ed','#c2410c','#fed7aa']);
+          if(mtg==='Standard')       pills.push(['✅','Standard Mortgage Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
+          else if(mtg==='Restricted')pills.push(['⚠️','Restricted Mortgage','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
+          else if(mtg==='Bridging Only') pills.push(['🟠','Bridging / Specialist Finance','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
+          else if(mtg==='Cash Only'||ia.mortgageable===false) pills.push(['❌','Standard Mortgage Unlikely','rgba(220,38,38,0.1)','#dc2626','rgba(220,38,38,0.3)']);
+          if(mtg==='Cash Only'||mtg==='Bridging Only') pills.push(['✅','Cash Buyer Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
+          if(critical>0)             pills.push(['⚠️','Solicitor Review Required','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
+          if(ia.resaleable===false)  pills.push(['🟠','Resale Risk','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
           return pills.map(([icon,label,bg,col,border])=>`<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid ${border};background:${bg};font-size:0.75rem;font-weight:700;color:${col};">${icon} ${label}</span>`).join('');
         })()}
       </div>
@@ -2184,7 +2184,7 @@ function renderResult(result, packName) {
     </div>` : ''}
 
     ${result.titleAnalysis?.whatBuyerCannotDo ? `
-    <div style="margin-top:14px;padding:14px 16px;background:#fff0f0;border:1px solid #fecaca;border-radius:11px;">
+    <div style="margin-top:14px;padding:14px 16px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.3);border-radius:11px;">
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:7px;">What the Buyer Cannot Do</div>
       <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${result.titleAnalysis.whatBuyerCannotDo}</div>
     </div>` : ''}
@@ -2240,23 +2240,23 @@ function renderResult(result, packName) {
       </div>`).join('')}
     </div>` : `<div style="padding:20px;text-align:center;color:var(--t3);">No confirmed buyer cost figures found in documents</div>`}
     ${summary?.unquantifiedLiabilities?.length ? `
-    <div style="margin-top:18px;border:1.5px solid #f59e0b;border-radius:13px;overflow:hidden;">
-      <div style="padding:13px 18px;background:#fffbeb;border-bottom:1px solid #fef3c7;display:flex;align-items:center;gap:10px;">
+    <div style="margin-top:18px;border:1.5px solid rgba(245,158,11,0.45);border-radius:13px;overflow:hidden;">
+      <div style="padding:13px 18px;background:rgba(245,158,11,0.1);border-bottom:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;gap:10px;">
         <span style="font-size:1rem;">⚠️</span>
         <div>
-          <div style="font-size:0.82rem;font-weight:800;color:#92400e;">Potential Buyer Liabilities — No Figure Stated</div>
-          <div style="font-size:0.7rem;color:#b45309;margin-top:2px;">These obligations were identified in the documents but no cost figure was given. They may represent significant financial exposure.</div>
+          <div style="font-size:0.82rem;font-weight:800;color:var(--warn);">Potential Buyer Liabilities — No Figure Stated</div>
+          <div style="font-size:0.7rem;color:var(--t2);margin-top:2px;">These obligations were identified in the documents but no cost figure was given. They may represent significant financial exposure.</div>
         </div>
       </div>
-      <div style="background:#fffdf5;padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:rgba(245,158,11,0.04);padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
         ${summary.unquantifiedLiabilities.map(l=>{
           const dotIdx = l.indexOf('.');
           const hasTitle = dotIdx > 0 && dotIdx < 80;
           const title = hasTitle ? l.slice(0, dotIdx).trim() : null;
           const desc  = hasTitle ? l.slice(dotIdx + 1).trim() : l;
-          return `<div style="padding:11px 14px;background:#fff;border:1px solid #fde68a;border-radius:9px;">
-            ${title ? `<div style="font-size:0.8rem;font-weight:700;color:#92400e;margin-bottom:4px;">⚠ ${title}</div>` : `<div style="font-size:0.72rem;font-weight:700;color:#d97706;margin-bottom:3px;">⚠ Unquantified Liability</div>`}
-            ${desc ? `<div style="font-size:0.83rem;color:#78350f;line-height:1.55;font-weight:500;">${desc}</div>` : ''}
+          return `<div style="padding:11px 14px;background:var(--bg);border:1px solid rgba(245,158,11,0.3);border-radius:9px;">
+            ${title ? `<div style="font-size:0.8rem;font-weight:700;color:var(--warn);margin-bottom:4px;">⚠ ${title}</div>` : `<div style="font-size:0.72rem;font-weight:700;color:var(--warn);margin-bottom:3px;">⚠ Unquantified Liability</div>`}
+            ${desc ? `<div style="font-size:0.83rem;color:var(--t1);line-height:1.55;font-weight:500;">${desc}</div>` : ''}
           </div>`;
         }).join('')}
       </div>
@@ -2279,7 +2279,7 @@ function renderResult(result, packName) {
       </div>
       ${cacFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Common Auction Conditions — Issues Found</div>${cacFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">No specific issues flagged in Common Auction Conditions.</div>`}
       ${specialFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin:14px 0 10px;">Special Conditions — Issues Found (${specialFlags.length})</div>${specialFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">${sc||'No separate Special Conditions document was identified. Always verify with your solicitor before bidding.'}</div>`}
-      <div style="padding:12px 14px;background:#fffbeb;border:1px solid #fef3c7;border-radius:10px;font-size:0.78rem;color:#92400e;line-height:1.6;">
+      <div style="padding:12px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:0.78rem;color:var(--warn);line-height:1.6;">
         ⚠️ <strong>Always read the full Special Conditions before bidding.</strong> They are legally binding from the moment the hammer falls and cannot be renegotiated.
       </div>`;
     })()}
@@ -2308,8 +2308,8 @@ function renderResult(result, packName) {
                 <span>📄</span>
                 <div style="flex:1;"><div style="font-size:0.86rem;font-weight:700;color:var(--t1);">${doc.document}</div>${doc.evidence?`<div style="font-size:0.68rem;color:var(--t3);margin-top:1px;">${doc.evidence}</div>`:''}</div>
                 <div style="display:flex;gap:5px;align-items:center;">
-                  ${crit?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:#fef2f2;color:#dc2626;">${crit} critical</span>`:''}
-                  ${warn?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:#fffbeb;color:#d97706;">${warn} warning</span>`:''}
+                  ${crit?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(220,38,38,0.12);color:#dc2626;">${crit} critical</span>`:''}
+                  ${warn?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:#d97706;">${warn} warning</span>`:''}
                   ${!crit&&!warn?`<span style="font-size:0.6rem;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--okbg);color:var(--ok);">✓ clear</span>`:''}
                   <span class="doc-chev" style="color:var(--t3);font-size:0.75rem;">▾</span>
                 </div>
@@ -2341,7 +2341,7 @@ function renderResult(result, packName) {
   <!-- ⑧ TAB: MISSING -->
   <div id="rtab-missing" class="report-tab-panel" style="display:none;">
     ${result.missingDocuments?.length ? `
-      <div style="padding:13px 15px;background:#fff0f0;border:1.5px solid #fecaca;border-radius:11px;margin-bottom:14px;">
+      <div style="padding:13px 15px;background:rgba(220,38,38,0.09);border:1.5px solid rgba(220,38,38,0.35);border-radius:11px;margin-bottom:14px;">
         <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:4px;">⚠️ ${result.missingDocuments.length} document${result.missingDocuments.length!==1?'s':''} missing</div>
         <div style="font-size:0.8rem;color:var(--t2);">You are bidding without full information. Each absence increases risk.</div>
       </div>
@@ -2416,23 +2416,23 @@ function renderFlagCard(f, index) {
   const sev = f.severity || 'note';
   const isCritical = sev==='critical'||sev==='high';
   const isWarning = sev==='warning'||sev==='medium';
-  const borderColor = isCritical?'#dc2626':isWarning?'#f59e0b':'#cbd5e1';
+  const borderColor = isCritical?'#dc2626':isWarning?'#f59e0b':'rgba(148,163,184,0.4)';
   const sevLabel = isCritical?'CRITICAL':isWarning?'WARNING':'NOTE';
-  const sevBg = isCritical?'#fef2f2':isWarning?'#fffbeb':'#f8fafc';
-  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'#64748b';
-  const highlightColor = isCritical?'rgba(220,38,38,0.08)':isWarning?'rgba(245,158,11,0.08)':'rgba(100,116,139,0.06)';
+  const sevBg = isCritical?'rgba(220,38,38,0.12)':isWarning?'rgba(245,158,11,0.12)':'rgba(100,116,139,0.08)';
+  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'var(--t3)';
+  const highlightColor = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(245,158,11,0.1)':'rgba(100,116,139,0.07)';
 
   // Derive impact-level pills from category, title and buyerImpact text
   const _t = ((f.category||'') + ' ' + (f.title||'') + ' ' + (f.buyerImpact||'')).toLowerCase();
   const _impTags = [];
-  if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  '#fef2f2','#b91c1c']);
-  if (/resale|re-sale|sell on|saleability|unmarketable/.test(_t))                              _impTags.push(['🟠','Resale Risk',    '#fff7ed','#c2410c']);
-  if (/covenant|dispute|adverse|possessory|easement|right of way|chancel|overriding|title/.test(_t)) _impTags.push(['🟡','Legal Risk',     '#fefce8','#92400e']);
-  if (/completion|timescale|short lease|deadline|notice|vacant possession|delay/.test(_t))     _impTags.push(['🔵','Time Risk',      '#eff6ff','#1e40af']);
-  if (/\bcost\b|fee|charge|sdlt|payment|contribution|levy|ground rent|service charge/.test(_t)) _impTags.push(['💷','Cost Risk',      '#f0fdf4','#15803d']);
-  if (/structural|survey|planning|repair|asbestos|damp|subsidence|drainage|condition|defect/.test(_t)) _impTags.push(['🏚','Condition Risk','#fdf4ff','#6d28d9']);
+  if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  'rgba(185,28,28,0.1)','#dc2626']);
+  if (/resale|re-sale|sell on|saleability|unmarketable/.test(_t))                              _impTags.push(['🟠','Resale Risk',    'rgba(194,65,12,0.1)','#ea580c']);
+  if (/covenant|dispute|adverse|possessory|easement|right of way|chancel|overriding|title/.test(_t)) _impTags.push(['🟡','Legal Risk',  'rgba(146,64,14,0.1)','#d97706']);
+  if (/completion|timescale|short lease|deadline|notice|vacant possession|delay/.test(_t))     _impTags.push(['🔵','Time Risk',      'rgba(30,64,175,0.1)','#3b82f6']);
+  if (/\bcost\b|fee|charge|sdlt|payment|contribution|levy|ground rent|service charge/.test(_t)) _impTags.push(['💷','Cost Risk',    'rgba(21,128,61,0.1)','#16a34a']);
+  if (/structural|survey|planning|repair|asbestos|damp|subsidence|drainage|condition|defect/.test(_t)) _impTags.push(['🏚','Condition Risk','rgba(109,40,217,0.1)','#7c3aed']);
   const impTagsHtml = _impTags.map(([icon,label,bg,col]) =>
-    `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};white-space:nowrap;">${icon} ${label}</span>`).join('');
+    `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};border:1px solid ${col.replace(')',',0.3)').replace('rgb','rgba')};white-space:nowrap;">${icon} ${label}</span>`).join('');
 
   // Split detail into sentences for better readability
   const detail = f.detail || f.description || '';
@@ -2443,7 +2443,7 @@ function renderFlagCard(f, index) {
     <div style="margin-top:12px;padding:10px 12px;background:${highlightColor};border-radius:8px;border-left:3px solid ${borderColor};">
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${sevColor};margin-bottom:5px;">📄 Evidence</div>
       ${f.documentSource ? `<div style="font-size:0.78rem;font-weight:600;color:var(--t1);margin-bottom:${f.evidence?'4px':'0'};">
-        <span style="background:${isCritical?'#fef2f2':isWarning?'#fffbeb':'#f0f9ff'};border:1px solid ${isCritical?'#fecaca':isWarning?'#fef3c7':'#e0f2fe'};padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.72rem;">${f.documentSource}</span>
+        <span style="background:${highlightColor};border:1px solid ${borderColor};padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--t2);">${f.documentSource}</span>
       </div>` : ''}
       ${f.evidence ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.55;font-style:italic;">"${f.evidence}"</div>` : ''}
     </div>` : '';
@@ -3729,12 +3729,39 @@ function searchDocuments(query) {
     resultsEl.innerHTML = '<div class="search-empty">Type above to search all document text</div>';
     return;
   }
-  const docs = (window._currentDocTexts && window._currentDocTexts.length)
-    ? window._currentDocTexts
-    : window._currentExtractedText
-      ? [{ name: 'Document', text: window._currentExtractedText }]
-      : [];
-  if (!docs.length) {
+
+  let isAIFallback = false;
+  let docs;
+  if (window._currentDocTexts && window._currentDocTexts.length) {
+    docs = window._currentDocTexts;
+  } else if (window._currentExtractedText) {
+    docs = [{ name: 'Document', text: window._currentExtractedText }];
+  } else if (lastResult) {
+    isAIFallback = true;
+    const r = lastResult;
+    let text = '';
+    if (r.summary) text += r.summary + '\n\n';
+    if (r.top5Risks) text += (Array.isArray(r.top5Risks) ? r.top5Risks.join('\n') : String(r.top5Risks)) + '\n\n';
+    (r.flags || r.risks || []).forEach(f => {
+      [f.title, f.detail, f.description, f.evidence, f.buyerImpact, f.investorImpact].filter(Boolean).forEach(s => { text += s + '\n'; });
+      text += '\n';
+    });
+    (r.buyerCostFigures || r.extraCosts || []).forEach(c => {
+      [c.label, c.evidence].filter(Boolean).forEach(s => { text += s + '\n'; });
+    });
+    if (r.buyerCostSummary?.unquantifiedLiabilities) {
+      const ul = r.buyerCostSummary.unquantifiedLiabilities;
+      text += (Array.isArray(ul) ? ul.join('\n') : String(ul)) + '\n\n';
+    }
+    if (r.titleAnalysis && typeof r.titleAnalysis === 'object') {
+      Object.values(r.titleAnalysis).filter(v => typeof v === 'string').forEach(v => { text += v + '\n'; });
+    }
+    docs = [{ name: 'From AI Analysis', text: text.trim() }];
+  } else {
+    docs = [];
+  }
+
+  if (!docs.length || !docs.some(d => d.text)) {
     resultsEl.innerHTML = '<div class="search-empty">No document text available — run a new analysis to enable search</div>';
     return;
   }
@@ -3761,12 +3788,15 @@ function searchDocuments(query) {
   }
   const total = results.reduce((s, r) => s + r.matches.length, 0);
   if (countEl) countEl.textContent = total ? `${total} match${total !== 1 ? 'es' : ''} found` : '';
+  const noteHtml = isAIFallback
+    ? `<div style="font-size:0.72rem;color:var(--t3);padding:8px 12px;background:var(--bg2);border:1px solid var(--b1);border-radius:7px;margin-bottom:10px;">Searching AI analysis data — re-run analysis to search full document text</div>`
+    : '';
   if (!total) {
-    resultsEl.innerHTML = `<div class="search-empty">No matches found for "${escHtml(query)}"</div>`;
+    resultsEl.innerHTML = noteHtml + `<div class="search-empty">No matches found for "${escHtml(query)}"</div>`;
     return;
   }
   const multiDoc = docs.length > 1;
-  resultsEl.innerHTML = results.map(r =>
+  resultsEl.innerHTML = noteHtml + results.map(r =>
     `<div>${multiDoc ? `<div class="search-doc-name">📄 ${escHtml(r.name)}</div>` : ''}${
       r.matches.map(m =>
         `<div class="search-result-card">${escHtml(m.before)}<mark class="search-highlight">${escHtml(m.matched)}</mark>${escHtml(m.after)}</div>`
