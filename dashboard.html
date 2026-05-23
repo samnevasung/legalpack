@@ -2083,6 +2083,8 @@ function renderResult(result, packName) {
     <button class="report-tab"        onclick="showReportTab('search',this)"   style="border-radius:0 0 12px 0;flex:1;">🔍 Search</button>
   </div>
 
+  ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs. Ask your solicitor to verify key findings.</div>` : ''}
+
   <!-- ③ TAB: OVERVIEW -->
   <div id="rtab-overview" class="report-tab-panel">
 
