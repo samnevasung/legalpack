@@ -869,16 +869,13 @@ body {
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Main</div>
-    <button class="nav-item active" data-panel="overview" onclick="switchPanel('overview',this)">
-      <span class="nav-icon">⬛</span> Overview
-    </button>
     <button class="nav-item" data-panel="analyse" onclick="showUploadArea();switchPanel('analyse',this)">
       <span class="nav-icon">🔍</span> Analyse Pack
     </button>
     <button id="nav-current-report" class="nav-item" data-panel="analyse" onclick="switchToCurrentReport()" style="display:none;color:var(--green);background:var(--greenmid);">
       <span class="nav-icon">📋</span> Current Report
     </button>
-    <button class="nav-item" data-panel="reports" onclick="switchPanel('reports',this)">
+    <button class="nav-item active" data-panel="reports" onclick="switchPanel('reports',this)">
       <span class="nav-icon">📁</span> Saved Reports
       <span class="nav-badge" id="reports-count" style="display:none">0</span>
     </button>
@@ -903,7 +900,7 @@ body {
 <div class="main">
   <div class="topbar">
     <button class="hamburger" onclick="openSidebar()">☰</button>
-    <div class="topbar-title" id="topbar-title">Overview</div>
+    <div class="topbar-title" id="topbar-title">Saved Reports</div>
     <div class="topbar-actions" id="topbar-actions">
       <div class="disclaimer-btn" tabindex="0">?
         <div class="disclaimer-tooltip">
@@ -918,41 +915,6 @@ body {
   </div>
 
   <div class="content">
-
-    <!-- OVERVIEW -->
-    <div class="panel active" id="panel-overview">
-      <div class="stat-grid">
-        <div class="stat-card blue">
-          <div class="stat-label">Reports Run</div>
-          <div class="stat-value" id="stat-total">0</div>
-          <div class="stat-sub">all time</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-label">Critical Flags</div>
-          <div class="stat-value" id="stat-yes">0</div>
-          <div class="stat-sub">across all reports</div>
-        </div>
-        <div class="stat-card amber">
-          <div class="stat-label">Warnings</div>
-          <div class="stat-value" id="stat-caution">0</div>
-          <div class="stat-sub">across all reports</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-label">Packs Reviewed</div>
-          <div class="stat-value" id="stat-no">0</div>
-          <div class="stat-sub">this month</div>
-        </div>
-      </div>
-
-      <div class="section-title">Recent Reports</div>
-      <div id="overview-reports">
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <div class="empty-text">No reports yet — analyse your first legal pack</div>
-          <button class="btn btn-primary" onclick="switchPanel('analyse', document.querySelector('[data-panel=analyse]'))">Analyse a Pack</button>
-        </div>
-      </div>
-    </div>
 
     <!-- ANALYSE -->
     <div class="panel" id="panel-analyse">
@@ -1027,7 +989,29 @@ body {
     </div>
 
     <!-- REPORTS -->
-    <div class="panel" id="panel-reports">
+    <div class="panel active" id="panel-reports">
+      <div class="stat-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Reports Run</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-sub">all time</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Critical Flags</div>
+          <div class="stat-value" id="stat-yes">0</div>
+          <div class="stat-sub">across all reports</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Warnings</div>
+          <div class="stat-value" id="stat-caution">0</div>
+          <div class="stat-sub">across all reports</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Packs Reviewed</div>
+          <div class="stat-value" id="stat-no">0</div>
+          <div class="stat-sub">this month</div>
+        </div>
+      </div>
       <div id="reports-list">
         <div class="empty-state">
           <div class="empty-icon">📁</div>
@@ -1495,12 +1479,11 @@ async function loadReports() {
     const d = await r.json();
     allReports = d.analyses || [];
     renderReports();
-    renderOverview();
     populateCompareSelects();
   } catch(e) { console.error('loadReports', e); }
 }
 
-function renderOverview() {
+function renderReports() {
   const total = allReports.length;
   const critical = allReports.reduce((sum, r) => sum + (r.high_count || 0), 0);
   const warnings = allReports.reduce((sum, r) => sum + Math.max(0, (r.issues_count || 0) - (r.high_count || 0)), 0);
@@ -1515,22 +1498,13 @@ function renderOverview() {
   document.getElementById('stat-caution').textContent = warnings;
   document.getElementById('stat-no').textContent = thisMonth;
 
-  const el = document.getElementById('overview-reports');
-  if (!allReports.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No reports yet</div><button class="btn btn-primary" onclick="switchPanel('analyse',document.querySelector('[data-panel=analyse]'))">Analyse a Pack</button></div>`;
-    return;
-  }
-  el.innerHTML = allReports.slice(0, 5).map(r => reportRow(r)).join('');
-
   const count = document.getElementById('reports-count');
   count.textContent = total;
   count.style.display = total ? 'inline-flex' : 'none';
-}
 
-function renderReports() {
   const el = document.getElementById('reports-list');
   if (!allReports.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-text">No saved reports yet</div></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-text">No saved reports yet</div><button class="btn btn-primary" onclick="switchPanel('analyse',document.querySelector('[data-panel=analyse]'))">Analyse a Pack</button></div>`;
     return;
   }
   el.innerHTML = allReports.map(r => reportRow(r)).join('');
@@ -1583,7 +1557,6 @@ async function deleteReport(id, e) {
     });
     allReports = allReports.filter(r => r.id !== id);
     renderReports();
-    renderOverview();
   } catch(e) { showToast('Could not delete report'); }
 }
 
@@ -1623,7 +1596,6 @@ function closeSidebar() {
 
 // ── PANEL NAVIGATION ──────────────────────────────────────────────────────────
 const panelTitles = {
-  overview: 'Overview',
   analyse: 'Analyse Legal Pack',
   reports: 'Saved Reports',
   compare: 'Compare Reports',
