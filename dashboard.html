@@ -833,6 +833,40 @@ body {
 .report-tab:hover { color: var(--t1); }
 .report-tab.active { color: var(--red); border-bottom-color: var(--red); }
 .report-tab-panel { min-height: 200px; }
+
+/* ── REPORT TWO-PANE LAYOUT ── */
+.report-two-pane {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+.report-left-pane {
+  flex: 0 0 50%;
+  min-width: 480px;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+.report-right-pane {
+  flex: 0 0 50%;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  height: calc(100vh - 76px);
+  overflow-y: auto;
+  border-left: 1px solid var(--b1);
+  padding-left: 20px;
+}
+@media (max-width: 1024px) {
+  .report-two-pane { flex-direction: column; }
+  .report-left-pane { flex: none; width: 100%; min-width: 0; padding-right: 0; }
+  .report-right-pane {
+    flex: none; width: 100%; position: static;
+    height: auto; overflow-y: visible;
+    border-left: none; border-top: 1px solid var(--b1);
+    padding-left: 0; padding-top: 20px; margin-top: 24px;
+  }
+}
+
 .search-highlight { background: rgba(245,158,11,0.3); color: #d97706; border-radius: 2px; padding: 0 1px; font-weight: 700; }
 .search-empty { padding: 32px; text-align: center; color: var(--t3); font-size: 0.82rem; }
 .search-doc-name { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: var(--t3); margin: 14px 0 6px; padding-bottom: 5px; border-bottom: 1px solid var(--b1); }
@@ -2243,7 +2277,8 @@ function renderResult(result, packName) {
   const ds = result.documentStatus || {};
   const uploadedFiles = result._uploadedFiles || [];
 
-  el.innerHTML = `<div class="result-wrap" style="margin-top:0;max-width:900px;">
+  el.innerHTML = `<div class="report-two-pane">
+  <div class="report-left-pane">
 
   <!-- ① COMPACT HEADER — always visible -->
   <div style="padding:16px 20px;margin-bottom:0;background:${rm.bg};border:1.5px solid ${rm.border};border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
@@ -2284,7 +2319,6 @@ function renderResult(result, packName) {
     <button class="report-tab"        onclick="showReportTab('missing',this)"   style="border-radius:0;flex:1;">📂 Missing${result.missingDocuments?.length?' ('+result.missingDocuments.length+')':''}</button>
     <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;flex:1;">☑ Checklist</button>
     <button class="report-tab"        onclick="showReportTab('notes',this)"     style="border-radius:0;flex:1;">✏️ Notes</button>
-    <button class="report-tab"        onclick="showReportTab('search',this)"   style="border-radius:0 0 12px 0;flex:1;">🔍 Search</button>
   </div>
 
   ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs. Ask your solicitor to verify key findings.</div>` : ''}
@@ -2589,8 +2623,11 @@ function renderResult(result, packName) {
     <button onclick="saveReportNotes()" class="btn btn-primary" style="margin-top:10px;">Save Notes</button>
   </div>
 
-  <!-- ⑪ TAB: SEARCH -->
-  <div id="rtab-search" class="report-tab-panel" style="display:none;">
+  </div><!-- /report-left-pane -->
+
+  <!-- ═══ RIGHT PANE — Search Documents ═══ -->
+  <div class="report-right-pane">
+    <div style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b1);">🔍 Search Documents</div>
     ${canAccessSearch() ? `
       <div style="position:relative;margin-bottom:12px;">
         <input type="text" id="search-input" placeholder="Search document text…" oninput="onSearchInput(this)" autocomplete="off"
@@ -2604,14 +2641,14 @@ function renderResult(result, packName) {
       <div style="text-align:center;padding:48px 20px;">
         <div style="font-size:2.5rem;margin-bottom:14px;">🔒</div>
         <div style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:6px;">Search is a premium feature</div>
-        <div style="font-size:0.82rem;color:var(--t2);margin-bottom:22px;max-width:280px;margin-left:auto;margin-right:auto;line-height:1.55;">Buy a credit to analyse a pack and search all document text, or upgrade for unlimited access.</div>
+        <div style="font-size:0.82rem;color:var(--t2);margin-bottom:22px;line-height:1.55;">Buy a credit to analyse a pack and search all document text, or upgrade for unlimited access.</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
           <button onclick="handleUpgrade('pay_as_you_go')" style="padding:9px 18px;background:var(--amber);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">⚡ Buy Credits</button>
           <button onclick="handleUpgrade('standard')" style="padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Upgrade →</button>
         </div>
       </div>
     `}
-  </div>
+  </div><!-- /report-right-pane -->
 
 </div>`;
 }
