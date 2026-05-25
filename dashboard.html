@@ -841,12 +841,19 @@ body {
   width: 100%;
 }
 .report-left-pane {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-right: 0;
+  box-sizing: border-box;
+  transition: flex 0.2s ease, padding 0.2s ease;
+}
+.report-two-pane.search-open .report-left-pane {
   flex: 0 0 50%;
   min-width: 480px;
   padding-right: 20px;
-  box-sizing: border-box;
 }
 .report-right-pane {
+  display: none;
   flex: 0 0 50%;
   box-sizing: border-box;
   position: sticky;
@@ -856,11 +863,21 @@ body {
   border-left: 1px solid var(--b1);
   padding-left: 20px;
 }
+.report-two-pane.search-open .report-right-pane { display: block; }
+/* Viewer back button */
+.search-viewer-back {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: none; color: var(--accent);
+  cursor: pointer; font-size: 0.78rem; font-weight: 700;
+  padding: 0; margin-bottom: 14px; font-family: 'DM Sans', sans-serif;
+}
+.search-viewer-back:hover { opacity: 0.75; }
 @media (max-width: 1024px) {
   .report-two-pane { flex-direction: column; }
+  .report-two-pane.search-open .report-left-pane,
   .report-left-pane { flex: none; width: 100%; min-width: 0; padding-right: 0; }
-  .report-right-pane {
-    flex: none; width: 100%; position: static;
+  .report-right-pane, .report-two-pane.search-open .report-right-pane {
+    display: block; flex: none; width: 100%; position: static;
     height: auto; overflow-y: visible;
     border-left: none; border-top: 1px solid var(--b1);
     padding-left: 0; padding-top: 20px; margin-top: 24px;
@@ -2302,6 +2319,7 @@ function renderResult(result, packName) {
         </button>` : ''}
       </div>
       <div style="display:flex;gap:5px;">
+        <button id="search-toggle-btn" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="toggleSearchPane()">🔍 Search</button>
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="shareReport()">🔗 Share</button>
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="showUploadArea()">+ New</button>
@@ -2628,26 +2646,34 @@ function renderResult(result, packName) {
   <!-- ═══ RIGHT PANE — Search Documents ═══ -->
   <div class="report-right-pane">
     <div style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b1);">🔍 Search Documents</div>
-    ${canAccessSearch() ? `
-      <div style="position:relative;margin-bottom:12px;">
-        <input type="text" id="search-input" placeholder="Search document text…" oninput="onSearchInput(this)" autocomplete="off"
-          style="width:100%;padding:10px 108px 10px 14px;background:var(--bg);border:1.5px solid var(--b1);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'">
-        <span id="search-count" style="position:absolute;right:34px;top:50%;transform:translateY(-50%);font-size:0.67rem;color:var(--t3);white-space:nowrap;pointer-events:none;"></span>
-        <button id="search-clear" onclick="const i=document.getElementById('search-input');i.value='';onSearchInput(i);" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:none;background:none;border:none;color:var(--t3);cursor:pointer;font-size:0.9rem;padding:2px 4px;line-height:1;">✕</button>
-      </div>
-      <div id="search-results"><div class="search-empty">Type above to search all document text</div></div>
-    ` : `
-      <div style="text-align:center;padding:48px 20px;">
-        <div style="font-size:2.5rem;margin-bottom:14px;">🔒</div>
-        <div style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:6px;">Search is a premium feature</div>
-        <div style="font-size:0.82rem;color:var(--t2);margin-bottom:22px;line-height:1.55;">Buy a credit to analyse a pack and search all document text, or upgrade for unlimited access.</div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-          <button onclick="handleUpgrade('pay_as_you_go')" style="padding:9px 18px;background:var(--amber);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">⚡ Buy Credits</button>
-          <button onclick="handleUpgrade('standard')" style="padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Upgrade →</button>
+
+    <!-- Search results view -->
+    <div id="search-pane-results">
+      ${canAccessSearch() ? `
+        <div style="position:relative;margin-bottom:12px;">
+          <input type="text" id="search-input" placeholder="Search document text…" oninput="onSearchInput(this)" autocomplete="off"
+            style="width:100%;padding:10px 108px 10px 14px;background:var(--bg);border:1.5px solid var(--b1);border-radius:10px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'">
+          <span id="search-count" style="position:absolute;right:34px;top:50%;transform:translateY(-50%);font-size:0.67rem;color:var(--t3);white-space:nowrap;pointer-events:none;"></span>
+          <button id="search-clear" onclick="const i=document.getElementById('search-input');i.value='';onSearchInput(i);" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:none;background:none;border:none;color:var(--t3);cursor:pointer;font-size:0.9rem;padding:2px 4px;line-height:1;">✕</button>
         </div>
-      </div>
-    `}
+        <div id="search-results"><div class="search-empty">Type above to search all document text</div></div>
+      ` : `
+        <div style="text-align:center;padding:48px 20px;">
+          <div style="font-size:2.5rem;margin-bottom:14px;">🔒</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:6px;">Search is a premium feature</div>
+          <div style="font-size:0.82rem;color:var(--t2);margin-bottom:22px;line-height:1.55;">Buy a credit to analyse a pack and search all document text, or upgrade for unlimited access.</div>
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button onclick="handleUpgrade('pay_as_you_go')" style="padding:9px 18px;background:var(--amber);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">⚡ Buy Credits</button>
+            <button onclick="handleUpgrade('standard')" style="padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Upgrade →</button>
+          </div>
+        </div>
+      `}
+    </div><!-- /search-pane-results -->
+
+    <!-- Document viewer (shown on result click) -->
+    <div id="search-pane-viewer" style="display:none;"></div>
+
   </div><!-- /report-right-pane -->
 
 </div>`;
@@ -4012,7 +4038,8 @@ function searchDocuments(query) {
   try { escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } catch(e) { escaped = query; }
   const re = new RegExp(escaped, 'gi');
   const results = [];
-  for (const doc of docs) {
+  for (let docIdx = 0; docIdx < docs.length; docIdx++) {
+    const doc = docs[docIdx];
     if (!doc.text) continue;
     const matches = [];
     let m;
@@ -4021,14 +4048,19 @@ function searchDocuments(query) {
       const s = Math.max(0, m.index - 100);
       const e = Math.min(doc.text.length, m.index + m[0].length + 100);
       matches.push({
-        before: (s > 0 ? '…' : '') + doc.text.slice(s, m.index),
-        matched: m[0],
-        after:   doc.text.slice(m.index + m[0].length, e) + (e < doc.text.length ? '…' : '')
+        before:   (s > 0 ? '…' : '') + doc.text.slice(s, m.index),
+        matched:  m[0],
+        after:    doc.text.slice(m.index + m[0].length, e) + (e < doc.text.length ? '…' : ''),
+        charIdx:  m.index,
+        matchLen: m[0].length,
       });
       if (matches.length >= 15) break;
     }
-    if (matches.length) results.push({ name: doc.name, matches });
+    if (matches.length) results.push({ name: doc.name, matches, docIdx });
   }
+
+  window._lastSearchDocs = docs;
+
   const total = results.reduce((s, r) => s + r.matches.length, 0);
   if (countEl) countEl.textContent = total ? `${total} match${total !== 1 ? 'es' : ''} found` : '';
   const noteHtml = isAIFallback
@@ -4042,10 +4074,65 @@ function searchDocuments(query) {
   resultsEl.innerHTML = noteHtml + results.map(r =>
     `<div>${multiDoc ? `<div class="search-doc-name">📄 ${escHtml(r.name)}</div>` : ''}${
       r.matches.map(m =>
-        `<div class="search-result-card">${escHtml(m.before)}<mark class="search-highlight">${escHtml(m.matched)}</mark>${escHtml(m.after)}</div>`
+        `<div class="search-result-card" style="cursor:pointer;" onclick="openDocViewer(${r.docIdx},${m.charIdx},${m.matchLen})" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--b1)'">${escHtml(m.before)}<mark class="search-highlight">${escHtml(m.matched)}</mark>${escHtml(m.after)}</div>`
       ).join('')
     }</div>`
   ).join('');
+}
+
+function toggleSearchPane() {
+  const pane = document.querySelector('.report-two-pane');
+  if (!pane) return;
+  const willOpen = !pane.classList.contains('search-open');
+  pane.classList.toggle('search-open');
+  const btn = document.getElementById('search-toggle-btn');
+  if (btn) {
+    btn.style.background = willOpen ? 'rgba(255,255,255,0.22)' : '';
+    btn.style.fontWeight  = willOpen ? '800' : '';
+  }
+}
+
+function openDocViewer(docIdx, charIdx, matchLen) {
+  const docs = window._lastSearchDocs || [];
+  const doc  = docs[docIdx];
+  if (!doc) return;
+
+  const text    = doc.text;
+  const WINDOW  = 800;
+  const s       = Math.max(0, charIdx - WINDOW);
+  const e       = Math.min(text.length, charIdx + matchLen + WINDOW);
+  const excerpt = text.slice(s, e);
+
+  const mStart  = charIdx - s;
+  const mEnd    = mStart + matchLen;
+  const before  = excerpt.slice(0, mStart);
+  const matched = excerpt.slice(mStart, mEnd);
+  const after   = excerpt.slice(mEnd);
+
+  const viewer  = document.getElementById('search-pane-viewer');
+  const results = document.getElementById('search-pane-results');
+  if (!viewer || !results) return;
+
+  viewer.innerHTML = `
+    <button class="search-viewer-back" onclick="closeDocViewer()">← Back to results</button>
+    <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:3px;">Document</div>
+    <div style="font-size:0.88rem;font-weight:700;color:var(--t1);margin-bottom:14px;word-break:break-word;padding-bottom:12px;border-bottom:1px solid var(--b1);">${escHtml(doc.name)}</div>
+    <div style="font-size:0.79rem;color:var(--t2);line-height:1.8;word-break:break-word;white-space:pre-wrap;">${s > 0 ? '<span style="color:var(--t3);">…</span>' : ''}${escHtml(before)}<mark class="search-highlight" id="viewer-match">${escHtml(matched)}</mark>${escHtml(after)}${e < text.length ? '<span style="color:var(--t3);">…</span>' : ''}</div>
+  `;
+
+  results.style.display = 'none';
+  viewer.style.display  = 'block';
+
+  setTimeout(() => {
+    document.getElementById('viewer-match')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
+}
+
+function closeDocViewer() {
+  const viewer  = document.getElementById('search-pane-viewer');
+  const results = document.getElementById('search-pane-results');
+  if (viewer)  { viewer.style.display  = 'none'; viewer.innerHTML = ''; }
+  if (results) results.style.display = 'block';
 }
 
 function showUploadArea() {
