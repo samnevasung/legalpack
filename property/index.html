@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO meta — populated by JS after fetch -->
+<title id="page-title">Property Analysis | LegalPack AI</title>
+<meta id="page-description" name="description" content="AI-powered UK property auction legal pack analysis by LegalPack AI.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link id="page-canonical" rel="canonical" href="https://legalpackai.com/property/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="LegalPack AI">
+<meta id="og-title" property="og:title" content="Property Analysis | LegalPack AI">
+<meta id="og-description" property="og:description" content="AI-powered UK property auction legal pack analysis.">
+<meta id="og-url" property="og:url" content="https://legalpackai.com/property/">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta id="tw-title" name="twitter:title" content="Property Analysis | LegalPack AI">
+<meta id="tw-description" name="twitter:description" content="AI-powered UK property auction legal pack analysis.">
+<meta name="twitter:image" content="https://legalpackai.com/logo-full@2x.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
+<link rel="shortcut icon" href="/favicon.png">
+
+<!-- Schema.org — replaced by JS -->
+<script id="page-schema" type="application/ld+json">{}</script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#6d28d9;--purple2:#7c3aed;--purplebg:#f5f0ff;--purplemid:#ddd6fe;--purpledeep:#4c1d95;
+  --t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;
+  --bg:#f8f7ff;--bg2:#f2f1fc;--b1:#e2e0f0;
+  --red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;
+  --amber:#d97706;--amberbg:#fffbeb;--ambermid:#fef3c7;
+  --ok:#15803d;--okbg:#f0fdf4;--okmid:#dcfce7;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:#fff;color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:var(--purple);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+/* ── Nav ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-0.4px;text-decoration:none;}
+.nav-logo-icon{width:30px;height:30px;background:var(--purple);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.nav-cta{padding:9px 20px;background:var(--purple);color:#fff;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 3px 12px rgba(109,40,217,0.3);}
+.nav-cta:hover{background:var(--purpledeep);text-decoration:none;}
+
+/* ── Hero ── */
+.property-hero{background:linear-gradient(135deg,var(--purpledeep) 0%,#1e0e5c 100%);padding:52px 24px 48px;text-align:center;}
+.property-hero-inner{max-width:720px;margin:0 auto;}
+.hero-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);padding:4px 12px;border-radius:20px;margin-bottom:16px;font-family:'DM Mono',monospace;}
+.hero-address{font-size:32px;font-weight:800;letter-spacing:-1.2px;line-height:1.2;color:#fff;margin-bottom:16px;}
+.hero-sub{font-size:15px;color:rgba(255,255,255,0.55);margin-bottom:24px;}
+
+/* ── Risk badge ── */
+.risk-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:40px;font-size:14px;font-weight:800;letter-spacing:0.2px;}
+.risk-badge.high{background:var(--redbg);color:var(--red);border:1.5px solid var(--redmid);}
+.risk-badge.medium{background:var(--amberbg);color:var(--amber);border:1.5px solid var(--ambermid);}
+.risk-badge.low{background:var(--okbg);color:var(--ok);border:1.5px solid var(--okmid);}
+.risk-badge.unknown{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border:1.5px solid rgba(255,255,255,0.2);}
+
+/* ── Content layout ── */
+.property-content{max-width:760px;margin:0 auto;padding:40px 24px 80px;}
+
+/* ── Stat pills ── */
+.stat-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px;}
+.stat-pill{flex:1;min-width:110px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;padding:16px 16px 14px;text-align:center;}
+.stat-pill-num{font-size:30px;font-weight:800;letter-spacing:-1.5px;line-height:1;margin-bottom:5px;}
+.stat-pill-label{font-size:10px;font-weight:700;letter-spacing:0.9px;text-transform:uppercase;color:var(--t3);font-family:'DM Mono',monospace;}
+.stat-pill.critical .stat-pill-num{color:var(--red);}
+.stat-pill.warning .stat-pill-num{color:var(--amber);}
+.stat-pill.neutral .stat-pill-num{color:var(--purple);}
+
+/* ── Summary block ── */
+.summary-block{background:var(--bg);border:1px solid var(--b1);border-radius:14px;padding:24px;margin-bottom:32px;}
+.summary-block-label{font-size:10px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;font-family:'DM Mono',monospace;}
+.summary-text{font-size:16px;color:var(--t2);line-height:1.74;}
+
+/* ── Flags ── */
+.section-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;margin-bottom:14px;color:var(--t1);}
+.flag-card{border:1.5px solid var(--b1);border-radius:12px;padding:18px 20px;margin-bottom:12px;background:#fff;}
+.flag-card.critical{border-color:var(--redmid);background:var(--redbg);}
+.flag-card.warning{border-color:var(--ambermid);background:var(--amberbg);}
+.flag-card.info{border-color:var(--purplemid);background:var(--purplebg);}
+.flag-severity{font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;margin-bottom:5px;font-family:'DM Mono',monospace;}
+.flag-card.critical .flag-severity{color:var(--red);}
+.flag-card.warning .flag-severity{color:var(--amber);}
+.flag-card.info .flag-severity{color:var(--purple);}
+.flag-title{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;line-height:1.4;}
+.flag-desc{font-size:14px;color:var(--t2);line-height:1.62;margin-top:6px;}
+
+/* ── Paywall blur ── */
+.flags-more{position:relative;margin-top:4px;}
+.flags-more-inner{filter:blur(6px);pointer-events:none;user-select:none;}
+.flags-paywall{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0.86) 25%,rgba(255,255,255,0.97) 100%);}
+.flags-paywall-title{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:8px;letter-spacing:-0.3px;}
+.flags-paywall-sub{font-size:13px;color:var(--t2);margin-bottom:20px;max-width:300px;line-height:1.55;}
+
+/* ── CTA block ── */
+.cta-block{background:linear-gradient(135deg,var(--purpledeep),#1e0e5c);border-radius:18px;padding:40px;text-align:center;margin:40px 0 28px;}
+.cta-block h2{color:#fff;font-size:24px;font-weight:800;letter-spacing:-0.7px;margin-bottom:10px;}
+.cta-block p{color:rgba(255,255,255,0.68);font-size:15px;margin-bottom:24px;line-height:1.6;}
+.btn-cta{display:inline-block;padding:14px 32px;background:#fff;color:var(--purpledeep);border-radius:10px;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,0.22);transition:transform 0.12s,box-shadow 0.12s;}
+.btn-cta:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(0,0,0,0.3);text-decoration:none;}
+
+/* ── Disclaimer ── */
+.disclaimer{font-size:12px;color:var(--t3);background:var(--bg);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;line-height:1.64;}
+
+/* ── Footer ── */
+footer{border-top:1px solid var(--b1);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-logo{font-size:14px;font-weight:800;color:var(--t1);}
+.footer-links{display:flex;gap:20px;font-size:13px;}
+.footer-links a{color:var(--t3);}
+.footer-links a:hover{color:var(--t1);}
+.footer-copy{font-size:12px;color:var(--t3);}
+
+/* ── States ── */
+.loading-state{text-align:center;padding:100px 24px;}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--b1);border-top-color:var(--purple);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 16px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-state{text-align:center;padding:80px 24px;max-width:480px;margin:0 auto;}
+.error-icon{font-size:40px;margin-bottom:16px;}
+.error-title{font-size:22px;font-weight:800;color:var(--t1);margin-bottom:8px;letter-spacing:-0.5px;}
+.error-sub{font-size:15px;color:var(--t2);margin-bottom:24px;line-height:1.6;}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  nav{padding:0 20px;}
+  .hero-address{font-size:22px;letter-spacing:-0.7px;}
+  .property-hero{padding:36px 20px 32px;}
+  .stat-row{gap:8px;}
+  .stat-pill{min-width:80px;padding:12px 10px;}
+  .stat-pill-num{font-size:22px;}
+  .cta-block{padding:28px 20px;}
+  .cta-block h2{font-size:20px;}
+  footer{padding:20px 24px;flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-logo-icon">&#x26A1;</div>
+    LegalPack AI
+  </a>
+  <a class="nav-cta" href="/#pricing">Analyse Your Pack</a>
+</nav>
+
+<!-- MAIN — replaced by JS -->
+<main id="main-content">
+  <div class="loading-state">
+    <div class="loading-spinner"></div>
+    <p style="color:var(--t3);font-size:15px;">Loading property analysis&hellip;</p>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">LegalPack AI</span>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/how-to-read-auction-legal-pack">Guide</a>
+    <a href="mailto:support@legalpackai.com">Support</a>
+  </div>
+  <span class="footer-copy">&copy; 2026 LegalPack AI</span>
+</footer>
+
+<script>
+const API_BASE = 'https://legalpack-backend-production.up.railway.app';
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function riskClass(r) {
+  if (!r) return 'unknown';
+  const l = r.toLowerCase();
+  if (l.includes('high') || l.includes('critical')) return 'high';
+  if (l.includes('medium') || l.includes('moderate')) return 'medium';
+  if (l.includes('low')) return 'low';
+  return 'unknown';
+}
+
+function riskEmoji(r) {
+  const c = riskClass(r);
+  return c === 'high' ? '&#x1F534;' : c === 'medium' ? '&#x1F7E1;' : c === 'low' ? '&#x1F7E2;' : '&#x26AA;';
+}
+
+function flagClass(severity) {
+  if (!severity) return 'info';
+  const s = severity.toLowerCase();
+  if (s === 'critical' || s === 'high') return 'critical';
+  if (s === 'warning' || s === 'medium') return 'warning';
+  return 'info';
+}
+
+function updateMeta(data) {
+  const address = data.address || 'Property';
+  const risk = data.risk_level || 'Unknown';
+  const slug = data.slug || '';
+  const critCount = data.critical_count || 0;
+  const title = `${address} — Auction Legal Pack Analysis | LegalPack AI`;
+  const desc = `AI analysis of the auction legal pack for ${address}. Risk level: ${risk}. ${critCount} critical flag${critCount !== 1 ? 's' : ''} found. See key issues before you bid.`;
+  const url = `https://legalpackai.com/property/${slug}`;
+
+  document.title = title;
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('page-description').content = desc;
+  document.getElementById('page-canonical').href = url;
+  document.getElementById('og-title').content = title;
+  document.getElementById('og-description').content = desc;
+  document.getElementById('og-url').content = url;
+  document.getElementById('tw-title').content = title;
+  document.getElementById('tw-description').content = desc;
+
+  document.getElementById('page-schema').textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': `Legal Pack Analysis: ${address}`,
+    'description': desc,
+    'url': url,
+    'datePublished': data.created_at || new Date().toISOString(),
+    'author': {'@type':'Organization','name':'LegalPack AI'},
+    'publisher': {'@type':'Organization','name':'LegalPack AI','logo':{'@type':'ImageObject','url':'https://legalpackai.com/logo-full.png'}}
+  });
+}
+
+function renderFlag(f) {
+  const fc = flagClass(f.severity);
+  return `<div class="flag-card ${fc}">
+    <div class="flag-severity">${esc(f.severity || 'Flag')}</div>
+    <div class="flag-title">${esc(f.title || 'Risk Identified')}</div>
+    ${f.description ? `<div class="flag-desc">${esc(f.description)}</div>` : ''}
+  </div>`;
+}
+
+function renderProperty(data) {
+  updateMeta(data);
+
+  const address     = data.address    || 'Unknown Property';
+  const risk        = data.risk_level || 'Unknown';
+  const rc          = riskClass(risk);
+  const flags       = Array.isArray(data.top_flags) ? data.top_flags : [];
+  const totalFlags  = data.total_flags || flags.length;
+  const critCount   = data.critical_count || 0;
+  const warnCount   = data.warning_count  || 0;
+  const summary     = data.summary || '';
+
+  const visibleFlag  = flags[0] || null;
+  const blurredFlags = flags.slice(1);
+  const hiddenCount  = Math.max(0, totalFlags - 1);
+
+  const flagsSection = flags.length > 0 ? `
+    <div class="section-title">Key Flags</div>
+    ${visibleFlag ? renderFlag(visibleFlag) : ''}
+    ${blurredFlags.length > 0 ? `
+    <div class="flags-more">
+      <div class="flags-more-inner">${blurredFlags.map(renderFlag).join('')}</div>
+      <div class="flags-paywall">
+        <div class="flags-paywall-title">+${hiddenCount} more flag${hiddenCount !== 1 ? 's' : ''} in this pack</div>
+        <div class="flags-paywall-sub">Analyse your own legal pack to see all flags, costs, and special conditions.</div>
+        <a class="btn-cta" href="/#pricing">Analyse a Pack from &pound;9.99</a>
+      </div>
+    </div>` : ''}` : '';
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="property-hero">
+      <div class="property-hero-inner">
+        <div class="hero-badge">Auction Legal Pack Analysis</div>
+        <h1 class="hero-address">${esc(address)}</h1>
+        <div class="hero-sub">AI-powered analysis by LegalPack AI</div>
+        <div class="risk-badge ${rc}">${riskEmoji(risk)} ${esc(risk)} Risk</div>
+      </div>
+    </div>
+
+    <div class="property-content">
+      <div class="stat-row">
+        <div class="stat-pill critical">
+          <div class="stat-pill-num">${critCount}</div>
+          <div class="stat-pill-label">Critical</div>
+        </div>
+        <div class="stat-pill warning">
+          <div class="stat-pill-num">${warnCount}</div>
+          <div class="stat-pill-label">Warnings</div>
+        </div>
+        <div class="stat-pill neutral">
+          <div class="stat-pill-num">${totalFlags}</div>
+          <div class="stat-pill-label">Total Flags</div>
+        </div>
+      </div>
+
+      ${summary ? `
+      <div class="summary-block">
+        <div class="summary-block-label">AI Summary</div>
+        <div class="summary-text">${esc(summary)}</div>
+      </div>` : ''}
+
+      ${flagsSection}
+
+      <div class="cta-block">
+        <h2>Bidding on a property?</h2>
+        <p>LegalPack AI reads every page of the legal pack &mdash; flagging hidden costs, title defects, short leases, and deal-killing clauses in minutes.</p>
+        <a class="btn-cta" href="/#pricing">Analyse Your Pack from &pound;9.99</a>
+      </div>
+
+      <div class="disclaimer">
+        This page is an AI-generated summary of a UK property auction legal pack. It is provided for informational purposes only and does not constitute legal advice. Always consult a qualified solicitor before making any property purchase decision. LegalPack AI is not responsible for any decisions made based on this information.
+      </div>
+    </div>
+  `;
+}
+
+function renderError(msg) {
+  document.getElementById('main-content').innerHTML = `
+    <div class="error-state">
+      <div class="error-icon">&#x1F50D;</div>
+      <div class="error-title">Property not found</div>
+      <div class="error-sub">${esc(msg || 'This property page does not exist or has been removed.')}</div>
+      <a href="/" style="display:inline-block;padding:12px 28px;background:var(--purple);color:#fff;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">Back to LegalPack AI</a>
+    </div>
+  `;
+}
+
+async function loadProperty() {
+  const slug = window.location.pathname.replace(/^\/property\//, '').replace(/\/$/, '');
+  if (!slug) { renderError('No property specified.'); return; }
+  try {
+    const res = await fetch(`${API_BASE}/public/property/${encodeURIComponent(slug)}`);
+    if (!res.ok) {
+      if (res.status === 404) { renderError('This property page does not exist.'); return; }
+      throw new Error(`HTTP ${res.status}`);
+    }
+    renderProperty(await res.json());
+  } catch(e) {
+    renderError('Failed to load property data. Please try again later.');
+  }
+}
+
+loadProperty();
+</script>
+</body>
+</html>
