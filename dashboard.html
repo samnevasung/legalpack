@@ -2009,11 +2009,12 @@ function updateQueueUI() {
     else { iconHtml = '❌'; statusText = 'Failed'; }
 
     const canDismiss = job.status === 'done' || job.status === 'error';
+    const jobSlug = job.status === 'done' ? addressToSlug(job.result?.address || job.displayName) : null;
     return `<div class="queue-item">
       <div class="queue-item-icon">${iconHtml}</div>
       <div class="queue-item-body">
         <div class="queue-item-name">${escHtml(job.displayName)}</div>
-        <div class="queue-item-status">${statusText}</div>
+        <div class="queue-item-status">${statusText}${jobSlug ? ` &middot; <a href="https://legalpackai.com/property/${jobSlug}" target="_blank" style="color:var(--accent);text-decoration:none;font-size:0.72rem;">View public page</a>` : ''}</div>
         ${job.status === 'error' ? `<div class="queue-item-err">${escHtml(job.error || 'Unknown error')}</div>` : ''}
         ${job.status === 'done' && job.reportId ? `<button class="queue-item-view" onclick="openReportFromQueue('${job.reportId}')">View Report →</button>` : ''}
       </div>
@@ -2289,6 +2290,7 @@ function renderResult(result, packName) {
 
   const ds = result.documentStatus || {};
   const uploadedFiles = result._uploadedFiles || [];
+  const pubSlug = addressToSlug(result.address);
 
   el.innerHTML = `<div class="report-two-pane">
   <div class="report-left-pane">
@@ -2318,6 +2320,7 @@ function renderResult(result, packName) {
         <button id="search-toggle-btn" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="toggleSearchPane()">🔍 Search</button>
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="shareReport()">🔗 Share</button>
+        ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;text-decoration:none;">🌐 Public Page</a>` : ''}
         <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="showUploadArea()">+ New</button>
       </div>
     </div>
@@ -3888,6 +3891,18 @@ function calcSDLT() {
   ).join('') + `<div class="calc-breakdown-row total"><span>Total SDLT</span><span>£${Math.round(sdlt).toLocaleString()}</span></div>`;
   const effective = price > 0 ? ((sdlt / price) * 100).toFixed(2) : 0;
   document.getElementById('sdlt-effective').textContent = `Effective rate: ${effective}% · Total purchase cost: £${(price + sdlt).toLocaleString()}`;
+}
+
+// ── PUBLIC PAGE SLUG ──────────────────────────────────────────────────────────
+function addressToSlug(address) {
+  if (!address) return null;
+  const s = address.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 120);
+  return s || null;
 }
 
 // ── SHARE REPORT ─────────────────────────────────────────────────────────────
