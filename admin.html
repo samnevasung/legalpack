@@ -98,6 +98,9 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
 .loading{padding:32px;text-align:center;color:var(--t3);font-size:0.8rem;}
 .empty{padding:32px;text-align:center;color:var(--t3);}
 @media(max-width:900px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}.stat-grid{grid-template-columns:repeat(2,1fr);}}
+@keyframes pulse-red{0%,100%{opacity:1;}50%{opacity:0.25;}}
+.err-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse-red 1.4s ease-in-out infinite;vertical-align:middle;margin-left:5px;}
+.err-stack-row td{background:var(--bg2)!important;}
 </style>
 </head>
 <body>
@@ -138,6 +141,8 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   <div class="sidebar-item" onclick="showPanel('broadcast',this)">📣 User Tools</div>
   <div class="sidebar-section">Promos</div>
   <div class="sidebar-item" onclick="showPanel('promo',this)">🎟 Promo Codes</div>
+  <div class="sidebar-section">Monitoring</div>
+  <div class="sidebar-item" onclick="showPanel('errors',this)" id="sidebar-errors-item">🔴 Error Console<span class="err-live-dot" id="sidebar-err-dot" style="display:none;" title="Errors in last 5 min"></span></div>
 </div>
 
 <div class="main">
@@ -309,6 +314,36 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   </div>
 </div>
 
+<!-- ERROR CONSOLE -->
+<div class="panel" id="panel-errors">
+  <div class="page-title" style="display:flex;align-items:center;gap:6px;">Error Console<span class="err-live-dot" id="page-err-dot" style="display:none;" title="Errors in last 5 min"></span></div>
+  <div class="page-sub">Production error logs — auto-refreshes every 30s</div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <select class="select-sm" id="err-level-filter" onchange="renderErrors()">
+      <option value="">All levels</option>
+      <option value="error">Error</option>
+      <option value="warn">Warn</option>
+      <option value="info">Info</option>
+    </select>
+    <select class="select-sm" id="err-context-filter" onchange="renderErrors()">
+      <option value="">All contexts</option>
+      <option value="analysis">Analysis</option>
+      <option value="webhook">Webhook</option>
+      <option value="auth">Auth</option>
+      <option value="payment">Payment</option>
+    </select>
+    <button class="btn-sm" onclick="loadErrors()">↻ Refresh</button>
+    <button class="btn-sm" onclick="clearErrView()" style="margin-left:auto;">Clear view</button>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Recent Errors</div><div class="card-sub" id="err-sub">Loading…</div></div>
+      <span id="err-refresh-time" style="font-size:0.65rem;color:var(--t3);font-family:'DM Mono',monospace;"></span>
+    </div>
+    <div id="errors-table"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end layout -->
 </div><!-- end admin-app -->
@@ -391,11 +426,12 @@ async function init(){
   authToken=session.access_token;
   document.getElementById('admin-app').style.display='block';
   await loadAll();
+  setInterval(loadErrors,30000);
 }
 
 async function loadAll(){
   document.getElementById('last-refresh').textContent='Refreshing...';
-  await Promise.all([loadUsers(),loadAnalyses(),loadPromoCodes()]);
+  await Promise.all([loadUsers(),loadAnalyses(),loadPromoCodes(),loadErrors()]);
   renderAll();
   document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en-GB');
 }
@@ -598,6 +634,7 @@ function showPanel(id,el){
   document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
+  if(id==='errors')loadErrors();
 }
 
 function calcMRR(){return allUsers.reduce((s,u)=>{if(u.plan==='standard')return s+69.99;if(u.plan==='pro')return s+119.99;return s;},0);}
@@ -663,6 +700,75 @@ async function submitRemoveCredit(){
     if(d.ok){toast('✓ Removed '+amount+' credit'+(amount>1?'s':'')+' from '+(user?.email||userId)+' (balance: '+d.newBalance+')');await loadUsers();renderAll();}
     else toast('Failed: '+(d.error||'Unknown'));
   }catch(e){toast('Failed to remove credits');}
+}
+
+// ── ERROR CONSOLE ─────────────────────────────────────────────────────────────
+let allErrors=[];
+
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function loadErrors(){
+  try{
+    const r=await fetch(API_BASE+'/admin/errors?limit=100',{headers:{Authorization:'Bearer '+authToken}});
+    const d=await r.json();
+    allErrors=d.errors||[];
+  }catch(e){allErrors=[];}
+  renderErrors();
+  updateErrLiveDot();
+  const rt=document.getElementById('err-refresh-time');
+  if(rt)rt.textContent='Updated '+new Date().toLocaleTimeString('en-GB');
+}
+
+function updateErrLiveDot(){
+  const fiveMinAgo=new Date(Date.now()-5*60*1000);
+  const hasRecent=allErrors.some(e=>e.level==='error'&&new Date(e.created_at)>fiveMinAgo);
+  ['sidebar-err-dot','page-err-dot'].forEach(id=>{const d=document.getElementById(id);if(d)d.style.display=hasRecent?'inline-block':'none';});
+}
+
+function renderErrors(){
+  const levelF=(document.getElementById('err-level-filter')||{}).value||'';
+  const ctxF=(document.getElementById('err-context-filter')||{}).value||'';
+  let errors=allErrors;
+  if(levelF)errors=errors.filter(e=>e.level===levelF);
+  if(ctxF)errors=errors.filter(e=>e.context===ctxF);
+
+  const sub=document.getElementById('err-sub');
+  if(sub)sub.textContent=errors.length+' entr'+(errors.length===1?'y':'ies')+(allErrors.length!==errors.length?' (filtered from '+allErrors.length+')':'');
+
+  const el=document.getElementById('errors-table');
+  if(!el)return;
+  if(!errors.length){el.innerHTML='<div class="empty">No errors logged ✓</div>';return;}
+
+  const lvCls=lv=>lv==='error'?'red':lv==='warn'?'amber':'standard';
+  const fmtTs=ts=>{if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});};
+
+  el.innerHTML=`<table><thead><tr><th>Time</th><th>Level</th><th>Context</th><th>Message</th><th>User</th></tr></thead><tbody>${
+    errors.map((e,i)=>{
+      const hasDetail=!!(e.stack||(e.metadata&&Object.keys(e.metadata).length));
+      const meta=e.metadata&&Object.keys(e.metadata).length?JSON.stringify(e.metadata,null,2):null;
+      return `<tr style="cursor:${hasDetail?'pointer':'default'};" onclick="${hasDetail?'toggleErrStack('+i+')':''}">
+        <td class="mono" style="font-size:0.66rem;white-space:nowrap;color:var(--t3);">${fmtTs(e.created_at)}</td>
+        <td><span class="badge ${lvCls(e.level)}">${e.level||'—'}</span></td>
+        <td><span class="badge payg" style="color:var(--cyan);border-color:rgba(6,182,212,0.3);">${e.context||'—'}</span></td>
+        <td style="max-width:340px;word-break:break-word;">${escHtml(e.message||'—')}${hasDetail?'<span style="font-size:0.58rem;color:var(--t3);margin-left:5px;">▶</span>':''}</td>
+        <td class="mono" style="font-size:0.64rem;color:var(--t3);">${e.user_id?e.user_id.substring(0,8)+'…':'—'}</td>
+      </tr>
+      <tr id="err-stack-${i}" class="err-stack-row" style="display:none;">
+        <td colspan="5" style="padding:2px 13px 10px;">
+          ${e.stack?`<pre style="background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:10px 12px;font-size:0.63rem;color:var(--t2);overflow-x:auto;white-space:pre-wrap;word-break:break-word;margin-bottom:4px;">${escHtml(e.stack)}</pre>`:''}
+          ${meta?`<pre style="background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:10px 12px;font-size:0.63rem;color:var(--cyan);overflow-x:auto;white-space:pre-wrap;">${escHtml(meta)}</pre>`:''}
+        </td>
+      </tr>`;
+    }).join('')
+  }</tbody></table>`;
+}
+
+function toggleErrStack(i){const row=document.getElementById('err-stack-'+i);if(row)row.style.display=row.style.display==='none'?'table-row':'none';}
+
+function clearErrView(){
+  allErrors=[];
+  renderErrors();
+  loadErrors();
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
