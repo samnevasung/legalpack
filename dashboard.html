@@ -833,6 +833,9 @@ body {
 .report-tab:hover { color: var(--t1); }
 .report-tab.active { color: var(--red); border-bottom-color: var(--red); }
 .report-tab-panel { min-height: 200px; }
+.report-tab-bar { overflow-x: auto; overflow-y: visible; scrollbar-width: none; }
+.report-tab-bar::-webkit-scrollbar { display: none; }
+.report-tab-bar .report-tab { flex: 0 0 auto; }
 
 /* ── REPORT TWO-PANE LAYOUT ── */
 .report-two-pane {
@@ -958,16 +961,9 @@ body {
   .drop-icon { font-size: 2.2rem; }
   .drop-title { font-size: 1.1rem; }
 
-  /* ── Report tab bar — scrollable ── */
-  .report-tab-bar {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    flex-wrap: nowrap !important;
-  }
-  .report-tab-bar::-webkit-scrollbar { display: none; }
-  .report-tab-bar .report-tab { flex: 0 0 auto !important; padding: 9px 11px; font-size: 0.71rem; }
+  /* ── Report tab bar (mobile sizing) ── */
+  .report-tab-bar { -webkit-overflow-scrolling: touch; }
+  .report-tab-bar .report-tab { padding: 9px 11px; font-size: 0.71rem; }
 
   /* ── Verdict + Mortgage: stack vertically ── */
   .verdict-mortgage-grid { grid-template-columns: 1fr !important; }
@@ -2328,15 +2324,15 @@ function renderResult(result, packName) {
   </div>
 
   <!-- ② TAB BAR — directly under header -->
-  <div class="report-tab-bar" style="display:flex;gap:0;border:1.5px solid ${rm.border};border-top:none;border-radius:0 0 14px 14px;overflow:hidden;background:var(--bg);margin-bottom:18px;">
-    <button class="report-tab active" onclick="showReportTab('overview',this)"  style="border-radius:0;flex:1;">📊 Overview</button>
-    <button class="report-tab"        onclick="showReportTab('flags',this)"     style="border-radius:0;flex:1;">🚩 Flags (${flags.length})</button>
-    <button class="report-tab"        onclick="showReportTab('costs',this)"     style="border-radius:0;flex:1;">💰 Costs</button>
-    <button class="report-tab"        onclick="showReportTab('special',this)"   style="border-radius:0;flex:1;">📜 Special Conditions</button>
-    <button class="report-tab"        onclick="showReportTab('docs',this)"      style="border-radius:0;flex:1;">📁 Documents</button>
-    <button class="report-tab"        onclick="showReportTab('missing',this)"   style="border-radius:0;flex:1;">📂 Missing${result.missingDocuments?.length?' ('+result.missingDocuments.length+')':''}</button>
-    <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;flex:1;">☑ Checklist</button>
-    <button class="report-tab"        onclick="showReportTab('notes',this)"     style="border-radius:0;flex:1;">✏️ Notes</button>
+  <div class="report-tab-bar" style="display:flex;gap:0;border:1.5px solid ${rm.border};border-top:none;border-radius:0 0 14px 14px;background:var(--bg);margin-bottom:18px;">
+    <button class="report-tab active" onclick="showReportTab('overview',this)"  style="border-radius:0;">Overview</button>
+    <button class="report-tab"        onclick="showReportTab('flags',this)"     style="border-radius:0;">Flags (${flags.length})</button>
+    <button class="report-tab"        onclick="showReportTab('costs',this)"     style="border-radius:0;">Costs</button>
+    <button class="report-tab"        onclick="showReportTab('special',this)"   style="border-radius:0;">Special Conditions</button>
+    <button class="report-tab"        onclick="showReportTab('docs',this)"      style="border-radius:0;">Documents</button>
+    <button class="report-tab"        onclick="showReportTab('missing',this)"   style="border-radius:0;">Missing${result.missingDocuments?.length?' ('+result.missingDocuments.length+')':''}</button>
+    <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;">Checklist</button>
+    <button class="report-tab"        onclick="showReportTab('notes',this)"     style="border-radius:0;">Notes</button>
   </div>
 
   ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs. Ask your solicitor to verify key findings.</div>` : ''}
