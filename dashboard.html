@@ -1894,6 +1894,20 @@ async function processQueue() {
   processQueue();
 }
 
+function mergeBatchResult(accumulated, newResult, isFirstBatch) {
+  if (!newResult) return accumulated;
+  if (isFirstBatch || !accumulated) return JSON.parse(JSON.stringify(newResult));
+  accumulated.flags = [...(accumulated.flags || []), ...(newResult.flags || [])];
+  accumulated.buyerCostFigures = [...(accumulated.buyerCostFigures || []), ...(newResult.buyerCostFigures || [])];
+  accumulated.missingDocuments = [...(accumulated.missingDocuments || []), ...(newResult.missingDocuments || [])];
+  const ads = accumulated.documentStatus = accumulated.documentStatus || {};
+  const nds = newResult.documentStatus || {};
+  ads.provided = [...(ads.provided || []), ...(nds.provided || [])];
+  ads.notIdentified = [...(ads.notIdentified || []), ...(nds.notIdentified || [])];
+  ads.optionalBuyerDueDiligence = [...(ads.optionalBuyerDueDiligence || []), ...(nds.optionalBuyerDueDiligence || [])];
+  return accumulated;
+}
+
 async function runAnalysisJob(job) {
   // Extract text from PDFs
   let extractedText = '';
@@ -1920,6 +1934,7 @@ async function runAnalysisJob(job) {
   const fileHash = await generateFileHash(job.files);
   let finalResult = null;
   let finalPackName = 'Legal Pack';
+  let _batchAcc = null;
 
   for (let i = 0; i < batches.length; i++) {
     const r = await fetch(API_BASE + '/analyse', {
@@ -1936,8 +1951,13 @@ async function runAnalysisJob(job) {
       }
       throw new Error(d.error || 'Analysis failed');
     }
-    finalResult = d.result;
+    _batchAcc = mergeBatchResult(_batchAcc, d.result, i === 0);
     if (d.packName && d.packName !== 'Legal Pack') finalPackName = d.packName;
+  }
+
+  if (_batchAcc) {
+    _batchAcc.flags = (_batchAcc.flags || []).filter((f, idx, arr) => arr.findIndex(x => x.title === f.title) === idx);
+    finalResult = _batchAcc;
   }
 
   if (finalResult && job.files?.length) finalResult._uploadedFiles = job.files.map(f => f.name);
