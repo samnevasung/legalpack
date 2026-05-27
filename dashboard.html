@@ -1525,6 +1525,7 @@ body {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <script>
 if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2194,7 +2195,7 @@ async function extractZip(file, depth) {
         }
         continue;
       }
-      if (lname.match(/\.(pdf|jpg|jpeg|png)$/)) {
+      if (lname.match(/\.(pdf|jpg|jpeg|png|docx)$/)) {
         const blob = await entry.async('blob');
         const subFile = new File([blob], name.split('/').pop());
         const subItems = await fileToItems(subFile);
@@ -2211,9 +2212,25 @@ async function fileToItems(file) {
   const name = file.name.toLowerCase();
   if (name.endsWith('.pdf')) {
     return await pdfToItems(file);
+  } else if (name.endsWith('.docx')) {
+    return await docxToItems(file);
   } else if (name.match(/\.(jpg|jpeg|png)$/)) {
     const data = await toBase64(file);
     return [{ type: 'image', name: file.name, mediaType: file.type || 'image/jpeg', data }];
+  }
+  return [];
+}
+
+async function docxToItems(file) {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const { value: docText } = await mammoth.extractRawText({ arrayBuffer });
+    console.log('[docx-extract]', file.name, docText.length, 'chars');
+    if (docText.trim().length > 50) {
+      return [{ type: 'text', name: file.name, text: `[DOCUMENT: ${file.name}]\n\n${docText}` }];
+    }
+  } catch(e) {
+    console.warn('[docx-extract] failed:', file.name, e.message);
   }
   return [];
 }
