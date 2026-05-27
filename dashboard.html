@@ -1912,25 +1912,17 @@ async function runAnalysisJob(job) {
   // Extract text from PDFs
   let extractedText = '';
   const _docTexts = [];
-  for (const file of job.files) {
-    if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-      try {
-        const ab = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-        const maxPages = Math.min(pdf.numPages, 60);
-        let fileText = '';
-        for (let p = 1; p <= maxPages; p++) {
-          const page = await pdf.getPage(p);
-          const content = await page.getTextContent();
-          fileText += content.items.map(i => i.str).join(' ') + '\n';
-        }
-        extractedText += fileText;
-        _docTexts.push({ name: file.name, text: fileText });
-      } catch(e) { console.log('Text extraction error:', e.message); }
-    }
-  }
+  window._pdfTextCache = {}; // populated by pdfToItems during buildBatches
 
   const batches = await buildBatches(job.files);
+
+  // Harvest text extracted during buildBatches — avoids a separate pdf.js pass
+  for (const [fname, text] of Object.entries(window._pdfTextCache)) {
+    if (text) {
+      extractedText += text + '\n';
+      _docTexts.push({ name: fname, text });
+    }
+  }
   const fileHash = await generateFileHash(job.files);
   let finalResult = null;
   let finalPackName = 'Legal Pack';
@@ -2228,7 +2220,31 @@ async function fileToItems(file) {
 
 async function pdfToItems(file) {
   const arrayBuffer = await file.arrayBuffer();
-  // Safe base64 conversion that doesn't blow the call stack
+
+  // ── Text extraction pass ──────────────────────────────────────────────────
+  let docText = '';
+  try {
+    const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer.slice(0) }).promise;
+    const maxTxtPages = Math.min(pdfDoc.numPages, 60);
+    for (let p = 1; p <= maxTxtPages; p++) {
+      const page = await pdfDoc.getPage(p);
+      const content = await page.getTextContent();
+      docText += content.items.map(i => i.str).join(' ') + '\n';
+    }
+  } catch(e) { /* scanned or corrupt — falls through to base64 */ }
+
+  console.log('[pdf-extract]', file.name, docText.length, 'chars');
+
+  // Cache for runAnalysisJob (deterministic cost extraction + search)
+  if (!window._pdfTextCache) window._pdfTextCache = {};
+  window._pdfTextCache[file.name] = docText;
+
+  if (docText.length > 500) {
+    // Text-based PDF — send as cheap text block
+    return [{ type: 'text', name: file.name, text: `[DOCUMENT: ${file.name}]\n\n${docText}` }];
+  }
+
+  // ── Scanned / image-only PDF — base64 fallback ───────────────────────────
   const uint8 = new Uint8Array(arrayBuffer);
   let binary = '';
   const chunkSize = 8192;
@@ -2237,12 +2253,11 @@ async function pdfToItems(file) {
   }
   const base64 = btoa(binary);
 
-  // Under 8MB — send as document directly (fastest, most accurate)
   if (file.size < 8 * 1024 * 1024) {
     return [{ type: 'document', name: file.name, data: base64 }];
   }
 
-  // Large PDF — render pages as images, max 40 pages to avoid rate limits
+  // Large scanned PDF — render as images, max 40 pages
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const items = [];
   const maxPages = Math.min(pdf.numPages, 40);
@@ -2255,7 +2270,7 @@ async function pdfToItems(file) {
     await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
     const data = canvas.toDataURL('image/jpeg', 0.65).split(',')[1];
     items.push({ type: 'image', name: `${file.name}_p${i}`, mediaType: 'image/jpeg', data });
-    canvas.width = 0; canvas.height = 0; // free memory
+    canvas.width = 0; canvas.height = 0;
   }
   if (pdf.numPages > maxPages) {
     items.push({ type: 'text', text: `[Note: PDF has ${pdf.numPages} pages. First ${maxPages} pages analysed.]` });
