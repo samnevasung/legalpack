@@ -984,6 +984,29 @@ body {
   .hamburger { display: none; }
   .sidebar-overlay { display: none !important; }
 }
+
+/* ── Onboarding Tour ── */
+#tour-ring {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  border: 2px solid #7c3aed;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.65), 0 0 20px rgba(124,58,237,0.55), 0 0 0 5px rgba(124,58,237,0.12);
+  transition: top 0.25s ease, left 0.25s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+}
+#tour-tooltip {
+  position: fixed;
+  z-index: 10002;
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px 16px;
+  width: 310px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.06);
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.2s ease;
+}
 </style>
 </head>
 <body>
@@ -1589,6 +1612,9 @@ async function init() {
     showToast('Payment cancelled — no charge made.');
     history.replaceState({}, '', '/dashboard.html');
   }
+
+  // Start onboarding tour for first-time users
+  setTimeout(startTour, 600);
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -1857,6 +1883,7 @@ async function enqueueAnalysis() {
   const jobListingMeta = window._listingMeta ? { ...window._listingMeta } : null;
   const jobId = ++_queueIdCounter;
   const displayName = (
+    jobListingMeta?.propertyAddress ||
     scrapedListingData?.address || scrapedListingData?.title ||
     jobListingMeta?.address || jobListingMeta?.title ||
     jobFiles[0]?.name || 'Legal Pack'
@@ -1910,47 +1937,60 @@ function mergeBatchResult(accumulated, newResult, isFirstBatch) {
 }
 
 async function runAnalysisJob(job) {
-  // Extract text from PDFs
   let extractedText = '';
   const _docTexts = [];
-  window._pdfTextCache = {}; // populated by pdfToItems during buildBatches
+  window._pdfTextCache = {};
 
-  const batches = await buildBatches(job.files);
+  const allItems = await extractAllItems(job.files);
 
-  // Harvest text extracted during buildBatches — avoids a separate pdf.js pass
+  // Harvest text extracted during extraction
   for (const [fname, text] of Object.entries(window._pdfTextCache)) {
     if (text) {
       extractedText += text + '\n';
       _docTexts.push({ name: fname, text });
     }
   }
+
   const fileHash = await generateFileHash(job.files);
   let finalResult = null;
   let finalPackName = 'Legal Pack';
-  let _batchAcc = null;
 
-  for (let i = 0; i < batches.length; i++) {
-    const r = await fetch(API_BASE + '/analyse', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
-      body: JSON.stringify({ batches: batches[i], batchIndex: i+1, totalBatches: batches.length, extractedText: i === 0 ? extractedText : '', listingMeta: i === 0 ? (job.listingMeta || null) : null, fileHash })
-    });
-    const d = await r.json();
-    if (!r.ok) {
-      if (r.status === 429) {
-        showToast('Rate limit hit — waiting 30 seconds...');
-        await new Promise(res => setTimeout(res, 30000));
-        i--; continue;
+  // Keep browser connection alive during long analysis
+  const keepalive = setInterval(() => {
+    fetch(`${API_BASE}/health`).catch(() => {});
+  }, 30000);
+
+  try {
+    // Single call — all documents in one request
+    const singlePayload = buildSinglePayload(allItems);
+    console.log(`[analysis] Single call — ${singlePayload.length} items (${allItems.length} extracted)`);
+    const r1 = await callAnalyse(singlePayload, 1, 1, extractedText, job.listingMeta, fileHash);
+
+    if (r1) {
+      finalResult = r1.result;
+      finalPackName = r1.packName;
+    } else {
+      // Fallback: split into 2 batches (max ever)
+      console.log('[analysis] Single call failed — falling back to 2 batches');
+      showToast('Retrying with split batches...');
+      const mid = Math.ceil(allItems.length / 2);
+      let acc = null;
+
+      const b1 = await callAnalyse(buildSinglePayload(allItems.slice(0, mid)), 1, 2, extractedText, job.listingMeta, fileHash);
+      if (b1) { acc = mergeBatchResult(acc, b1.result, true); if (b1.packName !== 'Legal Pack') finalPackName = b1.packName; }
+
+      const b2 = await callAnalyse(buildSinglePayload(allItems.slice(mid)), 2, 2, '', null, fileHash);
+      if (b2) { acc = mergeBatchResult(acc, b2.result, !acc); if (b2.packName !== 'Legal Pack') finalPackName = b2.packName; }
+
+      if (acc) {
+        acc.flags = (acc.flags || []).filter((f, idx, arr) => arr.findIndex(x => x.title === f.title) === idx);
+        finalResult = acc;
+      } else {
+        throw new Error('Analysis failed — all attempts exhausted');
       }
-      throw new Error(d.error || 'Analysis failed');
     }
-    _batchAcc = mergeBatchResult(_batchAcc, d.result, i === 0);
-    if (d.packName && d.packName !== 'Legal Pack') finalPackName = d.packName;
-  }
-
-  if (_batchAcc) {
-    _batchAcc.flags = (_batchAcc.flags || []).filter((f, idx, arr) => arr.findIndex(x => x.title === f.title) === idx);
-    finalResult = _batchAcc;
+  } finally {
+    clearInterval(keepalive);
   }
 
   if (finalResult && job.files?.length) finalResult._uploadedFiles = job.files.map(f => f.name);
@@ -1960,6 +2000,15 @@ async function runAnalysisJob(job) {
   job.result = finalResult;
   job.packName = finalPackName;
   job.status = 'done';
+
+  // Update display name to property address once available
+  const _resultAddr = finalResult?.address;
+  const _badAddr = new Set(['legal pack', 'legal-pack', 'pack', 'unknown', 'null', '']);
+  if (_resultAddr && !_badAddr.has(String(_resultAddr).toLowerCase().trim())) {
+    job.displayName = String(_resultAddr).slice(0, 60);
+  } else {
+    job.displayName = job.displayName.replace(/\.(zip|pdf)$/i, '').replace(/[_-]+/g, ' ').trim().slice(0, 60) || job.displayName;
+  }
 
   // Update search context for the most-recently-completed job
   window._currentExtractedText = extractedText;
@@ -2148,10 +2197,8 @@ async function generateFileHash(files) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function buildBatches(files) {
-  const MAX_BATCH = 2.5 * 1024 * 1024; // 2.5MB per batch — keeps output tokens under 8k limit
+async function extractAllItems(files) {
   const allItems = [];
-
   for (const file of files) {
     if (file.name.toLowerCase().endsWith('.zip')) {
       const items = await extractZip(file, 0);
@@ -2161,20 +2208,33 @@ async function buildBatches(files) {
       allItems.push(...items);
     }
   }
+  return allItems;
+}
 
-  const batches = [];
-  let current = [], currentSize = 0;
-  for (const item of allItems) {
-    const size = (item.data || item.text || '').length;
-    if (currentSize + size > MAX_BATCH && current.length) {
-      batches.push(current);
-      current = []; currentSize = 0;
+function buildSinglePayload(items) {
+  const textItems = items.filter(i => i.type === 'text' || i.type === 'image');
+  const docItems = items.filter(i => i.type === 'document');
+  const MAX_BASE64_ITEMS = 6; // cap scanned docs to avoid oversized payloads
+  return [...textItems, ...docItems.slice(0, MAX_BASE64_ITEMS)];
+}
+
+async function callAnalyse(payload, batchIndex, totalBatches, extractedText, listingMeta, fileHash) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const r = await fetch(API_BASE + '/analyse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
+      body: JSON.stringify({ batches: payload, batchIndex, totalBatches, extractedText, listingMeta, fileHash })
+    });
+    const d = await r.json();
+    if (r.status === 429) {
+      showToast('Rate limit hit — waiting 30 seconds...');
+      await new Promise(res => setTimeout(res, 30000));
+      continue;
     }
-    current.push(item);
-    currentSize += size;
+    if (!r.ok || !d.result) return null;
+    return { result: d.result, packName: d.packName || 'Legal Pack' };
   }
-  if (current.length) batches.push(current);
-  return batches.length ? batches : [[]];
+  return null;
 }
 
 async function extractZip(file, depth) {
@@ -2199,6 +2259,15 @@ async function extractZip(file, depth) {
         const blob = await entry.async('blob');
         const subFile = new File([blob], name.split('/').pop());
         const subItems = await fileToItems(subFile);
+        // Skip scanned boilerplate PDFs that add no property-specific content
+        const boilerplatePatterns = ['common auction conditions', 'auction conditions', 'rics conditions', 'standard conditions'];
+        const entryName = subFile.name.toLowerCase();
+        const isBoilerplate = boilerplatePatterns.some(p => entryName.includes(p));
+        const extractedLen = window._pdfTextCache?.[subFile.name]?.length ?? 0;
+        if (isBoilerplate && extractedLen < 500) {
+          console.log(`[skip-boilerplate] ${subFile.name} — scanned boilerplate, skipping`);
+          continue;
+        }
         items.push(...subItems);
       }
     }
@@ -2524,6 +2593,10 @@ function renderResult(result, packName) {
   <!-- ④ TAB: FLAGS -->
   <div id="rtab-flags" class="report-tab-panel" style="display:none;">
     ${flags.length ? `
+      <div style="display:flex;justify-content:flex-end;gap:7px;margin-bottom:14px;">
+        <button onclick="expandAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.12s;" onmouseover="this.style.borderColor='var(--t2)'" onmouseout="this.style.borderColor='var(--b1)'">▼ Expand all</button>
+        <button onclick="collapseAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.12s;" onmouseover="this.style.borderColor='var(--t2)'" onmouseout="this.style.borderColor='var(--b1)'">▶ Collapse all</button>
+      </div>
       ${criticalFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:10px;">Critical (${criticalFlags.length})</div>${criticalFlags.map((f,i)=>renderFlagCard(f,i)).join('')}` : ''}
       ${warningFlags.length  ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d97706;margin:14px 0 10px;">Warnings (${warningFlags.length})</div>${warningFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+i)).join('')}` : ''}
       ${noteFlags.length     ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin:14px 0 10px;">Notes (${noteFlags.length})</div>${noteFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+warningFlags.length+i)).join('')}` : ''}
@@ -2742,7 +2815,6 @@ function renderFlagCard(f, index) {
   const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'var(--t3)';
   const highlightColor = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(245,158,11,0.1)':'rgba(100,116,139,0.07)';
 
-  // Derive impact-level pills from category, title and buyerImpact text
   const _t = ((f.category||'') + ' ' + (f.title||'') + ' ' + (f.buyerImpact||'')).toLowerCase();
   const _impTags = [];
   if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  'rgba(185,28,28,0.1)','#dc2626']);
@@ -2754,10 +2826,7 @@ function renderFlagCard(f, index) {
   const impTagsHtml = _impTags.map(([icon,label,bg,col]) =>
     `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};border:1px solid ${col.replace(')',',0.3)').replace('rgb','rgba')};white-space:nowrap;">${icon} ${label}</span>`).join('');
 
-  // Split detail into sentences for better readability
   const detail = f.detail || f.description || '';
-
-  // Build evidence section
   const hasEvidence = f.documentSource || f.evidence;
   const evidenceHtml = hasEvidence ? `
     <div style="margin-top:12px;padding:10px 12px;background:${highlightColor};border-radius:8px;border-left:3px solid ${borderColor};">
@@ -2768,31 +2837,76 @@ function renderFlagCard(f, index) {
       ${f.evidence ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.55;font-style:italic;">"${f.evidence}"</div>` : ''}
     </div>` : '';
 
-  return `<div id="flag-${index||0}" style="padding:18px 20px;background:var(--bg);border:1px solid var(--b1);border-left:4px solid ${borderColor};border-radius:0 14px 14px 0;margin-bottom:12px;transition:box-shadow 0.15s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow=''">
+  const idx = index === undefined ? 0 : index;
+  const isFirst = idx === 0;
+  const cardBorderColor = isFirst ? borderColor : 'var(--b1)';
+  const cardShadow = isFirst ? '0 2px 12px rgba(0,0,0,0.06)' : '';
 
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-      <span style="font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:4px;background:${sevBg};color:${sevColor};letter-spacing:0.5px;">${sevLabel}</span>
-      ${f.category ? `<span style="font-size:0.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">${f.category}</span>` : ''}
-      ${impTagsHtml}
+  return `<div id="flag-${idx}" data-border="${borderColor}" style="padding:14px 18px;background:var(--bg);border:1px solid ${cardBorderColor};border-left:4px solid ${borderColor};border-radius:0 14px 14px 0;margin-bottom:10px;transition:border-color 0.15s,box-shadow 0.15s;box-shadow:${cardShadow};">
+
+    <div onclick="toggleFlag(${idx})" style="cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;user-select:none;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap;">
+          <span style="font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:4px;background:${sevBg};color:${sevColor};letter-spacing:0.5px;">${sevLabel}</span>
+          ${f.category ? `<span style="font-size:0.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">${f.category}</span>` : ''}
+          ${impTagsHtml}
+        </div>
+        <div style="font-size:0.97rem;font-weight:700;color:var(--t1);line-height:1.35;">${f.title}</div>
+      </div>
+      <span id="flag-chev-${idx}" style="color:var(--t3);font-size:0.7rem;flex-shrink:0;padding-top:4px;">${isFirst ? '▼' : '▶'}</span>
     </div>
 
-    <div style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:10px;line-height:1.3;">${f.title}</div>
-
-    ${detail ? `
-    <div style="margin-bottom:${(f.buyerImpact||f.investorImpact)?'10px':'0'};">
-      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">What this means</div>
-      <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${detail}</div>
-    </div>` : ''}
-
-    ${(f.buyerImpact||f.investorImpact) ? `
-    <div style="padding:10px 12px;background:${sevBg};border-radius:8px;margin-bottom:0;">
-      <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:${sevColor};margin-bottom:4px;">Buyer Impact</div>
-      <div style="font-size:0.84rem;font-weight:600;color:${isCritical?'#dc2626':isWarning?'#d97706':'var(--t2)'};line-height:1.55;">⚡ ${f.buyerImpact||f.investorImpact}</div>
-    </div>` : ''}
-
-    ${evidenceHtml}
+    <div id="flag-body-${idx}" style="display:${isFirst ? 'block' : 'none'};">
+      ${detail ? `
+      <div style="margin-top:10px;margin-bottom:${(f.buyerImpact||f.investorImpact)?'10px':'0'};">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">What this means</div>
+        <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${detail}</div>
+      </div>` : ''}
+      ${(f.buyerImpact||f.investorImpact) ? `
+      <div style="padding:10px 12px;background:${sevBg};border-radius:8px;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:${sevColor};margin-bottom:4px;">Buyer Impact</div>
+        <div style="font-size:0.84rem;font-weight:600;color:${isCritical?'#dc2626':isWarning?'#d97706':'var(--t2)'};line-height:1.55;">⚡ ${f.buyerImpact||f.investorImpact}</div>
+      </div>` : ''}
+      ${evidenceHtml}
+    </div>
 
   </div>`;
+}
+
+function toggleFlag(idx) {
+  const body = document.getElementById('flag-body-' + idx);
+  const chev = document.getElementById('flag-chev-' + idx);
+  const card = document.getElementById('flag-' + idx);
+  if (!body) return;
+  const willOpen = body.style.display === 'none';
+  body.style.display = willOpen ? 'block' : 'none';
+  if (chev) chev.textContent = willOpen ? '▼' : '▶';
+  if (card) {
+    card.style.borderColor = willOpen ? (card.dataset.border || 'var(--b1)') : 'var(--b1)';
+    card.style.boxShadow = willOpen ? '0 2px 12px rgba(0,0,0,0.06)' : '';
+  }
+}
+
+function expandAllFlags() {
+  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
+    const idx = b.id.slice(10);
+    b.style.display = 'block';
+    const chev = document.getElementById('flag-chev-' + idx);
+    const card = document.getElementById('flag-' + idx);
+    if (chev) chev.textContent = '▼';
+    if (card) { card.style.borderColor = card.dataset.border || ''; card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }
+  });
+}
+
+function collapseAllFlags() {
+  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
+    const idx = b.id.slice(10);
+    b.style.display = 'none';
+    const chev = document.getElementById('flag-chev-' + idx);
+    const card = document.getElementById('flag-' + idx);
+    if (chev) chev.textContent = '▶';
+    if (card) { card.style.borderColor = 'var(--b1)'; card.style.boxShadow = ''; }
+  });
 }
 
 
@@ -4336,6 +4450,119 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Onboarding Tour ───────────────────────────────────────────────────────────
+const TOUR_STEPS = [
+  { sel: '#drop-zone',                          text: 'Drop your legal pack ZIP here — we support PDF, ZIP and multi-file uploads.' },
+  { sel: '#listing-url-input',                  text: 'Paste the auctioneer listing URL to auto-fill property details into your report.' },
+  { sel: '#analyse-btn',                        text: 'Hit Analyse — we read every page like a cautious UK solicitor.' },
+  { sel: '#queue-panel',                        text: 'Track your analysis here — you can navigate away while it runs.', showPanel: true },
+  { sel: '[data-panel="reports"].nav-item',     text: 'All your reports are saved here — access them anytime.' },
+];
+
+let _tourStep = 0;
+
+function startTour() {
+  if (localStorage.getItem('legalpack_tour_done')) return;
+  // Ensure analyse panel is active
+  const analyseNavBtn = document.querySelector('[data-panel="analyse"]');
+  if (analyseNavBtn) switchPanel('analyse', analyseNavBtn);
+  _tourStep = 0;
+  _showTourStep();
+}
+
+function _showTourStep() {
+  _cleanTourEl();
+  const step = TOUR_STEPS[_tourStep];
+  const target = document.querySelector(step.sel);
+
+  // Temporarily show queue panel for its step
+  if (step.showPanel && target) target.classList.add('visible');
+
+  const rect = target ? target.getBoundingClientRect() : null;
+  const PAD = 8;
+
+  // Ring
+  let ring = document.getElementById('tour-ring');
+  if (!ring) { ring = document.createElement('div'); ring.id = 'tour-ring'; document.body.appendChild(ring); }
+  if (rect) {
+    ring.style.cssText = `top:${rect.top - PAD}px;left:${rect.left - PAD}px;width:${rect.width + PAD * 2}px;height:${rect.height + PAD * 2}px;display:block;opacity:1;`;
+  } else {
+    ring.style.display = 'none';
+  }
+
+  // Tooltip
+  let tip = document.getElementById('tour-tooltip');
+  if (!tip) { tip = document.createElement('div'); tip.id = 'tour-tooltip'; document.body.appendChild(tip); }
+
+  const total = TOUR_STEPS.length;
+  const n = _tourStep + 1;
+  const dots = Array.from({length: total}, (_, i) =>
+    `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${i === _tourStep ? '#7c3aed' : '#d1d5db'};"></span>`
+  ).join('');
+
+  tip.style.opacity = '0';
+  tip.style.display = 'block';
+  tip.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:0.68rem;font-weight:700;color:#7c3aed;letter-spacing:0.06em;">${n} OF ${total}</span>
+      <button onclick="endTour()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:0.78rem;font-weight:600;padding:2px 6px;border-radius:5px;line-height:1;" onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#9ca3af'">Skip Tour ✕</button>
+    </div>
+    <p style="margin:0 0 14px;font-size:0.875rem;line-height:1.55;color:#111827;">${step.text}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;gap:5px;align-items:center;">${dots}</div>
+      <div style="display:flex;gap:8px;">
+        ${n > 1 ? `<button onclick="_tourNav(-1)" style="background:none;border:1px solid #e5e7eb;color:#374151;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;padding:6px 13px;border-radius:7px;cursor:pointer;" onmouseover="this.style.borderColor='#9ca3af'" onmouseout="this.style.borderColor='#e5e7eb'">Back</button>` : ''}
+        <button onclick="_tourNav(1)" style="background:#7c3aed;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;padding:6px 16px;border-radius:7px;cursor:pointer;" onmouseover="this.style.background='#6d28d9'" onmouseout="this.style.background='#7c3aed'">${n === total ? 'Finish ✓' : 'Next →'}</button>
+      </div>
+    </div>
+  `;
+
+  // Position tooltip below ring (or above if near bottom, or centred if no target)
+  requestAnimationFrame(() => {
+    const tH = tip.offsetHeight, tW = tip.offsetWidth;
+    const vH = window.innerHeight, vW = window.innerWidth;
+    let top, left;
+    if (rect) {
+      const below = rect.bottom + PAD + 14;
+      const above = rect.top - PAD - 14 - tH;
+      top = (below + tH < vH - 16) ? below : (above > 16 ? above : Math.max(16, vH / 2 - tH / 2));
+      left = Math.max(16, Math.min(rect.left + rect.width / 2 - tW / 2, vW - tW - 16));
+    } else {
+      top = vH / 2 - tH / 2;
+      left = vW / 2 - tW / 2;
+    }
+    tip.style.top = top + 'px';
+    tip.style.left = left + 'px';
+    tip.style.opacity = '1';
+  });
+}
+
+function _tourNav(dir) {
+  _tourStep += dir;
+  if (_tourStep < 0) { _tourStep = 0; return; }
+  if (_tourStep >= TOUR_STEPS.length) { endTour(); return; }
+  _showTourStep();
+}
+
+function _cleanTourEl() {
+  // Remove temporary queue-panel visibility
+  TOUR_STEPS.filter(s => s.showPanel).forEach(s => {
+    const el = document.querySelector(s.sel);
+    if (el && !analysisQueue.length) el.classList.remove('visible');
+  });
+}
+
+function endTour() {
+  _cleanTourEl();
+  ['tour-ring', 'tour-tooltip'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 250);
+  });
+  localStorage.setItem('legalpack_tour_done', 'true');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
