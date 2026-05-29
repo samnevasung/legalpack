@@ -1964,7 +1964,7 @@ async function runAnalysisJob(job) {
     // Single call — all documents in one request
     const singlePayload = buildSinglePayload(allItems);
     console.log(`[analysis] Single call — ${singlePayload.length} items (${allItems.length} extracted)`);
-    const r1 = await callAnalyse(singlePayload, 1, 1, extractedText, job.listingMeta, fileHash);
+    const r1 = await callAnalyse(singlePayload, 1, 1, job.listingMeta, fileHash);
 
     if (r1) {
       finalResult = r1.result;
@@ -1976,10 +1976,10 @@ async function runAnalysisJob(job) {
       const mid = Math.ceil(allItems.length / 2);
       let acc = null;
 
-      const b1 = await callAnalyse(buildSinglePayload(allItems.slice(0, mid)), 1, 2, extractedText, job.listingMeta, fileHash);
+      const b1 = await callAnalyse(buildSinglePayload(allItems.slice(0, mid)), 1, 2, job.listingMeta, fileHash);
       if (b1) { acc = mergeBatchResult(acc, b1.result, true); if (b1.packName !== 'Legal Pack') finalPackName = b1.packName; }
 
-      const b2 = await callAnalyse(buildSinglePayload(allItems.slice(mid)), 2, 2, '', null, fileHash);
+      const b2 = await callAnalyse(buildSinglePayload(allItems.slice(mid)), 2, 2, null, fileHash);
       if (b2) { acc = mergeBatchResult(acc, b2.result, !acc); if (b2.packName !== 'Legal Pack') finalPackName = b2.packName; }
 
       if (acc) {
@@ -2218,12 +2218,12 @@ function buildSinglePayload(items) {
   return [...textItems, ...docItems.slice(0, MAX_BASE64_ITEMS)];
 }
 
-async function callAnalyse(payload, batchIndex, totalBatches, extractedText, listingMeta, fileHash) {
+async function callAnalyse(payload, batchIndex, totalBatches, listingMeta, fileHash) {
   for (let attempt = 0; attempt < 2; attempt++) {
     const r = await fetch(API_BASE + '/analyse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
-      body: JSON.stringify({ batches: payload, batchIndex, totalBatches, extractedText, listingMeta, fileHash })
+      body: JSON.stringify({ batches: payload, batchIndex, totalBatches, listingMeta, fileHash })
     });
     const d = await r.json();
     if (r.status === 429) {
