@@ -4448,6 +4448,11 @@ function closeAccountModal() { document.getElementById('account-modal').classLis
 
 async function handleUpgrade(plan) {
   if (!authToken) return;
+  // Gate on the dashboard being fully initialised before opening the payment modal.
+  // Covers every trigger: Buy Credits button, upgrade plan buttons, 0-credits
+  // analysis check, and ?plan= URL param.  For user-initiated clicks after load,
+  // dashboardInitialized is already resolved so this is a zero-delay microtask.
+  await dashboardInitialized;
   openStripeModal(plan);
 }
 
@@ -4626,47 +4631,62 @@ init();
 
 <!-- STRIPE PAYMENT MODAL -->
 <div class="modal-overlay" id="stripe-modal" onclick="if(event.target===this)closeStripeModal()">
-  <div class="modal-box" style="padding:0;max-width:480px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--b1);">
+  <!--
+    max-height:70vh + overflow:hidden on the box keeps it compact.
+    The header is flex-shrink:0 so it stays pinned at the top.
+    The scrollable body (flex:1; overflow-y:auto) absorbs the Stripe iframe
+    and payment button, scrolling internally if the viewport is short.
+    stripe-payment-element has no fixed min-height so the Stripe iframe
+    sizes naturally inside the constrained container.
+  -->
+  <div class="modal-box" style="padding:0;max-width:480px;display:flex;flex-direction:column;max-height:70vh;overflow:hidden;border-radius:12px;">
+
+    <!-- Header — pinned, never scrolls away -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--b1);flex-shrink:0;">
       <div style="font-size:1rem;font-weight:800;" id="stripe-modal-title">Complete Payment</div>
       <button class="modal-close" style="position:static;" onclick="closeStripeModal()">✕</button>
     </div>
 
-    <!-- Plan summary -->
-    <div id="stripe-plan-summary" style="padding:16px 24px;border-bottom:1px solid var(--b1);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div>
-          <div style="font-size:0.85rem;font-weight:700;" id="stripe-plan-name">—</div>
-          <div style="font-size:0.75rem;color:var(--t2);" id="stripe-plan-desc">—</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:1.4rem;font-weight:800;font-family:'DM Mono',monospace;" id="stripe-plan-price">—</div>
-          <div style="font-size:0.7rem;color:var(--green);font-weight:700;display:none;" id="stripe-discount-label"></div>
-        </div>
-      </div>
-      <!-- Quantity selector (PAYG only) -->
-      <div id="stripe-qty-wrap" style="display:none;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--b1);border-radius:9px;padding:10px 14px;">
-        <div style="font-size:0.78rem;color:var(--t2);">Number of credits</div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button onclick="changeQty(-1)" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--b1);background:var(--bg4);color:var(--t1);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
-          <span id="stripe-qty-display" style="font-size:1rem;font-weight:800;font-family:'DM Mono',monospace;min-width:20px;text-align:center;">1</span>
-          <button onclick="changeQty(1)" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--b1);background:var(--bg4);color:var(--t1);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
-        </div>
-      </div>
-      <div id="stripe-bulk-notice" style="display:none;margin-top:8px;padding:8px 12px;background:var(--greenmid);border-radius:7px;font-size:0.75rem;color:var(--green);font-weight:700;">
-        🎉 25% bulk discount applied — you save £<span id="stripe-savings">0</span>
-      </div>
-    </div>
+    <!-- Scrollable body — plan summary + Stripe element + pay button -->
+    <div style="overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;">
 
-    <!-- Stripe Element mounts here -->
-    <div style="padding:20px 24px;">
-      <div id="stripe-payment-element" style="min-height:200px;"></div>
-      <div id="stripe-error" style="display:none;color:var(--red);font-size:0.8rem;margin-top:10px;padding:10px;background:var(--redbg);border-radius:7px;"></div>
-      <button id="stripe-pay-btn" onclick="confirmStripePayment()" style="width:100%;padding:14px;margin-top:16px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;transition:opacity 0.15s;">
-        Pay Now
-      </button>
-      <p style="text-align:center;color:var(--t3);font-size:0.72rem;margin-top:10px;">Secured by Stripe · Cancel anytime</p>
-    </div>
+      <!-- Plan summary -->
+      <div id="stripe-plan-summary" style="padding:16px 24px;border-bottom:1px solid var(--b1);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.85rem;font-weight:700;" id="stripe-plan-name">—</div>
+            <div style="font-size:0.75rem;color:var(--t2);" id="stripe-plan-desc">—</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.4rem;font-weight:800;font-family:'DM Mono',monospace;" id="stripe-plan-price">—</div>
+            <div style="font-size:0.7rem;color:var(--green);font-weight:700;display:none;" id="stripe-discount-label"></div>
+          </div>
+        </div>
+        <!-- Quantity selector (PAYG only) -->
+        <div id="stripe-qty-wrap" style="display:none;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--b1);border-radius:9px;padding:10px 14px;">
+          <div style="font-size:0.78rem;color:var(--t2);">Number of credits</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button onclick="changeQty(-1)" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--b1);background:var(--bg4);color:var(--t1);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+            <span id="stripe-qty-display" style="font-size:1rem;font-weight:800;font-family:'DM Mono',monospace;min-width:20px;text-align:center;">1</span>
+            <button onclick="changeQty(1)" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--b1);background:var(--bg4);color:var(--t1);font-size:1.1rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+          </div>
+        </div>
+        <div id="stripe-bulk-notice" style="display:none;margin-top:8px;padding:8px 12px;background:var(--greenmid);border-radius:7px;font-size:0.75rem;color:var(--green);font-weight:700;">
+          🎉 25% bulk discount applied — you save £<span id="stripe-savings">0</span>
+        </div>
+      </div>
+
+      <!-- Stripe Element mounts here — no fixed min-height, sizes naturally -->
+      <div style="padding:20px 24px;">
+        <div id="stripe-payment-element"></div>
+        <div id="stripe-error" style="display:none;color:var(--red);font-size:0.8rem;margin-top:10px;padding:10px;background:var(--redbg);border-radius:7px;"></div>
+        <button id="stripe-pay-btn" onclick="confirmStripePayment()" style="width:100%;padding:14px;margin-top:16px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;transition:opacity 0.15s;">
+          Pay Now
+        </button>
+        <p style="text-align:center;color:var(--t3);font-size:0.72rem;margin-top:10px;">Secured by Stripe · Cancel anytime</p>
+      </div>
+
+    </div><!-- /scrollable body -->
   </div>
 </div>
 
