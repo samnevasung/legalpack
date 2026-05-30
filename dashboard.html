@@ -5,7 +5,6 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="alternate icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<text y='.9em' font-size='90'>🔨</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1576,6 +1575,13 @@ let queueProcessing = false;
 let queueMinimized = false;
 let _queueIdCounter = 0;
 
+// Promise that resolves once init() has completed auth + data loading + renderUserUI.
+// Anything that needs the dashboard chrome to be populated before it runs (e.g. the
+// auto-open payment modal from ?plan= redirects) should wait on this rather than
+// using a fixed setTimeout, which can fire before the UI has rendered.
+let _dashboardInitResolve;
+const dashboardInitialized = new Promise(resolve => { _dashboardInitResolve = resolve; });
+
 const PLANS = {
   pay_as_you_go: { label: 'Pay As You Go', limit: null },
   standard: { label: 'Standard', limit: 50 },
@@ -1618,6 +1624,9 @@ async function init() {
 
   // Start onboarding tour for first-time users
   setTimeout(startTour, 600);
+
+  // Dashboard chrome is fully populated — unblock anything waiting on dashboardInitialized.
+  _dashboardInitResolve();
 }
 
 sb.auth.onAuthStateChange((event, session) => {
@@ -4572,20 +4581,27 @@ function endTour() {
 loadPreferences();
 init();
 
-// Auto-open upgrade modal if ?plan= param present (from landing page pricing flow)
+// Auto-open upgrade modal if ?plan= param present (from landing page pricing flow).
+// Uses dashboardInitialized rather than a fixed setTimeout so the payment modal
+// only appears once auth + loadUser() + renderUserUI() have all completed and the
+// browser has had at least one frame to paint the dashboard chrome.  A fixed 1500ms
+// delay is unreliable on slow connections and fires too early on fast ones, leaving
+// users facing a black overlay with no visible dashboard behind it.
 (function() {
   const params = new URLSearchParams(window.location.search);
   const plan = params.get('plan');
-  if (plan) {
-    // Wait for auth to complete then open upgrade
-    setTimeout(() => {
+  if (!plan) return;
+
+  dashboardInitialized.then(() => {
+    // One rAF after init ensures the browser has painted the sidebar/topbar/panels
+    // before the modal overlay appears — nav and dashboard chrome are always visible.
+    requestAnimationFrame(() => {
       if (authToken) {
         handleUpgrade(plan);
-        // Clean URL
         window.history.replaceState({}, '', '/dashboard.html');
       }
-    }, 1500);
-  }
+    });
+  });
 })();
 </script>
 <!-- CANCELLATION RETENTION MODAL -->
