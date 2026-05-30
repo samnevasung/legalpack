@@ -1,4 +1,5 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
@@ -151,22 +152,53 @@ const requireAuth = async (req, res, next) => {
       .single();
 
     if (error || !user) {
-      // Get signup IP — normalise IPv6 loopback to IPv4
-      const signupIp = (req.ip || req.headers['x-forwarded-for'] || '').split(',')[0].trim().replace('::ffff:', '') || 'unknown';
+      // ── One-free-credit-per-person check ──────────────────────────────────
+      // Signal 1 (IP hash) + Signal 2 (email domain) are combined. Neither alone
+      // is airtight — VPN users can bypass the IP check — but together they raise
+      // the effort bar substantially without adding friction for legitimate users.
+      // Raw IPs are never stored anywhere (GDPR). SHA-256 hash only.
+      //
+      // Supabase table required (run once):
+      //   CREATE TABLE used_trial_ips (
+      //     ip_hash     TEXT NOT NULL,
+      //     email_domain TEXT,
+      //     created_at  TIMESTAMPTZ DEFAULT now()
+      //   );
+      //   CREATE INDEX ON used_trial_ips (ip_hash);
 
-      // Check if this IP already claimed a free credit
-      let freeCredit = 0;
-      if (signupIp && signupIp !== 'unknown' && signupIp !== '127.0.0.1' && signupIp !== '::1') {
+      // Normalise IPv6-mapped IPv4, then hash — never store the raw IP.
+      const rawIp = (req.ip || req.headers['x-forwarded-for'] || '')
+        .split(',')[0].trim().replace('::ffff:', '');
+      const ipHash = (rawIp && rawIp !== '127.0.0.1' && rawIp !== '::1')
+        ? crypto.createHash('sha256').update(rawIp).digest('hex')
+        : null;
+      const emailDomain = (authUser.email || '').split('@')[1]?.toLowerCase() || null;
+
+      // Signal 1 — IP hash: has this IP already claimed a free credit?
+      // NOTE: Does not catch VPN/proxy/Tor users, but significantly raises the
+      // effort bar compared to no check at all.
+      let ipAlreadyUsed = false;
+      if (ipHash) {
         const { data: ipMatch } = await supabase
-          .from('users')
-          .select('id')
-          .eq('signup_ip', signupIp)
-          .eq('ip_credit_claimed', true)
+          .from('used_trial_ips')
+          .select('ip_hash')
+          .eq('ip_hash', ipHash)
           .limit(1);
-        if (!ipMatch || ipMatch.length === 0) {
-          freeCredit = 1; // first account from this IP — grant free credit
-        }
+        ipAlreadyUsed = !!(ipMatch && ipMatch.length > 0);
       }
+
+      // Signal 2 — email domain: same domain already used for > 3 free credits.
+      // Catches disposable-email farms (e.g. mailinator.com, guerrillamail.*).
+      let domainFlagged = false;
+      if (emailDomain) {
+        const { count } = await supabase
+          .from('used_trial_ips')
+          .select('*', { count: 'exact', head: true })
+          .eq('email_domain', emailDomain);
+        domainFlagged = (count || 0) > 3;
+      }
+
+      const freeCredit = (!ipAlreadyUsed && !domainFlagged) ? 1 : 0;
 
       const { data: newUser, error: createError } = await supabase
         .from('users')
@@ -180,14 +212,23 @@ const requireAuth = async (req, res, next) => {
           analyses_used_this_month: 0,
           analyses_total: 0,
           pay_as_you_go_credits: freeCredit,
-          signup_ip: signupIp,
-          ip_credit_claimed: freeCredit === 1,
         })
         .select()
         .single();
       if (createError) return res.status(500).json({ error: 'Failed to create user record' });
       user = newUser;
-      if (freeCredit === 1) console.log(`Free credit granted to ${authUser.email} from IP ${signupIp}`);
+
+      // Record the ip_hash + email_domain so future accounts from the same IP
+      // or a flagged domain are denied a free credit.
+      if (freeCredit === 1 && ipHash) {
+        await supabase.from('used_trial_ips').insert({ ip_hash: ipHash, email_domain: emailDomain });
+      }
+
+      if (freeCredit === 1) {
+        console.log(`Free credit granted to ${authUser.email} (domain: ${emailDomain})`);
+      } else {
+        console.log(`Free credit denied — ${authUser.email} ipAlreadyUsed=${ipAlreadyUsed} domainFlagged=${domainFlagged}`);
+      }
     }
 
     req.user = user;
