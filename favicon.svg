@@ -1,7 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- Hammer: head + handle rotated -45° to match 🔨 emoji orientation -->
-  <g transform="rotate(-45 16 16)" fill="#000">
-    <rect x="4" y="7" width="20" height="9" rx="2"/>
-    <rect x="14" y="15" width="5" height="14" rx="2.5"/>
-  </g>
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>
+  <rect width='32' height='32' rx='6' fill='#6c47ff'/>
+  <path d='M8 22 L18 12 L20 10 L22 12 L12 22 Z' fill='white'/>
+  <rect x='18' y='6' width='8' height='5' rx='1' fill='white' transform='rotate(45 22 8.5)'/>
 </svg>
