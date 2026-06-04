@@ -17,44 +17,72 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--t1:#111111;--t2:#555555;--t3:#999999;--b1:#e2e2ee;--red:#7c3aed;--redbg:#f5f0ff;--redmid:#ddd6fe;--amber:#d97706;--ambermid:#fef3c7;--amberbg:#fffbeb;--green:#2db87a;--greenmid:#0d2e1a;}
-body{background:#ffffff;color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--b1);background:var(--bg2);}
-.logo{font-size:1rem;font-weight:800;text-decoration:none;color:var(--t1);}
-.logo em{color:var(--red);font-style:normal;}
-main{max-width:800px;margin:0 auto;padding:32px 20px;}
+:root{
+  --purple:#6d28d9;--purpledeep:#4c1d95;--purplebg:#f5f0ff;--purplemid:#ddd6fe;
+  --t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;
+  --bg:#f8f7ff;--bg2:#f2f1fc;--b1:#e2e0f0;
+  --red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;
+  --amber:#d97706;--amberbg:#fffbeb;--ambermid:#fef3c7;
+  --ok:#15803d;--okbg:#f0fdf4;--okmid:#dcfce7;
+}
+body{background:#fff;color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+
+/* ── NAV — matches informational pages ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-0.4px;text-decoration:none;}
+.nav-logo-icon{width:30px;height:30px;background:var(--purple);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.nav-cta{padding:9px 20px;background:var(--purple);color:#fff;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.15s;box-shadow:0 3px 12px rgba(109,40,217,0.3);}
+.nav-cta:hover{background:var(--purpledeep);text-decoration:none;}
+
+main{max-width:800px;margin:0 auto;padding:32px 20px 60px;}
 .report-header{margin-bottom:24px;}
-.report-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;}
+.report-title{font-size:1.4rem;font-weight:800;margin-bottom:4px;color:var(--t1);}
 .report-meta{font-size:0.78rem;color:var(--t3);}
-.shared-badge{display:inline-block;background:var(--bg3);border:1px solid var(--b1);color:var(--t3);font-size:0.65rem;font-weight:800;padding:3px 8px;border-radius:5px;margin-left:8px;letter-spacing:1px;}
-.fact-card{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:12px;}
+.shared-badge{display:inline-block;background:var(--bg2);border:1px solid var(--b1);color:var(--t3);font-size:0.65rem;font-weight:800;padding:3px 8px;border-radius:5px;margin-left:8px;letter-spacing:1px;}
+
+/* ── FACT CARDS — light background so text is legible ── */
+.fact-card{background:var(--bg);border:1px solid var(--b1);border-radius:10px;padding:12px;}
 .fact-label{font-size:0.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:4px;}
-.fact-val{font-size:0.88rem;font-weight:700;}
+.fact-val{font-size:0.88rem;font-weight:700;color:var(--t1);}
 .facts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+
 .section-title{font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+
+/* ── RISK FLAGS ── */
 .risk-item{background:#fff;border:1px solid var(--b1);border-radius:10px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
 .risk-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .risk-severity{font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;letter-spacing:0.5px;}
 .risk-severity.high{background:var(--redmid);color:var(--red);}
 .risk-severity.medium{background:var(--ambermid);color:var(--amber);}
-.risk-severity.low{background:var(--greenmid);color:var(--green);}
-.risk-title{font-size:0.85rem;font-weight:700;flex:1;}
+.risk-severity.low{background:var(--okmid);color:var(--ok);}
+.risk-title{font-size:0.85rem;font-weight:700;flex:1;color:var(--t1);}
 .risk-desc{font-size:0.78rem;color:var(--t2);line-height:1.5;margin-bottom:4px;}
 .risk-impact{font-size:0.72rem;color:var(--amber);font-style:italic;}
-.cost-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;margin-bottom:6px;}
+
+/* ── COSTS ── */
+.cost-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:9px;margin-bottom:6px;}
 .cost-amount{font-family:'DM Mono',monospace;font-weight:700;color:var(--amber);}
-.cta-box{background:var(--redbg);border:1px solid var(--redmid);border-radius:16px;padding:28px;text-align:center;margin-top:28px;}
-.cta-box h3{font-size:1rem;font-weight:800;margin-bottom:6px;}
+
+/* ── CTA ── */
+.cta-box{background:var(--purplebg);border:1px solid var(--purplemid);border-radius:16px;padding:28px;text-align:center;margin-top:28px;}
+.cta-box h3{font-size:1rem;font-weight:800;margin-bottom:6px;color:var(--t1);}
 .cta-box p{font-size:0.82rem;color:var(--t2);margin-bottom:14px;}
-.cta-btn{display:inline-block;background:var(--red);color:#fff;padding:11px 28px;border-radius:9px;text-decoration:none;font-weight:800;font-size:0.9rem;}
+.cta-btn{display:inline-block;background:var(--purple);color:#fff;padding:11px 28px;border-radius:9px;text-decoration:none;font-weight:800;font-size:0.9rem;}
+.cta-btn:hover{background:var(--purpledeep);}
+
 .loading{text-align:center;padding:60px;color:var(--t3);}
-footer{text-align:center;padding:28px;color:var(--t3);font-size:0.72rem;border-top:1px solid var(--b1);margin-top:40px;background:var(--bg2);}
+footer{text-align:center;padding:28px;color:var(--t3);font-size:0.72rem;border-top:1px solid var(--b1);margin-top:40px;background:var(--bg);}
+
+@media(max-width:600px){
+  nav{padding:0 20px;}
+  .facts-grid{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
 <body>
 <nav>
-  <a href="/" class="logo"><img src="/logo.png" srcset="/logo@2x.png 2x" alt="LegalPack AI" style="height:36px;width:auto;display:block;"></a>
-  <a href="/dashboard.html" style="color:var(--t3);font-size:0.78rem;text-decoration:none;">Go to Dashboard →</a>
+  <a href="/" class="nav-logo"><div class="nav-logo-icon">🔨</div>LegalPack AI</a>
+  <a href="/dashboard.html" class="nav-cta">Dashboard →</a>
 </nav>
 <main>
   <div id="loading" class="loading">Loading report...</div>
@@ -88,13 +116,13 @@ async function loadSharedReport() {
         <div class="report-meta">Analysed ${date} · ${flags.length} flags · ${critical} critical</div>
       </div>
 
-      ${result.summary ? `<div style="background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;">Summary</div><div style="font-size:0.88rem;line-height:1.6;color:var(--t2);">${result.summary}</div></div>` : ''}
+      ${result.summary ? `<div style="background:var(--bg);border:1px solid var(--b1);border-radius:12px;padding:16px 18px;margin-bottom:16px;"><div class="section-title" style="margin-bottom:8px;">Summary</div><div style="font-size:0.88rem;line-height:1.6;color:var(--t2);">${result.summary}</div></div>` : ''}
 
       <div class="facts-grid">
         <div class="fact-card"><div class="fact-label">Critical Flags</div><div class="fact-val" style="color:var(--red);font-size:1.4rem;">${critical}</div></div>
         <div class="fact-card"><div class="fact-label">Warnings</div><div class="fact-val" style="color:var(--amber);font-size:1.4rem;">${warnings}</div></div>
-        <div class="fact-card"><div class="fact-label">Tenure</div><div class="fact-val">${result.tenure || '—'}</div></div>
-        <div class="fact-card"><div class="fact-label">Mortgageability</div><div class="fact-val">${result.mortgageability || '—'}</div></div>
+        <div class="fact-card"><div class="fact-label">Tenure</div><div class="fact-val">${result.tenure || 'Not specified'}</div></div>
+        <div class="fact-card"><div class="fact-label">Mortgageability</div><div class="fact-val">${result.mortgageability || 'Not assessed'}</div></div>
         ${result.leaseYears ? `<div class="fact-card"><div class="fact-label">Lease</div><div class="fact-val" style="color:${result.leaseYears < 85 ? 'var(--red)' : 'var(--t1)'};">${result.leaseYears} yrs</div></div>` : ''}
         ${result.groundRent && result.groundRent !== 'N/A' ? `<div class="fact-card"><div class="fact-label">Ground Rent</div><div class="fact-val">${result.groundRent}</div></div>` : ''}
       </div>
