@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Pack Checker — Instant AI Analysis for Auction Buyers | LegalPack AI</title>
+<meta name="description" content="The UK's smartest legal pack checker. Upload your auction legal pack and get risks, costs, and document gaps flagged in minutes. First check free.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://legalpackai.com/legal-pack-checker">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="LegalPack AI">
+<meta property="og:title" content="Legal Pack Checker — Instant AI Analysis for Auction Buyers | LegalPack AI">
+<meta property="og:description" content="Upload your auction legal pack and LegalPack AI checks for 100+ risks in minutes. Flying freeholds, short leases, hidden fees, missing documents. First check free.">
+<meta property="og:url" content="https://legalpackai.com/legal-pack-checker">
+<meta property="og:image" content="https://legalpackai.com/logo-full@2x.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a legal pack checker?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A legal pack checker is a tool that reads the documents in a UK property auction legal pack — title register, lease, searches, special conditions, replies to enquiries — and flags risks, costs, and missing documents before you bid. LegalPack AI is an AI-powered legal pack checker trained specifically on UK property auction legal packs and UK property law."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How accurate is an AI legal pack checker?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LegalPack AI is trained and fine-tuned on thousands of UK property auction legal packs and the full UK legal framework governing auction sales: Common Auction Conditions (4th Edition), HM Land Registry title register format, Leasehold Reform, Housing and Urban Development Act 1993, and related legislation. Every flag in the report includes the exact document, page, and clause reference — so you can verify each finding yourself or share it with a solicitor for independent confirmation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What file formats can I upload to LegalPack AI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "LegalPack AI accepts PDF files and ZIP archives containing multiple PDFs. Most auction legal packs are provided as a single ZIP file or as a set of individual PDFs. You can upload the entire pack at once — up to 500MB total. There is no need to separate individual documents before uploading."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does a legal pack check take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A full legal pack check takes 3–4 minutes for most packs, including complex multi-document ZIPs of 300+ pages. The checker is available 24/7, so you can run a check the night before your auction if the pack arrives late."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does LegalPack AI replace a solicitor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. LegalPack AI provides legal information — structured risk flags extracted directly from the pack documents — not legal advice. It does not replace a conveyancing solicitor for the transaction. It is the pre-bid screening tool that tells you whether a lot is worth a solicitor's attention before you spend £350–£550 finding out. If you win the lot at auction, you will still need a solicitor to complete the conveyancing."
+      }
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--purple:#6d28d9;--purple2:#7c3aed;--purplebg:#f5f0ff;--purplemid:#ddd6fe;--purpledeep:#4c1d95;--t1:#0d0c1a;--t2:#4a4863;--t3:#9490b0;--bg:#f8f7ff;--bg2:#f2f1fc;--b1:#e2e0f0;--red:#dc2626;--redbg:#fef2f2;--redmid:#fecaca;--amber:#d97706;--amberbg:#fffbeb;--ambermid:#fef3c7;--ok:#15803d;--okbg:#f0fdf4;--okmid:#dcfce7;}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:#fff;color:var(--t1);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:var(--purple);text-decoration:none;}
+a:hover{text-decoration:underline;}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-0.4px;text-decoration:none;}
+.nav-logo-icon{width:30px;height:30px;background:var(--purple);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.nav-cta{padding:9px 20px;background:var(--purple);color:#fff;border-radius:9px;font-size:13px;font-weight:700;text-decoration:none;transition:all 0.15s;box-shadow:0 3px 12px rgba(109,40,217,0.3);}
+.nav-cta:hover{background:var(--purpledeep);text-decoration:none;}
+.hero-content{max-width:760px;margin:0 auto;padding:64px 24px 48px;}
+.breadcrumb{font-size:13px;color:var(--t3);margin-bottom:20px;font-family:'DM Mono',monospace;}
+.breadcrumb a{color:var(--t3);}.breadcrumb a:hover{color:var(--purple);}
+.article-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--purple);background:var(--purplebg);border:1px solid var(--purplemid);padding:4px 12px;border-radius:20px;margin-bottom:18px;}
+h1{font-size:48px;font-weight:800;letter-spacing:-2.5px;line-height:1.04;color:var(--t1);margin-bottom:18px;}
+h1 em{color:var(--purple);font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;}
+.article-intro{font-size:19px;color:var(--t2);line-height:1.72;margin-bottom:32px;font-weight:400;}
+.article-meta{display:flex;align-items:center;gap:16px;font-size:13px;color:var(--t3);font-family:'DM Mono',monospace;padding-bottom:32px;border-bottom:1px solid var(--b1);margin-bottom:48px;}
+article{max-width:760px;margin:0 auto;padding:0 24px 80px;}
+h2{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--t1);margin:48px 0 16px;}
+h3{font-size:20px;font-weight:700;letter-spacing:-0.4px;color:var(--t1);margin:32px 0 12px;}
+p{font-size:16.5px;color:var(--t2);line-height:1.78;margin-bottom:18px;}
+ul,ol{margin:0 0 18px 20px;}
+li{font-size:16px;color:var(--t2);line-height:1.72;margin-bottom:8px;}
+strong{color:var(--t1);font-weight:700;}
+.callout{padding:18px 20px;border-radius:12px;margin:28px 0;border-left:3px solid;}
+.callout.ok{background:var(--okbg);border-color:var(--ok);}
+.callout.info{background:var(--purplebg);border-color:var(--purple);}
+.callout-title{font-size:13px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;}
+.callout.ok .callout-title{color:var(--ok);}
+.callout.info .callout-title{color:var(--purple);}
+.callout p{margin:0;font-size:15px;}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0;}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;font-size:14.5px;color:var(--t2);line-height:1.45;}
+.check-icon{color:var(--ok);font-size:15px;flex-shrink:0;margin-top:1px;font-weight:700;}
+.step-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0;}
+.step-card{background:var(--bg);border:1px solid var(--b1);border-radius:14px;padding:22px 20px;text-align:center;}
+.step-num{width:36px;height:36px;background:var(--purple);color:#fff;border-radius:50%;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:'DM Mono',monospace;}
+.step-card h3{font-size:15px;font-weight:700;margin-bottom:8px;letter-spacing:-0.3px;}
+.step-card p{font-size:13.5px;color:var(--t3);margin:0;line-height:1.5;}
+.advantage-list{display:flex;flex-direction:column;gap:12px;margin:24px 0;}
+.advantage-item{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;}
+.adv-icon{width:32px;height:32px;background:var(--purplebg);border:1px solid var(--purplemid);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.adv-text h4{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.adv-text p{font-size:14px;color:var(--t2);margin:0;line-height:1.55;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0;}
+.price-card{background:var(--bg);border:1px solid var(--b1);border-radius:14px;padding:22px 20px;}
+.price-card.featured{background:var(--purplebg);border-color:var(--purplemid);}
+.price-name{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--t3);margin-bottom:8px;}
+.price-amount{font-size:1.6rem;font-weight:800;color:var(--t1);letter-spacing:-1px;margin-bottom:4px;}
+.price-amount.featured{color:var(--purple);}
+.price-period{font-size:12px;color:var(--t3);margin-bottom:10px;}
+.price-desc{font-size:13.5px;color:var(--t2);line-height:1.55;}
+.cta-box{background:var(--purplebg);border:2px solid var(--purplemid);border-radius:16px;padding:32px;margin:40px 0;text-align:center;}
+.cta-box h3{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--t1);margin-bottom:12px;}
+.cta-box p{font-size:15px;color:var(--t2);line-height:1.65;margin-bottom:20px;}
+.btn-primary{display:inline-block;padding:14px 32px;background:var(--purple);color:#fff;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none;transition:all 0.15s;box-shadow:0 3px 12px rgba(109,40,217,0.3);}
+.btn-primary:hover{background:var(--purpledeep);transform:translateY(-1px);text-decoration:none;}
+.cta-block{background:linear-gradient(135deg,var(--purpledeep),#1e0e5c);border-radius:18px;padding:40px;text-align:center;margin:52px 0;}
+.cta-block h2{color:#fff;font-size:26px;letter-spacing:-0.8px;margin:0 0 12px;}
+.cta-block p{color:rgba(255,255,255,0.75);font-size:15px;margin:0 0 24px;}
+.cta-block a{display:inline-block;padding:15px 36px;background:#fff;color:var(--purpledeep);border-radius:10px;font-weight:800;font-size:15px;text-decoration:none;transition:all 0.15s;}
+.cta-block a:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.related-guides{margin:48px 0 0;}
+.related-guides h2{margin-bottom:16px;}
+.related-list{display:flex;flex-direction:column;gap:10px;}
+.related-link{display:block;padding:14px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;font-size:15px;font-weight:600;color:var(--t1);text-decoration:none;transition:all 0.15s;}
+.related-link:hover{background:var(--purplebg);border-color:var(--purplemid);color:var(--purple);text-decoration:none;}
+.related-link span{font-size:13px;font-weight:400;color:var(--t3);display:block;margin-top:2px;}
+footer{background:var(--bg);border-top:1px solid var(--b1);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+footer p{font-size:12px;color:var(--t3);font-family:'DM Mono',monospace;}
+.footer-links{display:flex;gap:20px;}
+.footer-links a{font-size:12px;color:var(--t3);}
+.footer-links a:hover{color:var(--purple);}
+@media(max-width:640px){nav{padding:0 20px;}h1{font-size:34px;letter-spacing:-1.5px;}footer{flex-direction:column;text-align:center;}.step-flow,.pricing-grid,.check-grid{grid-template-columns:1fr;}}
+.page-layout{max-width:1060px;margin:0 auto;display:flex;gap:40px;align-items:flex-start;}
+.page-layout article{flex:1;min-width:0;max-width:none;margin:0;}
+.sidebar{width:220px;flex-shrink:0;position:sticky;top:80px;padding-right:24px;}
+.sidebar-box{background:var(--bg,#f8f7ff);border:1px solid var(--b1,#e2e0f0);border-radius:14px;padding:20px;}
+.sidebar-title{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3,#9490b0);margin-bottom:14px;font-family:'DM Mono',monospace;}
+.sidebar-links{display:flex;flex-direction:column;gap:2px;}
+.sidebar-link{display:block;font-size:13.5px;color:var(--t2,#4a4863);text-decoration:none;padding:9px 10px;border-radius:8px;transition:all 0.15s;line-height:1.3;}
+.sidebar-link:hover{background:var(--purplebg,#f5f0ff);color:var(--purple,#6d28d9);text-decoration:none;}
+@media(max-width:900px){.page-layout{flex-direction:column;}.sidebar{width:100%;position:static;padding-right:0;}.sidebar-links{flex-direction:row;flex-wrap:wrap;gap:8px;}.sidebar-link{font-size:12.5px;padding:7px 10px;background:var(--bg,#f8f7ff);border:1px solid var(--b1,#e2e0f0);}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="nav-logo-icon">🔨</div>LegalPack AI</a>
+  <a href="/about.html" style="font-size:13px;font-weight:600;color:#4a4863;text-decoration:none;margin-right:6px;">About</a>
+  <a href="/faq.html" style="font-size:13px;font-weight:600;color:#4a4863;text-decoration:none;margin-right:6px;">FAQ</a>
+  <a href="/#pricing" class="nav-cta">Analyse a Pack →</a>
+</nav>
+
+<div class="hero-content">
+  <div class="breadcrumb"><a href="/">Home</a> › Legal Pack Checker</div>
+  <div class="article-tag">🔨 Instant AI Checker</div>
+  <h1>Legal pack checker: <em>upload, analyse</em>, bid with confidence</h1>
+  <p class="article-intro">LegalPack AI is the UK's most thorough legal pack checker for property auction buyers. Upload your pack, and in 3–4 minutes you know every risk, every hidden cost, and every document that's missing. First check free.</p>
+  <div class="article-meta">
+    <span>🔨 100+ risk checks per pack</span>
+    <span>⚡ 3–4 minute results</span>
+    <span>🇬🇧 UK auctions only</span>
+  </div>
+</div>
+
+<div class="page-layout">
+<article>
+
+<div class="cta-box" style="margin-top:0;">
+  <h3>Run your free legal pack check now</h3>
+  <p>No account needed for your first analysis. Upload a ZIP or individual PDFs — up to 500MB. Results in minutes.</p>
+  <a href="/#upload" class="btn-primary">Analyse your legal pack — first analysis free</a>
+</div>
+
+<h2>What is a legal pack checker?</h2>
+<p>A legal pack checker is a tool that reads the documents in a UK property auction legal pack — the title register, lease, searches, special conditions, replies to enquiries, and management pack — and identifies risks, costs, and gaps that a buyer needs to know about before bidding.</p>
+<p>LegalPack AI is an AI-powered legal pack checker built specifically for UK property auctions. It doesn't just scan for keywords — it reads documents the way a cautious UK solicitor would, understanding the context of what each clause means, what each register entry implies, and what should be in the pack but isn't. The result is a structured report with exact source references, cost estimates, and a financial exposure summary.</p>
+
+<h2>What LegalPack AI checks for</h2>
+
+<div class="check-grid">
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Flying freeholds</strong> and structural boundary issues</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Short leases</strong> and marriage value exposure below 80 years</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Chancel repair liability</strong> in Local Authority Search results</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Unadopted roads</strong> and highway maintenance liability</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Buyer's premiums</strong> and hidden auction administration fees</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Service charge and ground rent arrears</strong> via LPE1 form</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Restrictive covenants</strong> in the Charges Register</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Absentee freeholder</strong> risk and building insurance status</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Possessory title</strong> and other low-grade title classes</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Special conditions of sale</strong> — 14-day completion, seller's costs, VAT</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Missing searches</strong>, missing management pack, missing lease</span></div>
+  <div class="check-item"><span class="check-icon">✓</span><span><strong>Financial exposure summary</strong> with cost estimates for each risk</span></div>
+</div>
+
+<p>Every flag in the report includes the exact document name, page number, and clause or entry reference. You can verify any finding yourself — or share the report with your solicitor as a pre-structured summary of the key issues.</p>
+
+<h2>How the checker works</h2>
+
+<div class="step-flow">
+  <div class="step-card">
+    <div class="step-num">1</div>
+    <h3>Upload your legal pack</h3>
+    <p>ZIP or individual PDFs, up to 500MB. Packs from any UK auction house. The entire pack, not just one document.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-num">2</div>
+    <h3>AI extracts and reads every document</h3>
+    <p>LegalPack AI reads every page of every document simultaneously — cross-referencing risks across the title register, lease, searches, and conditions.</p>
+  </div>
+  <div class="step-card">
+    <div class="step-num">3</div>
+    <h3>Receive structured report</h3>
+    <p>Flags, cost estimates, exact source references, financial exposure summary. Ready in 3–4 minutes. Available at 2am if needed.</p>
+  </div>
+</div>
+
+<h2>Why LegalPack AI is the smarter legal pack checker</h2>
+
+<div class="advantage-list">
+  <div class="advantage-item">
+    <div class="adv-icon">📖</div>
+    <div class="adv-text">
+      <h4>Reads the full pack, not a summary</h4>
+      <p>LegalPack AI reads every page of every document in the pack — including documents referenced in the title register but not highlighted in the main conditions. Most buyers never read the epitome of title or the earlier conveyances. We do.</p>
+    </div>
+  </div>
+  <div class="advantage-item">
+    <div class="adv-icon">🕐</div>
+    <div class="adv-text">
+      <h4>Available 24/7 — including the night before an auction</h4>
+      <p>Packs are routinely released 48–72 hours before auction day. LegalPack AI is available at any hour — run your check at 11pm the night before and have results in 3–4 minutes.</p>
+    </div>
+  </div>
+  <div class="advantage-item">
+    <div class="adv-icon">💷</div>
+    <div class="adv-text">
+      <h4>Cost estimates for every risk found</h4>
+      <p>It's not enough to know a risk exists — you need to know what it costs. Every risk flag in a LegalPack AI report includes a cost estimate so you can adjust your maximum bid before the hammer falls.</p>
+    </div>
+  </div>
+  <div class="advantage-item">
+    <div class="adv-icon">📂</div>
+    <div class="adv-text">
+      <h4>Flags missing documents, not just what's there</h4>
+      <p>A legal pack that's missing a lease, a management pack, or a search is a red flag — but only if someone notices the gap. LegalPack AI checks for what should be in the pack based on the property type and flags anything absent.</p>
+    </div>
+  </div>
+  <div class="advantage-item">
+    <div class="adv-icon">🎯</div>
+    <div class="adv-text">
+      <h4>First check free — no account required</h4>
+      <p>Upload your first legal pack and run a complete check with no account required and no credit card needed. If you find it useful — which you will — PAYG at £9.99 per check or subscribe from £69.99/month.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Pricing</h2>
+<div class="pricing-grid">
+  <div class="price-card">
+    <div class="price-name">Pay As You Go</div>
+    <div class="price-amount">£9.99</div>
+    <div class="price-period">per check</div>
+    <div class="price-desc">For occasional buyers. No commitment. Full check every time. First check free.</div>
+  </div>
+  <div class="price-card featured">
+    <div class="price-name">Standard</div>
+    <div class="price-amount featured">£69.99</div>
+    <div class="price-period">per month · 30 checks</div>
+    <div class="price-desc">For active investors. Less than £2.34 per check.</div>
+  </div>
+  <div class="price-card">
+    <div class="price-name">Pro</div>
+    <div class="price-amount">£149.99</div>
+    <div class="price-period">per month · 100 checks</div>
+    <div class="price-desc">For high-volume investors and sourcing agents. 100 checks per month.</div>
+  </div>
+</div>
+
+<p>Solicitors average <strong>£429+VAT</strong> for a legal pack review. At £9.99 per check, you can screen 43 packs for the cost of a single solicitor review.</p>
+
+<div class="cta-box">
+  <h3>Is your legal pack flagging risks you haven't spotted?</h3>
+  <p>Upload your legal pack and LegalPack AI checks for flying freeholds, short leases, hidden fees, missing documents, and 100+ other issues in minutes. Solicitors charge £350–£550+VAT for the same review — we charge £9.99.</p>
+  <a href="/#upload" class="btn-primary">Analyse your legal pack — first analysis free</a>
+</div>
+
+<h2>Frequently asked questions</h2>
+
+<h3>What is a legal pack checker?</h3>
+<p>A legal pack checker reads the documents in a UK auction legal pack and flags risks, costs, and missing documents before you bid. LegalPack AI is an AI-powered checker trained on UK property auction legal packs and UK property law — it reads every page and provides a structured report with exact source references.</p>
+
+<h3>How accurate is an AI legal pack checker?</h3>
+<p>LegalPack AI is trained on thousands of UK auction legal packs and the full UK legal framework for auction sales. Every flag includes the exact document, page, and clause reference so you can verify each finding yourself. The AI reads documents the way a cautious UK solicitor would — not just scanning for keywords, but understanding what each entry means in context.</p>
+
+<h3>What file formats can I upload?</h3>
+<p>LegalPack AI accepts PDF files and ZIP archives containing multiple PDFs. Upload the entire legal pack at once — up to 500MB. No need to separate documents before uploading.</p>
+
+<h3>How long does a legal pack check take?</h3>
+<p>3–4 minutes for most packs, including complex multi-document ZIPs of 300+ pages. Available 24/7.</p>
+
+<h3>Does LegalPack AI replace a solicitor?</h3>
+<p>No. LegalPack AI provides legal information, not legal advice. It is the pre-bid screening tool. If you win the lot, you still need a conveyancing solicitor for the transaction. Many buyers share the LegalPack AI report with their solicitor to accelerate the full conveyancing review.</p>
+
+<div class="related-guides">
+  <h2>Related guides</h2>
+  <div class="related-list">
+    <a href="/legal-pack-analysis.html" class="related-link">Legal pack analysis: AI-powered review for auction buyers<span>What a full legal pack analysis covers and how it compares to a solicitor</span></a>
+    <a href="/auction-legal-pack-review.html" class="related-link">Auction legal pack review: get yours before the hammer falls<span>Why timing matters and how to get a review the night before your auction</span></a>
+    <a href="/what-is-a-legal-pack.html" class="related-link">What is a legal pack? The complete UK auction buyer's guide<span>Understanding every document that should be in a legal pack</span></a>
+    <a href="/how-to-read-auction-legal-pack.html" class="related-link">How to read an auction legal pack<span>A step-by-step guide for buyers who want to read the pack themselves</span></a>
+  </div>
+</div>
+
+<div class="cta-block">
+  <h2>Run your free legal pack check now</h2>
+  <p>No account needed for your first check. Upload your pack and get 100+ risk checks including flying freeholds, short leases, hidden fees, and missing documents — in 3–4 minutes.</p>
+  <a href="/">Start Your Free Check →</a>
+</div>
+
+</article>
+<aside class="sidebar">
+  <div class="sidebar-box">
+    <div class="sidebar-title">Free Property Tools</div>
+    <div class="sidebar-links">
+      <a href="/btl-yield-calculator.html" class="sidebar-link">BTL Yield Calculator</a>
+      <a href="/sdlt-calculator.html" class="sidebar-link">SDLT Calculator</a>
+      <a href="/auction-legal-pack-checklist.html" class="sidebar-link">Legal Pack Checklist</a>
+      <a href="/hidden-costs-auction-legal-pack.html" class="sidebar-link">Hidden Costs Guide</a>
+      <a href="/faq.html" class="sidebar-link">FAQ</a>
+    </div>
+  </div>
+</aside>
+</div>
+
+<footer>
+  <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--t1);">
+    <div style="width:24px;height:24px;background:var(--purple);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;">🔨</div>
+    LegalPack AI
+  </div>
+  <p>© 2026 LegalPack AI · Built for UK property investors</p>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/about.html">About</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+  </div>
+  <div style="width:100%;border-top:1px solid var(--b1,#e2e0f0);margin-top:12px;padding-top:14px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;"><span style="font-size:11px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#9490b0;font-family:'DM Mono',monospace;flex-shrink:0;">Free Property Tools</span><a href="/btl-yield-calculator.html" style="font-size:12px;color:#9490b0;text-decoration:none;">BTL Yield Calculator</a><a href="/sdlt-calculator.html" style="font-size:12px;color:#9490b0;text-decoration:none;">SDLT Calculator</a><a href="/auction-legal-pack-checklist.html" style="font-size:12px;color:#9490b0;text-decoration:none;">Legal Pack Checklist</a><a href="/hidden-costs-auction-legal-pack.html" style="font-size:12px;color:#9490b0;text-decoration:none;">Hidden Costs Guide</a></div>
+</footer>
+
+</body>
+</html>
