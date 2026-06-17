@@ -4546,7 +4546,8 @@ function _showTourStep() {
   `;
 
   // Position tooltip below ring (or above if near bottom, or centred if no target)
-  requestAnimationFrame(() => {
+  // Double-rAF ensures the browser has painted the tooltip so offsetHeight/Width are non-zero
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     const tH = tip.offsetHeight, tW = tip.offsetWidth;
     const vH = window.innerHeight, vW = window.innerWidth;
     let top, left;
@@ -4562,7 +4563,7 @@ function _showTourStep() {
     tip.style.top = top + 'px';
     tip.style.left = left + 'px';
     tip.style.opacity = '1';
-  });
+  }));
 }
 
 function _tourNav(dir) {
