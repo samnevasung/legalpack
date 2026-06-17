@@ -1741,12 +1741,13 @@ function renderUserUI() {
     : `${credits} credit${credits !== 1 ? 's' : ''} remaining`;
   document.getElementById('am-plan-bar').style.width = limit ? Math.min(100, Math.round((used/limit)*100)) + '%' : '0%';
 
-  // Sidebar credit badge
+  // Sidebar credit badge — plan users see remaining analyses, PAYG users see credits
   const credVal = document.getElementById('sb-credits-val');
   const credFree = document.getElementById('sb-credits-free');
-  if (credVal) credVal.textContent = credits;
-  // Show "1st analysis free" tag only when credits === 1 and no analyses done yet
-  const isNewUser = credits === 1 && (u.totalAnalyses === 0 || allReports.length === 0);
+  const badgeCount = limit ? Math.max(0, limit - used) : credits;
+  if (credVal) credVal.textContent = badgeCount;
+  // Show "1st analysis free" tag only for PAYG new users with 1 credit and no analyses yet
+  const isNewUser = !limit && credits === 1 && (u.totalAnalyses === 0 || allReports.length === 0);
   if (credFree) credFree.style.display = isNewUser ? '' : 'none';
 
   loadReferralCode();
