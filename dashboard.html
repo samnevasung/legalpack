@@ -996,6 +996,54 @@ body {
   .sidebar-overlay { display: none !important; }
 }
 
+/* ── Sidebar Credit Badge ── */
+#sb-credits-wrap {
+  margin: 0 10px 4px;
+  border-radius: 10px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-mid);
+  padding: 8px 12px 7px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+#sb-credits-wrap .cred-icon { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+#sb-credits-wrap .cred-label { font-size: 0.6rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--t3); line-height: 1; margin-bottom: 2px; }
+#sb-credits-wrap .cred-val { font-size: 1.05rem; font-weight: 800; color: var(--accent); line-height: 1; }
+#sb-credits-wrap .cred-free { font-size: 0.58rem; font-weight: 600; color: var(--ok); background: var(--okbg); border: 1px solid var(--okmid); border-radius: 4px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+
+@keyframes creditRay {
+  0%   { box-shadow: 0 0 0 0 rgba(124,58,237,0.55), 0 0 0 0 rgba(124,58,237,0.25); border-color: var(--accent); }
+  60%  { box-shadow: 0 0 0 7px rgba(124,58,237,0.12), 0 0 0 14px rgba(124,58,237,0.05); border-color: var(--accent); }
+  100% { box-shadow: 0 0 0 0 rgba(124,58,237,0), 0 0 0 0 rgba(124,58,237,0); border-color: var(--accent); }
+}
+#sb-credits-wrap.new-user-glow { animation: creditRay 1.5s ease-out infinite; }
+
+/* ── Free Credit Notification Modal ── */
+#free-credit-modal {
+  position: fixed; inset: 0; z-index: 10100;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#free-credit-modal.visible { opacity: 1; pointer-events: all; }
+#free-credit-modal-card {
+  background: var(--bg);
+  border: 1px solid var(--accent-mid);
+  border-radius: 18px;
+  padding: 32px 28px 26px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 0 0 1px rgba(124,58,237,0.1);
+  transform: translateY(12px);
+  transition: transform 0.3s ease;
+}
+#free-credit-modal.visible #free-credit-modal-card { transform: translateY(0); }
+
 /* ── Onboarding Tour ── */
 #tour-ring {
   position: fixed;
@@ -1041,6 +1089,15 @@ body {
       <div class="user-plan" id="sb-plan">PAY AS YOU GO</div>
     </div>
   </div>
+  <!-- Credit balance badge -->
+  <div id="sb-credits-wrap">
+    <span class="cred-icon">⚡</span>
+    <div>
+      <div class="cred-label">Credit Balance</div>
+      <div><span class="cred-val" id="sb-credits-val">—</span><span class="cred-free" id="sb-credits-free" style="display:none;">1st analysis free</span></div>
+    </div>
+  </div>
+
   <nav class="sidebar-nav">
     <div class="nav-section-label">Main</div>
     <button class="nav-item" data-panel="analyse" onclick="showUploadArea();switchPanel('analyse',this)">
@@ -1634,6 +1691,12 @@ async function init() {
   // Start onboarding tour for first-time users
   setTimeout(startTour, 600);
 
+  // Re-apply credit badge glow if user finished tour but hasn't dismissed the notification yet
+  if (localStorage.getItem('legalpack_tour_done') && !localStorage.getItem('legalpack_credits_noticed')) {
+    const wrap = document.getElementById('sb-credits-wrap');
+    if (wrap) wrap.classList.add('new-user-glow');
+  }
+
   // Dashboard chrome is fully populated — unblock anything waiting on dashboardInitialized.
   _dashboardInitResolve();
 }
@@ -1677,6 +1740,15 @@ function renderUserUI() {
     ? `${used} of ${limit} analyses used this month`
     : `${credits} credit${credits !== 1 ? 's' : ''} remaining`;
   document.getElementById('am-plan-bar').style.width = limit ? Math.min(100, Math.round((used/limit)*100)) + '%' : '0%';
+
+  // Sidebar credit badge
+  const credVal = document.getElementById('sb-credits-val');
+  const credFree = document.getElementById('sb-credits-free');
+  if (credVal) credVal.textContent = credits;
+  // Show "1st analysis free" tag only when credits === 1 and no analyses done yet
+  const isNewUser = credits === 1 && (u.totalAnalyses === 0 || allReports.length === 0);
+  if (credFree) credFree.style.display = isNewUser ? '' : 'none';
+
   loadReferralCode();
 }
 
@@ -4589,7 +4661,27 @@ function endTour() {
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 250);
   });
+  const isFirstTime = !localStorage.getItem('legalpack_tour_done');
   localStorage.setItem('legalpack_tour_done', 'true');
+  if (isFirstTime) {
+    // Glow the credit badge for new users
+    const wrap = document.getElementById('sb-credits-wrap');
+    if (wrap) wrap.classList.add('new-user-glow');
+    // Show free credit notification after a short delay
+    setTimeout(showFreeCredit, 400);
+  }
+}
+
+function showFreeCredit() {
+  const modal = document.getElementById('free-credit-modal');
+  if (modal) modal.classList.add('visible');
+}
+
+function closeFreeCredit() {
+  const modal = document.getElementById('free-credit-modal');
+  if (modal) modal.classList.remove('visible');
+  // Keep glow for the session so they notice the badge — stops on next load
+  localStorage.setItem('legalpack_credits_noticed', 'true');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -4897,6 +4989,24 @@ async function confirmStripePayment() {
       <div class="section-title" style="margin-bottom:8px;">Danger Zone</div>
       <button onclick="confirmDeleteAccount()" style="width:100%;padding:10px;border-radius:9px;border:1px solid var(--red);background:none;color:var(--red);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Delete Account</button>
     </div>
+  </div>
+</div>
+
+<!-- Free Credit Notification Modal -->
+<div id="free-credit-modal" onclick="closeFreeCredit()">
+  <div id="free-credit-modal-card" onclick="event.stopPropagation()">
+    <div style="font-size:2.4rem;margin-bottom:10px;">⚡</div>
+    <h2 style="font-size:1.2rem;font-weight:800;color:var(--t1);margin-bottom:8px;">You have 1 free credit</h2>
+    <p style="font-size:0.875rem;color:var(--t2);line-height:1.6;margin-bottom:20px;">Your first legal pack analysis is on us. Upload a legal pack and hit <strong style="color:var(--t1);">Analyse Legal Pack</strong> — no payment needed.</p>
+    <div style="background:var(--accent-bg);border:1px solid var(--accent-mid);border-radius:10px;padding:12px 16px;margin-bottom:22px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:1.5rem;">🎯</span>
+      <div style="text-align:left;">
+        <div style="font-size:0.75rem;font-weight:700;color:var(--accent);">1 credit = 1 full legal pack report</div>
+        <div style="font-size:0.68rem;color:var(--t3);margin-top:2px;">Title issues · Hidden costs · Auction risks · Plain English summary</div>
+      </div>
+    </div>
+    <button onclick="closeFreeCredit()" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px 0;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--accent-deep)'" onmouseout="this.style.background='var(--accent)'">Got it — let's analyse →</button>
+    <div style="margin-top:10px;font-size:0.68rem;color:var(--t3);">Credit balance shown in the sidebar. Top up anytime with <strong style="color:var(--t2);">Buy Credits</strong>.</div>
   </div>
 </div>
 
