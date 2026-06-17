@@ -141,7 +141,7 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webk
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:256px 256px;}
 
 /* ─── NAV ─── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;background:rgba(248,247,255,0.88);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid rgba(109,40,217,0.1);}
+nav{position:fixed;top:41px;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;background:rgba(248,247,255,0.88);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid rgba(109,40,217,0.1);}
 .nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
 .nav-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 12px rgba(109,40,217,0.35);}
 .nav-links{display:flex;align-items:center;gap:32px}
@@ -470,11 +470,11 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
 <body>
 
 <!-- Promo banner -->
-<div id="promo-banner" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 50%,#6d28d9 100%);color:#fff;text-align:center;padding:10px 48px 10px 16px;font-size:0.82rem;font-weight:600;line-height:1.4;position:relative;letter-spacing:0.01em;">
+<div id="promo-banner" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 50%,#6d28d9 100%);color:#fff;text-align:center;padding:10px 48px 10px 16px;font-size:0.82rem;font-weight:600;line-height:1.4;position:fixed;top:0;left:0;right:0;z-index:101;letter-spacing:0.01em;">
   <span style="margin-right:6px;">⚡</span>
   <strong style="font-weight:800;">Limited time:</strong> New users get their first legal pack analysis completely free — no card required.
   <a href="/dashboard.html" style="display:inline-block;margin-left:12px;background:#fff;color:#6d28d9;font-weight:800;font-size:0.76rem;padding:3px 12px;border-radius:20px;text-decoration:none;white-space:nowrap;transition:opacity .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Claim free analysis →</a>
-  <button onclick="document.getElementById('promo-banner').style.display='none'" aria-label="Dismiss" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;line-height:1;padding:4px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">✕</button>
+  <button onclick="dismissBanner()" aria-label="Dismiss" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;line-height:1;padding:4px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">✕</button>
 </div>
 
 <nav>
@@ -1189,6 +1189,14 @@ document.addEventListener('keydown',function(e){
   },{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
   els.forEach(function(el){io.observe(el);});
 })();
+
+// ─── PROMO BANNER ───
+function dismissBanner(){
+  var b=document.getElementById('promo-banner');
+  var nav=document.querySelector('nav');
+  if(b){b.style.display='none';}
+  if(nav){nav.style.top='0';}
+}
 
 // ─── NAV SCROLL ───
 window.addEventListener('scroll',function(){
