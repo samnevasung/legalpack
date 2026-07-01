@@ -141,42 +141,43 @@ body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;-webk
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:256px 256px;}
 
 /* ─── NAV ─── */
-nav{position:fixed;top:41px;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;background:rgba(248,247,255,0.88);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid rgba(109,40,217,0.1);}
-.nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
+nav{position:fixed;top:41px;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;background:rgba(10,8,18,0.7);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(109,40,217,0.15);transition:background 0.3s;}
+nav.scrolled{background:rgba(10,8,18,0.95);}
+.nav-logo{text-decoration:none;display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
 .nav-logo-icon{width:32px;height:32px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 4px 12px rgba(109,40,217,0.35);}
 .nav-links{display:flex;align-items:center;gap:32px}
-.nav-links a{font-size:14px;font-weight:600;color:var(--t2);text-decoration:none;transition:color 0.15s;letter-spacing:-0.1px;}
-.nav-links a:hover{color:var(--purple)}
+.nav-links a{font-size:14px;font-weight:600;color:rgba(255,255,255,0.6);text-decoration:none;transition:color 0.15s;letter-spacing:-0.1px;}
+.nav-links a:hover{color:#fff}
 .nav-right{display:flex;align-items:center;gap:10px}
-.btn-ghost{padding:8px 18px;border-radius:8px;border:1px solid var(--b1);background:none;color:var(--t2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.15s;}
-.btn-ghost:hover{color:var(--t1);border-color:var(--purple);background:var(--purplebg)}
+.btn-ghost{padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.15s;}
+.btn-ghost:hover{color:#fff;border-color:rgba(167,139,250,0.5);background:rgba(109,40,217,0.15)}
 .btn-nav{padding:10px 22px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.18s;box-shadow:0 3px 14px rgba(109,40,217,0.35);letter-spacing:-0.2px;}
 .btn-nav:hover{background:var(--purpledeep);box-shadow:0 5px 18px rgba(109,40,217,0.45);transform:translateY(-1px);}
 
-/* ─── HERO ─── */
-.hero{min-height:100vh;display:flex;align-items:center;padding:120px 56px 80px;position:relative;overflow:hidden;}
+/* ─── HERO (fullscreen dark) ─── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#0a0812;padding:0 24px;}
 .hero-mesh{position:absolute;inset:0;pointer-events:none;z-index:0;}
-.hero-mesh::before{content:'';position:absolute;top:-20%;left:-10%;width:80%;height:120%;border-radius:50%;background:radial-gradient(ellipse, rgba(109,40,217,0.13) 0%, transparent 65%);}
-.hero-mesh::after{content:'';position:absolute;top:10%;right:-15%;width:60%;height:90%;border-radius:50%;background:radial-gradient(ellipse, rgba(139,92,246,0.09) 0%, transparent 65%);}
-.hero-grid-lines{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(109,40,217,0.04) 1px, transparent 1px),linear-gradient(90deg, rgba(109,40,217,0.04) 1px, transparent 1px);background-size:60px 60px;}
-.hero-inner{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1.15fr;gap:72px;align-items:center;position:relative;z-index:1;}
-.hero-left{}
-.hero-pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--red);margin-bottom:28px;padding:5px 13px;border-radius:20px;border:1px solid var(--redmid);background:var(--redbg);}
-.hero-pulse{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 2s ease-in-out infinite;}
+.hero-mesh::before{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(ellipse,rgba(109,40,217,0.22) 0%,transparent 70%);}
+.hero-mesh::after{content:'';position:absolute;bottom:-10%;right:-5%;width:500px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(139,92,246,0.1) 0%,transparent 65%);}
+.hero-grid-lines{position:absolute;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(109,40,217,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(109,40,217,0.06) 1px,transparent 1px);background-size:72px 72px;}
+.hero-inner{position:relative;z-index:1;text-align:center;max-width:680px;width:100%;}
+.hero-pill{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:rgba(167,139,250,0.9);margin-bottom:32px;padding:6px 16px;border-radius:20px;border:1px solid rgba(109,40,217,0.35);background:rgba(109,40,217,0.12);}
+.hero-pulse{width:6px;height:6px;border-radius:50%;background:#a78bfa;animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
-.hero h1{font-size:74px;font-weight:800;letter-spacing:-4px;line-height:0.95;margin-bottom:10px;color:var(--t1);}
-.hero h1 em{color:var(--purple);font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;letter-spacing:-2px;}
-.hero-sub{font-size:19px;color:var(--t2);line-height:1.7;margin-bottom:24px;max-width:480px;font-weight:450;}
-.hero-fear{font-size:14.5px;color:#3d1515;line-height:1.72;margin-bottom:36px;max-width:480px;padding:15px 17px;background:linear-gradient(135deg,#fff8f8,#fef2f2);border:1px solid var(--redmid);border-left:3px solid var(--red);border-radius:0 12px 12px 0;}
-.hero-fear strong{color:var(--red);}
-.hero-ctas{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
-.btn-hero{padding:17px 40px;border-radius:12px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800;cursor:pointer;text-decoration:none;transition:all 0.22s;box-shadow:0 8px 28px rgba(109,40,217,0.4),0 2px 8px rgba(109,40,217,0.2);letter-spacing:-0.3px;}
-.btn-hero:hover{background:var(--purpledeep);transform:translateY(-2px);box-shadow:0 14px 36px rgba(109,40,217,0.5),0 4px 12px rgba(109,40,217,0.25)}
-.btn-hero-ghost{padding:16px 28px;border-radius:12px;border:1.5px solid var(--b2);background:rgba(255,255,255,0.6);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.15s;backdrop-filter:blur(8px);}
-.btn-hero-ghost:hover{border-color:var(--purple);color:var(--purple);background:var(--purplebg)}
-.hero-trust{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
-.hero-trust-item{font-size:12.5px;color:var(--t3);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px;font-weight:500;}
-.hero-trust-sep{width:4px;height:4px;background:var(--b2);border-radius:50%;}
+.hero h1{font-size:64px;font-weight:800;letter-spacing:-3.5px;line-height:1.0;margin-bottom:20px;color:#fff;}
+.hero h1 em{color:#a78bfa;font-style:italic;font-family:'Instrument Serif',serif;font-weight:400;letter-spacing:-2px;}
+.hero-sub{font-size:18px;color:rgba(255,255,255,0.55);line-height:1.72;margin-bottom:44px;font-weight:400;}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:32px;}
+.btn-hero{padding:18px 44px;border-radius:12px;border:none;background:var(--purple);color:#fff;font-family:'DM Sans',sans-serif;font-size:17px;font-weight:800;cursor:pointer;text-decoration:none;transition:all 0.22s;box-shadow:0 8px 32px rgba(109,40,217,0.5),0 2px 8px rgba(109,40,217,0.25);letter-spacing:-0.3px;}
+.btn-hero:hover{background:var(--purpledeep);transform:translateY(-2px);box-shadow:0 16px 40px rgba(109,40,217,0.6)}
+.btn-hero-ghost{padding:17px 28px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.15s;backdrop-filter:blur(8px);}
+.btn-hero-ghost:hover{border-color:rgba(167,139,250,0.5);color:#a78bfa;background:rgba(109,40,217,0.1)}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;}
+.hero-trust-item{font-size:12.5px;color:rgba(255,255,255,0.35);font-family:'DM Mono',monospace;display:flex;align-items:center;gap:5px;font-weight:500;}
+.hero-trust-sep{width:3px;height:3px;background:rgba(255,255,255,0.2);border-radius:50%;}
+/* hidden legacy styles that aren't used in new hero */
+.hero-fear{display:none;}
+.hero-report{display:none;}
 
 /* ─── ANIMATED REPORT CARD ─── */
 .hero-report{position:relative;z-index:1;}
@@ -500,66 +501,21 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
   <div class="hero-mesh"></div>
   <div class="hero-grid-lines"></div>
   <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-pill"><span class="hero-pulse"></span> UK Auction Buyer Protection</div>
-      <h1>Know What The<br>Legal Pack Is<br><em>Hiding</em></h1>
-      <p class="hero-sub">We read every page like a paranoid property solicitor — before you bid, not after.</p>
-      <div class="hero-fear">
-        <strong>Most auction buyers never read the full legal pack.</strong> Hidden seller fees, short leases, unadopted roads and title defects are buried in clauses — and you have days, not weeks.
-      </div>
-      <div class="hero-ctas">
-        <button onclick="goToApp()" class="btn-hero">Analyse a Legal Pack →</button>
-        <a href="#how" class="btn-hero-ghost">See how it works</a>
-      </div>
-      <div class="hero-trust">
-        <div class="hero-trust-item">⚡ 3–4 min analysis</div>
-        <span class="hero-trust-sep"></span>
-        <div class="hero-trust-item">📄 Any size ZIP or PDF</div>
-        <span class="hero-trust-sep"></span>
-        <div class="hero-trust-item">🔒 No data stored</div>
-      </div>
+    <div class="hero-pill"><span class="hero-pulse"></span> UK Property Auction</div>
+    <h1>Know What The<br>Legal Pack Is <em>Hiding</em></h1>
+    <p class="hero-sub">Upload your legal pack and get a full risk report in minutes — hidden costs, title defects, and deal-killing clauses flagged before you bid.</p>
+    <div class="hero-ctas">
+      <button onclick="goToApp()" class="btn-hero">Analyse a Legal Pack →</button>
+      <a href="#how" class="btn-hero-ghost">See how it works</a>
     </div>
-    <div class="hero-report">
-      <div class="report-card" style="position:relative;">
-        <div class="scan-bar"></div>
-        <div class="rc-topbar">
-          <div class="rc-dot" style="background:#dc2626"></div>
-          <div class="rc-dot" style="background:#f59e0b;margin-left:4px"></div>
-          <div class="rc-dot" style="background:#22c55e;margin-left:4px"></div>
-          <span class="rc-address" style="margin-left:8px;">58 Gramfield Rd, Huddersfield HD4 5QD</span>
-          <span class="rc-badge">🚨 SEVERE RISK</span>
-        </div>
-        <div class="rc-verdict">
-          <div class="rc-verdict-icon">🔴</div>
-          <div class="rc-verdict-body">
-            <small>AI Verdict</small>
-            <strong>Cash Buyers Only Likely</strong>
-            <p>Sale by lender under power of sale with no title guarantee. Transferee details blank — current owner cannot be verified.</p>
-          </div>
-        </div>
-        <div class="rc-stats">
-          <div class="rc-stat"><div class="rc-stat-val" style="color:#dc2626;">9</div><div class="rc-stat-lbl">Critical</div></div>
-          <div class="rc-stat"><div class="rc-stat-val" style="color:#d97706;">7</div><div class="rc-stat-lbl">Warnings</div></div>
-          <div class="rc-stat"><div class="rc-stat-val" style="color:var(--t1);">£5k</div><div class="rc-stat-lbl">Min Deposit</div></div>
-        </div>
-        <div class="rc-flags">
-          <div class="rc-flag crit">
-            <div class="rc-flag-head"><span class="rc-flag-sev crit">CRITICAL</span><span class="rc-flag-title">No Title Guarantee — Lender Sale</span></div>
-            <div class="rc-flag-desc">Buyer has zero legal recourse if title defects emerge after purchase.</div>
-            <div class="rc-source">↳ Title Register · Entry A1(3)</div>
-          </div>
-          <div class="rc-flag crit">
-            <div class="rc-flag-head"><span class="rc-flag-sev crit">CRITICAL</span><span class="rc-flag-title">Transferee Details Blank — TR2 Form</span></div>
-            <div class="rc-flag-desc">Current registered owner cannot be verified. Land Registry may reject transfer.</div>
-            <div class="rc-source">↳ Transfer Deed · Page 3</div>
-          </div>
-          <div class="rc-flag warn">
-            <div class="rc-flag-head"><span class="rc-flag-sev warn">WARNING</span><span class="rc-flag-title">Buyer Accepts Property 'As Seen'</span></div>
-            <div class="rc-flag-desc">No right to renegotiate if structural defects found after auction.</div>
-            <div class="rc-source">↳ Special Conditions · Clause G4</div>
-          </div>
-        </div>
-      </div>
+    <div class="hero-trust">
+      <div class="hero-trust-item">⚡ 3–4 min analysis</div>
+      <span class="hero-trust-sep"></span>
+      <div class="hero-trust-item">📄 ZIP or PDF, any size</div>
+      <span class="hero-trust-sep"></span>
+      <div class="hero-trust-item">🔒 No data stored</div>
+      <span class="hero-trust-sep"></span>
+      <div class="hero-trust-item">✦ First analysis free</div>
     </div>
   </div>
 </section>
@@ -1207,8 +1163,8 @@ function dismissBanner(){
 // ─── NAV SCROLL ───
 window.addEventListener('scroll',function(){
   var nav=document.querySelector('nav');
-  if(window.scrollY>20){nav.style.borderBottomColor='rgba(109,40,217,0.15)';}
-  else{nav.style.borderBottomColor='rgba(109,40,217,0.1)';}
+  if(window.scrollY>60){nav.classList.add('scrolled');}
+  else{nav.classList.remove('scrolled');}
 });
 </script>
 <script src="/auth-guard.js"></script>
