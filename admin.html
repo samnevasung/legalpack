@@ -112,6 +112,18 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
 @keyframes pulse-red{0%,100%{opacity:1;}50%{opacity:0.25;}}
 .err-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse-red 1.4s ease-in-out infinite;vertical-align:middle;margin-left:5px;}
 .err-stack-row td{background:var(--bg2)!important;}
+/* SUPPORT */
+.sp-ticket{padding:10px 13px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background 0.1s;}
+.sp-ticket:hover{background:var(--bg3);}
+.sp-ticket.active{background:var(--purplebg);border-left:2px solid var(--purple);}
+.sp-ticket-email{font-size:0.75rem;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sp-ticket-preview{font-size:0.68rem;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.sp-ticket-meta{display:flex;align-items:center;gap:5px;margin-top:4px;}
+.sp-msg{max-width:75%;padding:8px 11px;border-radius:11px;font-size:0.78rem;line-height:1.55;word-break:break-word;}
+.sp-msg.user{background:var(--bg3);color:var(--t1);align-self:flex-start;border-bottom-left-radius:3px;border:1px solid var(--b1);}
+.sp-msg.admin{background:var(--purple);color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.sp-msg.system{background:none;color:var(--t3);font-size:0.68rem;align-self:center;text-align:center;padding:3px 0;}
+.sp-msg-time{font-size:0.6rem;opacity:0.55;display:block;margin-top:3px;}
 </style>
 </head>
 <body>
@@ -152,6 +164,8 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   <div class="sidebar-item" onclick="showPanel('broadcast',this)">📣 User Tools</div>
   <div class="sidebar-section">Promos</div>
   <div class="sidebar-item" onclick="showPanel('promo',this)">🎟 Promo Codes</div>
+  <div class="sidebar-section">Support</div>
+  <div class="sidebar-item" onclick="showPanel('support',this)" id="sidebar-support-item">💬 Support<span id="sidebar-support-badge" style="display:none;margin-left:5px;background:var(--red);color:#fff;font-size:0.55rem;font-weight:800;padding:1px 5px;border-radius:8px;vertical-align:middle;"></span></div>
   <div class="sidebar-section">Monitoring</div>
   <div class="sidebar-item" onclick="showPanel('errors',this)" id="sidebar-errors-item">🔴 Error Console<span class="err-live-dot" id="sidebar-err-dot" style="display:none;" title="Errors in last 5 min"></span></div>
 </div>
@@ -362,6 +376,55 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
       <span id="err-refresh-time" style="font-size:0.65rem;color:var(--t3);font-family:'DM Mono',monospace;"></span>
     </div>
     <div id="errors-table"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- SUPPORT PANEL -->
+<div class="panel" id="panel-support">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div class="page-title">Support</div>
+    <div style="display:flex;gap:7px;">
+      <select class="select-sm" id="support-status-filter" onchange="renderTickets()">
+        <option value="">All</option>
+        <option value="open">Open</option>
+        <option value="pending">Pending</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <button class="btn-sm" onclick="loadSupport()">↻ Refresh</button>
+    </div>
+  </div>
+  <div class="page-sub" id="support-sub">Loading…</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div class="stat-card blue"><div class="stat-label">Open</div><div class="stat-value" id="sp-open">—</div></div>
+    <div class="stat-card amber"><div class="stat-label">Total</div><div class="stat-value" id="sp-total">—</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;height:calc(100vh - 260px);min-height:400px;">
+
+    <!-- TICKET LIST -->
+    <div class="card" style="display:flex;flex-direction:column;overflow:hidden;">
+      <div class="card-header" style="flex-shrink:0;">
+        <div class="card-title">Tickets</div>
+      </div>
+      <div id="support-ticket-list" style="overflow-y:auto;flex:1;"></div>
+    </div>
+
+    <!-- CONVERSATION -->
+    <div class="card" style="display:flex;flex-direction:column;overflow:hidden;" id="support-convo-card">
+      <div class="card-header" style="flex-shrink:0;" id="support-convo-header">
+        <div style="color:var(--t3);font-size:0.76rem;">Select a ticket to view the conversation</div>
+      </div>
+      <div id="support-msgs" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg);"></div>
+      <div id="support-reply-wrap" style="display:none;padding:10px 12px;border-top:1px solid var(--b1);display:flex;gap:8px;align-items:flex-end;background:var(--bg2);">
+        <textarea id="support-reply-input" placeholder="Type a reply…" rows="2" style="flex:1;resize:none;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:0.8rem;padding:8px 10px;outline:none;max-height:100px;" onkeydown="supportHandleKey(event)"></textarea>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <button class="btn-primary" onclick="supportSendReply()" style="white-space:nowrap;font-size:0.72rem;padding:6px 12px;">Send ↵</button>
+          <button id="support-resolve-btn" class="action-btn success" onclick="supportToggleResolve()" style="font-size:0.65rem;padding:4px 8px;"></button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -656,6 +719,7 @@ function showPanel(id,el){
   document.getElementById('panel-'+id).classList.add('active');
   el.classList.add('active');
   if(id==='errors')loadErrors();
+  if(id==='support')loadSupport();
 }
 
 function calcMRR(){return allUsers.reduce((s,u)=>{if(u.plan==='standard')return s+69.99;if(u.plan==='pro')return s+119.99;return s;},0);}
@@ -831,6 +895,144 @@ async function downloadErrors(days){
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
+
+// ─── SUPPORT ───────────────────────────────────────────────
+var _spTickets = [];
+var _spActiveTicket = null;
+var _spChannel = null;
+
+async function loadSupport(){
+  document.getElementById('support-sub').textContent = 'Loading…';
+  const sb = window.supabase.createClient(
+    'https://ktrbbaakmlwmhyvpufcs.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
+  );
+  const {data, error} = await sb.from('support_tickets').select('*').order('last_message_at',{ascending:false});
+  if(error){ document.getElementById('support-sub').textContent = 'Error: '+error.message; return; }
+  _spTickets = data || [];
+  renderTickets();
+  updateSupportBadge();
+  // Realtime — new tickets or ticket updates
+  if(_spChannel) sb.removeChannel(_spChannel);
+  _spChannel = sb.channel('admin-support')
+    .on('postgres_changes',{event:'*',schema:'public',table:'support_tickets'},()=>loadSupport())
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},payload=>{
+      const m = payload.new;
+      if(_spActiveTicket && m.ticket_id === _spActiveTicket.id){
+        spAppendMsg(m.sender_type, m.message, m.created_at);
+      }
+      if(m.sender_type==='user') updateSupportBadge();
+    })
+    .subscribe();
+}
+
+function updateSupportBadge(){
+  const open = _spTickets.filter(t=>t.status!=='resolved').length;
+  const badge = document.getElementById('sidebar-support-badge');
+  if(badge){
+    if(open > 0){ badge.textContent = open; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
+  }
+}
+
+function renderTickets(){
+  const filter = (document.getElementById('support-status-filter')||{}).value||'';
+  const tickets = filter ? _spTickets.filter(t=>t.status===filter) : _spTickets;
+  document.getElementById('sp-open').textContent = _spTickets.filter(t=>t.status!=='resolved').length;
+  document.getElementById('sp-total').textContent = _spTickets.length;
+  document.getElementById('support-sub').textContent = tickets.length + ' ticket' + (tickets.length!==1?'s':'');
+  const list = document.getElementById('support-ticket-list');
+  if(!tickets.length){ list.innerHTML='<div class="empty">No tickets</div>'; return; }
+  const statusBadge = s => s==='open'?'<span class="badge red">open</span>':s==='pending'?'<span class="badge amber">pending</span>':'<span class="badge green">resolved</span>';
+  const fmtAgo = ts => { if(!ts)return''; const d=(Date.now()-new Date(ts))/1000; if(d<60)return'just now'; if(d<3600)return Math.floor(d/60)+'m ago'; if(d<86400)return Math.floor(d/3600)+'h ago'; return Math.floor(d/86400)+'d ago'; };
+  list.innerHTML = tickets.map(t=>`
+    <div class="sp-ticket${_spActiveTicket&&_spActiveTicket.id===t.id?' active':''}" onclick="spOpenTicket('${t.id}')">
+      <div class="sp-ticket-email">${escHtml(t.user_email||'Unknown')}</div>
+      <div class="sp-ticket-preview">${escHtml(t.subject||'Support Request')}</div>
+      <div class="sp-ticket-meta">${statusBadge(t.status)}<span style="font-size:0.6rem;color:var(--t3);margin-left:auto;">${fmtAgo(t.last_message_at)}</span></div>
+    </div>`).join('');
+}
+
+async function spOpenTicket(id){
+  _spActiveTicket = _spTickets.find(t=>t.id===id) || null;
+  if(!_spActiveTicket) return;
+  renderTickets(); // re-render to show active state
+
+  const sb = window.supabase.createClient(
+    'https://ktrbbaakmlwmhyvpufcs.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
+  );
+  const t = _spActiveTicket;
+  // Header
+  const statusBadge = s => s==='open'?'<span class="badge red">open</span>':s==='pending'?'<span class="badge amber">pending</span>':'<span class="badge green">resolved</span>';
+  document.getElementById('support-convo-header').innerHTML = `
+    <div>
+      <div class="card-title" style="margin-bottom:2px;">${escHtml(t.user_email)}</div>
+      <div style="display:flex;gap:6px;align-items:center;">${statusBadge(t.status)}<span style="font-size:0.65rem;color:var(--t3);">${escHtml(t.subject||'Support Request')}</span></div>
+    </div>`;
+
+  // Resolve button
+  const resolveBtn = document.getElementById('support-resolve-btn');
+  resolveBtn.textContent = t.status==='resolved' ? '↩ Reopen' : '✓ Resolve';
+  resolveBtn.className = 'action-btn ' + (t.status==='resolved' ? '' : 'success');
+
+  // Messages
+  const {data:msgs} = await sb.from('support_messages').select('*').eq('ticket_id',id).order('created_at',{ascending:true});
+  const msgsEl = document.getElementById('support-msgs');
+  msgsEl.innerHTML = '';
+  (msgs||[]).forEach(m => spAppendMsg(m.sender_type, m.message, m.created_at));
+
+  // Show reply area
+  const replyWrap = document.getElementById('support-reply-wrap');
+  replyWrap.style.display = 'flex';
+  document.getElementById('support-reply-input').focus();
+}
+
+function spAppendMsg(type, text, ts){
+  const el = document.getElementById('support-msgs');
+  const div = document.createElement('div');
+  div.className = 'sp-msg ' + type;
+  const d = new Date(ts);
+  const time = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = escHtml(text).replace(/\n/g,'<br>') + '<span class="sp-msg-time">'+time+'</span>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function supportSendReply(){
+  const input = document.getElementById('support-reply-input');
+  const text = (input.value||'').trim();
+  if(!text || !_spActiveTicket) return;
+  input.value = '';
+  const sb = window.supabase.createClient(
+    'https://ktrbbaakmlwmhyvpufcs.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
+  );
+  await sb.from('support_messages').insert({ticket_id:_spActiveTicket.id, sender_type:'admin', message:text});
+  await sb.from('support_tickets').update({last_message_at:new Date().toISOString(), status:'pending'}).eq('id',_spActiveTicket.id);
+  toast('Reply sent');
+}
+
+async function supportToggleResolve(){
+  if(!_spActiveTicket) return;
+  const newStatus = _spActiveTicket.status==='resolved' ? 'open' : 'resolved';
+  const sb = window.supabase.createClient(
+    'https://ktrbbaakmlwmhyvpufcs.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
+  );
+  await sb.from('support_tickets').update({status:newStatus}).eq('id',_spActiveTicket.id);
+  _spActiveTicket.status = newStatus;
+  document.getElementById('support-resolve-btn').textContent = newStatus==='resolved' ? '↩ Reopen' : '✓ Resolve';
+  document.getElementById('support-resolve-btn').className = 'action-btn ' + (newStatus==='resolved'?'':'success');
+  toast(newStatus==='resolved' ? 'Ticket resolved' : 'Ticket reopened');
+  loadSupport();
+}
+
+function supportHandleKey(e){
+  if(e.key==='Enter' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); supportSendReply(); }
+}
+// ─── END SUPPORT ───────────────────────────────────────────
+
 init();
 </script>
 </body>

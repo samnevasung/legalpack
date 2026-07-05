@@ -1360,5 +1360,220 @@ window.addEventListener('scroll',function(){
 });
 </script>
 <script src="/auth-guard.js"></script>
+
+<!-- ═══ LIVE SUPPORT CHAT WIDGET ═══ -->
+<style>
+#lp-chat-btn{position:fixed;bottom:24px;right:24px;z-index:900;width:54px;height:54px;border-radius:50%;background:var(--purple);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(109,40,217,0.45);display:flex;align-items:center;justify-content:center;font-size:22px;transition:transform 0.18s,box-shadow 0.18s;}
+#lp-chat-btn:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(109,40,217,0.55);}
+#lp-chat-badge{position:absolute;top:-3px;right:-3px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;width:17px;height:17px;border-radius:50%;display:none;align-items:center;justify-content:center;border:2px solid #fff;}
+#lp-chat-window{position:fixed;bottom:88px;right:24px;z-index:900;width:340px;max-height:500px;background:#fff;border-radius:18px;box-shadow:0 12px 48px rgba(0,0,0,0.18);display:none;flex-direction:column;overflow:hidden;border:1px solid #e2e0f0;font-family:'DM Sans',sans-serif;}
+#lp-chat-window.open{display:flex;}
+.lp-chat-head{background:linear-gradient(135deg,#4c1d95,#6d28d9);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.lp-chat-head-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.lp-chat-head-info{flex:1;}
+.lp-chat-head-name{font-size:13.5px;font-weight:800;color:#fff;}
+.lp-chat-head-status{font-size:11px;color:rgba(255,255,255,0.65);display:flex;align-items:center;gap:4px;}
+.lp-online-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;}
+.lp-chat-close{background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:16px;line-height:1;padding:2px;}
+.lp-chat-close:hover{color:#fff;}
+#lp-chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:200px;max-height:300px;background:#f9f8ff;}
+.lp-msg{max-width:80%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.55;word-break:break-word;}
+.lp-msg.user{background:#6d28d9;color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.lp-msg.admin{background:#fff;color:#0d0c1a;align-self:flex-start;border-bottom-left-radius:3px;border:1px solid #e2e0f0;}
+.lp-msg.system{background:none;color:#9490b0;font-size:12px;align-self:center;text-align:center;padding:4px 0;}
+.lp-msg-time{font-size:10px;opacity:0.55;display:block;margin-top:3px;}
+.lp-chat-input-wrap{padding:10px 12px;border-top:1px solid #e2e0f0;display:flex;gap:8px;align-items:flex-end;background:#fff;}
+#lp-chat-input{flex:1;resize:none;border:1.5px solid #e2e0f0;border-radius:10px;padding:8px 11px;font-family:'DM Sans',sans-serif;font-size:13.5px;color:#0d0c1a;outline:none;max-height:80px;min-height:36px;line-height:1.4;}
+#lp-chat-input:focus{border-color:#6d28d9;}
+#lp-chat-send{width:34px;height:34px;border-radius:9px;background:#6d28d9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s;}
+#lp-chat-send:hover{background:#4c1d95;}
+#lp-chat-send svg{fill:#fff;}
+.lp-signin-prompt{padding:16px;text-align:center;color:#4a4863;font-size:13px;line-height:1.6;}
+.lp-signin-prompt a{color:#6d28d9;font-weight:700;text-decoration:none;}
+</style>
+
+<button id="lp-chat-btn" onclick="lpToggleChat()" aria-label="Open support chat">
+  💬
+  <span id="lp-chat-badge"></span>
+</button>
+
+<div id="lp-chat-window">
+  <div class="lp-chat-head">
+    <div class="lp-chat-head-avatar">🔨</div>
+    <div class="lp-chat-head-info">
+      <div class="lp-chat-head-name">LegalPack AI Support</div>
+      <div class="lp-chat-head-status"><span class="lp-online-dot"></span> We reply within a few hours</div>
+    </div>
+    <button class="lp-chat-close" onclick="lpToggleChat()">✕</button>
+  </div>
+  <div id="lp-chat-msgs">
+    <div class="lp-msg system">We usually reply within a few hours. Leave your question below.</div>
+  </div>
+  <div class="lp-chat-input-wrap">
+    <textarea id="lp-chat-input" placeholder="Type a message..." rows="1" onkeydown="lpHandleKey(event)" oninput="lpAutoResize(this)"></textarea>
+    <button id="lp-chat-send" onclick="lpSendMessage()">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LP_SB_URL = 'https://ktrbbaakmlwmhyvpufcs.supabase.co';
+  var LP_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
+  var _sb = null;
+  var _ticketId = null;
+  var _session = null;
+  var _channel = null;
+  var _unread = 0;
+  var _open = false;
+
+  function getSb(){
+    if(_sb) return _sb;
+    if(window.sbClient) return window.sbClient;
+    _sb = window.supabase.createClient(LP_SB_URL, LP_SB_KEY);
+    return _sb;
+  }
+
+  function lpFmt(ts){
+    var d=new Date(ts);
+    return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function lpAppendMsg(type, text, ts){
+    var msgs = document.getElementById('lp-chat-msgs');
+    var div = document.createElement('div');
+    div.className = 'lp-msg ' + type;
+    div.innerHTML = text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') +
+      (ts ? '<span class="lp-msg-time">' + lpFmt(ts) + '</span>' : '');
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function lpSetUnread(n){
+    _unread = n;
+    var badge = document.getElementById('lp-chat-badge');
+    if(n > 0 && !_open){
+      badge.textContent = n > 9 ? '9+' : n;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  async function lpLoadMessages(){
+    if(!_ticketId) return;
+    var sb = getSb();
+    var {data} = await sb.from('support_messages').select('*').eq('ticket_id',_ticketId).order('created_at',{ascending:true});
+    if(!data) return;
+    var msgs = document.getElementById('lp-chat-msgs');
+    msgs.innerHTML = '';
+    data.forEach(function(m){
+      lpAppendMsg(m.sender_type, m.message, m.created_at);
+    });
+  }
+
+  async function lpSubscribe(){
+    if(!_ticketId) return;
+    var sb = getSb();
+    if(_channel) sb.removeChannel(_channel);
+    _channel = sb.channel('ticket-'+_ticketId)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages',filter:'ticket_id=eq.'+_ticketId},function(payload){
+        var m = payload.new;
+        lpAppendMsg(m.sender_type, m.message, m.created_at);
+        if(m.sender_type==='admin' && !_open){ lpSetUnread(_unread+1); }
+      })
+      .subscribe();
+  }
+
+  async function lpGetOrCreateTicket(){
+    var sb = getSb();
+    // Check for existing open ticket
+    var {data:existing} = await sb.from('support_tickets')
+      .select('id')
+      .eq('user_id', _session.user.id)
+      .in('status',['open','pending'])
+      .order('created_at',{ascending:false})
+      .limit(1);
+    if(existing && existing.length > 0){
+      _ticketId = existing[0].id;
+    } else {
+      var meta = _session.user.user_metadata || {};
+      var name = (meta.first_name||meta.full_name||'').trim() || _session.user.email.split('@')[0];
+      var {data:ticket} = await sb.from('support_tickets').insert({
+        user_id: _session.user.id,
+        user_email: _session.user.email,
+        user_name: name,
+        subject: 'Support Request',
+        status: 'open'
+      }).select('id').single();
+      if(ticket) _ticketId = ticket.id;
+    }
+  }
+
+  async function lpInitChat(){
+    var sb = getSb();
+    var {data:s} = await sb.auth.getSession();
+    _session = s && s.session ? s.session : null;
+
+    if(!_session){
+      // Show sign-in prompt
+      var msgs = document.getElementById('lp-chat-msgs');
+      msgs.innerHTML = '<div class="lp-signin-prompt">Please <a href="#" onclick="openSignInModal();return false;">sign in</a> to chat with support. It\'s free and takes 30 seconds.</div>';
+      document.querySelector('.lp-chat-input-wrap').style.display = 'none';
+      return;
+    }
+    document.querySelector('.lp-chat-input-wrap').style.display = 'flex';
+    await lpGetOrCreateTicket();
+    await lpLoadMessages();
+    await lpSubscribe();
+  }
+
+  window.lpToggleChat = function(){
+    _open = !_open;
+    var win = document.getElementById('lp-chat-window');
+    var btn = document.getElementById('lp-chat-btn');
+    if(_open){
+      win.classList.add('open');
+      btn.innerHTML = '✕<span id="lp-chat-badge" style="display:none"></span>';
+      lpSetUnread(0);
+      lpInitChat();
+      setTimeout(function(){ document.getElementById('lp-chat-input') && document.getElementById('lp-chat-input').focus(); },100);
+    } else {
+      win.classList.remove('open');
+      btn.innerHTML = '💬<span id="lp-chat-badge"></span>';
+    }
+  };
+
+  window.lpSendMessage = async function(){
+    if(!_session){ openSignInModal(); return; }
+    var input = document.getElementById('lp-chat-input');
+    var text = (input.value||'').trim();
+    if(!text) return;
+    if(!_ticketId){ await lpGetOrCreateTicket(); }
+    input.value = '';
+    input.style.height = '';
+    var sb = getSb();
+    await sb.from('support_messages').insert({
+      ticket_id: _ticketId,
+      sender_type: 'user',
+      message: text
+    });
+    // Bump ticket updated_at and last_message_at
+    await sb.from('support_tickets').update({last_message_at: new Date().toISOString(), status:'open'}).eq('id',_ticketId);
+  };
+
+  window.lpHandleKey = function(e){
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); window.lpSendMessage(); }
+  };
+
+  window.lpAutoResize = function(el){
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+  };
+})();
+</script>
+<!-- ═══ END LIVE SUPPORT CHAT WIDGET ═══ -->
+
 </body>
 </html>
