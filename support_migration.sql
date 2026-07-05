@@ -54,10 +54,10 @@ create policy "Users view own tickets"
   on public.support_tickets for select
   using (auth.uid() = user_id);
 
--- Users can insert their own tickets
+-- Users can insert their own tickets (or guests with null user_id)
 create policy "Users insert own tickets"
   on public.support_tickets for insert
-  with check (auth.uid() = user_id);
+  with check (auth.uid() = user_id OR user_id is null);
 
 -- Users can see messages on their own tickets
 create policy "Users view own messages"
@@ -68,14 +68,15 @@ create policy "Users view own messages"
     )
   );
 
--- Users can insert messages on their own tickets
+-- Users can insert messages on their own tickets (or guest tickets)
 create policy "Users insert own messages"
   on public.support_messages for insert
   with check (
-    ticket_id in (
-      select id from public.support_tickets where user_id = auth.uid()
+    sender_type = 'user'
+    and (
+      ticket_id in (select id from public.support_tickets where user_id = auth.uid())
+      or ticket_id in (select id from public.support_tickets where user_id is null)
     )
-    and sender_type = 'user'
   );
 
 -- Admin email — update this to your email

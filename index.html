@@ -490,9 +490,9 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
     <a href="/about.html">About</a>
     <a href="/faq.html">FAQ</a>
   </div>
-  <div class="nav-right">
-    <a href="#" onclick="openSignInModal();return false;" class="btn-ghost">Sign In</a>
-    <button onclick="goToApp()" class="btn-nav">Go to Dashboard →</button>
+  <div class="nav-right" id="nav-right">
+    <a href="#" onclick="openSignInModal();return false;" class="btn-ghost" id="nav-signin-btn">Sign In</a>
+    <button onclick="goToApp()" class="btn-nav" id="nav-dashboard-btn">Go to Dashboard →</button>
   </div>
 </nav>
 
@@ -506,7 +506,7 @@ footer p{font-size:11px;color:var(--t3);font-family:'DM Mono',monospace;}
     <p class="hero-sub">Upload your legal pack and get a full risk report in minutes — hidden costs, title defects, and deal-killing clauses flagged before you bid.</p>
     <div class="hero-ctas">
       <button onclick="goToApp()" class="btn-hero">Analyse a Legal Pack →</button>
-      <a href="#how" class="btn-hero-ghost">See how it works</a>
+      <a href="/how-it-works.html" class="btn-hero-ghost">See how it works</a>
     </div>
     <div class="hero-trust">
       <div class="hero-trust-item">⚡ 3–4 min analysis</div>
@@ -1224,11 +1224,37 @@ const SUPABASE_URL = 'https://ktrbbaakmlwmhyvpufcs.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
 var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-sbClient.auth.getSession().then(function(r){
-  if(r.data&&r.data.session){
-    var btn=document.querySelector('.btn-nav');
-    if(btn){btn.textContent='Go to Dashboard →';btn.onclick=function(){window.location.href='/dashboard.html';}}
+function updateNavAuth(session){
+  var navRight = document.getElementById('nav-right');
+  var signinBtn = document.getElementById('nav-signin-btn');
+  if(!navRight) return;
+  if(session){
+    var meta = session.user.user_metadata || {};
+    var name = (meta.first_name || meta.full_name || session.user.email.split('@')[0]).split(' ')[0];
+    signinBtn && (signinBtn.style.display = 'none');
+    // Remove existing auth chips if any
+    var existing = document.getElementById('nav-user-chip');
+    if(existing) existing.remove();
+    var chip = document.createElement('div');
+    chip.id = 'nav-user-chip';
+    chip.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    chip.innerHTML = '<span style="font-size:13px;font-weight:600;color:var(--t2);">Hi, '+name+'</span>'
+      + '<button onclick="sbClient.auth.signOut().then(()=>location.reload())" style="font-size:12px;font-weight:600;padding:6px 13px;border-radius:8px;border:1px solid var(--b1);background:none;color:var(--t2);cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--purple)\';this.style.color=\'var(--purple)\'" onmouseout="this.style.borderColor=\'var(--b1)\';this.style.color=\'var(--t2)\'">Log out</button>';
+    navRight.insertBefore(chip, navRight.firstChild);
+  } else {
+    signinBtn && (signinBtn.style.display = '');
+    var existing = document.getElementById('nav-user-chip');
+    if(existing) existing.remove();
   }
+}
+
+sbClient.auth.getSession().then(function(r){
+  var session = r.data && r.data.session ? r.data.session : null;
+  updateNavAuth(session);
+});
+
+sbClient.auth.onAuthStateChange(function(event, session){
+  updateNavAuth(session);
 });
 
 function goToApp(){
@@ -1487,8 +1513,9 @@ window.addEventListener('scroll',function(){
   }
 
   async function lpGetOrCreateTicket(){
+    if(_ticketId) return; // already created (e.g. guest flow)
+    if(!_session) return;
     var sb = getSb();
-    // Check for existing open ticket
     var {data:existing} = await sb.from('support_tickets')
       .select('id')
       .eq('user_id', _session.user.id)
@@ -1499,11 +1526,11 @@ window.addEventListener('scroll',function(){
       _ticketId = existing[0].id;
     } else {
       var meta = _session.user.user_metadata || {};
-      var name = (meta.first_name||meta.full_name||'').trim() || _session.user.email.split('@')[0];
+      var name = _lpGuestName || (meta.first_name||meta.full_name||'').trim() || _session.user.email.split('@')[0];
       var {data:ticket} = await sb.from('support_tickets').insert({
         user_id: _session.user.id,
         user_email: _session.user.email,
-        user_name: name,
+        user_name: name + (_lpGuestPhone ? ' · '+_lpGuestPhone : ''),
         subject: 'Support Request',
         status: 'open'
       }).select('id').single();
@@ -1511,23 +1538,102 @@ window.addEventListener('scroll',function(){
     }
   }
 
+  var _lpFormDone = false;
+  var _lpGuestEmail = null;
+  var _lpGuestName = null;
+  var _lpGuestPhone = null;
+
   async function lpInitChat(){
     var sb = getSb();
     var {data:s} = await sb.auth.getSession();
     _session = s && s.session ? s.session : null;
 
-    if(!_session){
-      // Show sign-in prompt
-      var msgs = document.getElementById('lp-chat-msgs');
-      msgs.innerHTML = '<div class="lp-signin-prompt">Please <a href="#" onclick="openSignInModal();return false;">sign in</a> to chat with support. It\'s free and takes 30 seconds.</div>';
-      document.querySelector('.lp-chat-input-wrap').style.display = 'none';
+    if(_lpFormDone){
+      // Already filled form — go straight to chat
+      document.querySelector('.lp-chat-input-wrap').style.display = 'flex';
+      document.getElementById('lp-pre-form') && (document.getElementById('lp-pre-form').style.display = 'none');
+      await lpGetOrCreateTicket();
+      await lpLoadMessages();
+      await lpSubscribe();
       return;
     }
+
+    // Show pre-contact form
+    var msgs = document.getElementById('lp-chat-msgs');
+    msgs.innerHTML = '';
+    document.querySelector('.lp-chat-input-wrap').style.display = 'none';
+
+    var meta = _session ? (_session.user.user_metadata || {}) : {};
+    var prefillName = _session ? ((meta.first_name||'') + ' ' + (meta.last_name||'')).trim() || meta.full_name || '' : '';
+    var prefillEmail = _session ? (_session.user.email || '') : '';
+
+    var form = document.createElement('div');
+    form.id = 'lp-pre-form';
+    form.style.cssText = 'padding:14px;display:flex;flex-direction:column;gap:10px;';
+    form.innerHTML = '<div style="font-size:13px;font-weight:700;color:#0d0c1a;margin-bottom:2px;">Before we start — a few details</div>'
+      + '<input id="lp-form-name" placeholder="Your name *" value="'+prefillName+'" style="padding:9px 11px;border:1.5px solid #e2e0f0;border-radius:9px;font-family:\'DM Sans\',sans-serif;font-size:13px;outline:none;color:#0d0c1a;" onfocus="this.style.borderColor=\'#6d28d9\'" onblur="this.style.borderColor=\'#e2e0f0\'">'
+      + '<input id="lp-form-email" type="email" placeholder="Email address *" value="'+prefillEmail+'" style="padding:9px 11px;border:1.5px solid #e2e0f0;border-radius:9px;font-family:\'DM Sans\',sans-serif;font-size:13px;outline:none;color:#0d0c1a;" onfocus="this.style.borderColor=\'#6d28d9\'" onblur="this.style.borderColor=\'#e2e0f0\'">'
+      + '<input id="lp-form-phone" type="tel" placeholder="Phone number (optional)" style="padding:9px 11px;border:1.5px solid #e2e0f0;border-radius:9px;font-family:\'DM Sans\',sans-serif;font-size:13px;outline:none;color:#0d0c1a;" onfocus="this.style.borderColor=\'#6d28d9\'" onblur="this.style.borderColor=\'#e2e0f0\'">'
+      + '<textarea id="lp-form-msg" placeholder="What can we help you with? *" rows="3" style="padding:9px 11px;border:1.5px solid #e2e0f0;border-radius:9px;font-family:\'DM Sans\',sans-serif;font-size:13px;outline:none;color:#0d0c1a;resize:none;" onfocus="this.style.borderColor=\'#6d28d9\'" onblur="this.style.borderColor=\'#e2e0f0\'"></textarea>'
+      + '<div id="lp-form-err" style="display:none;font-size:12px;color:#dc2626;padding:6px 10px;background:#fef2f2;border-radius:7px;"></div>'
+      + '<button onclick="lpSubmitForm()" style="padding:10px;background:#6d28d9;color:#fff;border:none;border-radius:9px;font-family:\'DM Sans\',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'#4c1d95\'" onmouseout="this.style.background=\'#6d28d9\'">Start Chat →</button>';
+    msgs.appendChild(form);
+  }
+
+  window.lpSubmitForm = async function(){
+    var name = (document.getElementById('lp-form-name').value||'').trim();
+    var email = (document.getElementById('lp-form-email').value||'').trim();
+    var phone = (document.getElementById('lp-form-phone').value||'').trim();
+    var msg = (document.getElementById('lp-form-msg').value||'').trim();
+    var errEl = document.getElementById('lp-form-err');
+    if(!name || !email || !msg){
+      errEl.textContent = 'Please fill in name, email and message.';
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    _lpGuestName = name;
+    _lpGuestEmail = email;
+    _lpGuestPhone = phone;
+    _lpFormDone = true;
+
+    // If not signed in, create an anonymous-style ticket using provided email
+    if(!_session){
+      // Store details for ticket creation
+      var sb = getSb();
+      // Create ticket without user_id (guest)
+      var {data:ticket} = await sb.from('support_tickets').insert({
+        user_id: null,
+        user_email: email,
+        user_name: name + (phone ? ' · ' + phone : ''),
+        subject: msg.length > 60 ? msg.substring(0,60)+'…' : msg,
+        status: 'open'
+      }).select('id').single();
+      if(ticket) _ticketId = ticket.id;
+      // Send first message
+      if(_ticketId){
+        await sb.from('support_messages').insert({ticket_id:_ticketId, sender_type:'user', message:msg});
+        await sb.from('support_tickets').update({last_message_at:new Date().toISOString()}).eq('id',_ticketId);
+      }
+    }
+
+    var msgs = document.getElementById('lp-chat-msgs');
+    msgs.innerHTML = '';
     document.querySelector('.lp-chat-input-wrap').style.display = 'flex';
-    await lpGetOrCreateTicket();
+    document.getElementById('lp-chat-input').focus();
+
+    if(_session){
+      await lpGetOrCreateTicket();
+      // Send first message
+      if(_ticketId && msg){
+        var sb = getSb();
+        await sb.from('support_messages').insert({ticket_id:_ticketId, sender_type:'user', message:msg});
+        await sb.from('support_tickets').update({last_message_at:new Date().toISOString()}).eq('id',_ticketId);
+      }
+    }
     await lpLoadMessages();
     await lpSubscribe();
-  }
+  };
 
   window.lpToggleChat = function(){
     _open = !_open;
