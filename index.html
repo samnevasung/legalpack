@@ -1466,10 +1466,11 @@ window.addEventListener('scroll',function(){
     return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   }
 
-  function lpAppendMsg(type, text, ts){
+  function lpAppendMsg(type, text, ts, id){
     var msgs = document.getElementById('lp-chat-msgs');
     var div = document.createElement('div');
     div.className = 'lp-msg ' + type;
+    if(id) div.setAttribute('data-msgid', id);
     div.innerHTML = text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') +
       (ts ? '<span class="lp-msg-time">' + lpFmt(ts) + '</span>' : '');
     msgs.appendChild(div);
@@ -1495,21 +1496,49 @@ window.addEventListener('scroll',function(){
     var msgs = document.getElementById('lp-chat-msgs');
     msgs.innerHTML = '';
     data.forEach(function(m){
-      lpAppendMsg(m.sender_type, m.message, m.created_at);
+      lpAppendMsg(m.sender_type, m.message, m.created_at, m.id);
     });
+    _lastMsgCount = data.length;
+  }
+
+  var _pollInterval = null;
+  var _lastMsgCount = 0;
+
+  async function lpPoll(){
+    if(!_ticketId) return;
+    var sb = getSb();
+    var {data} = await sb.from('support_messages').select('*').eq('ticket_id',_ticketId).order('created_at',{ascending:true});
+    if(!data) return;
+    if(data.length > _lastMsgCount){
+      var msgs = document.getElementById('lp-chat-msgs');
+      msgs.innerHTML = '';
+      data.forEach(function(m){ lpAppendMsg(m.sender_type, m.message, m.created_at); });
+      var newAdminMsgs = data.slice(_lastMsgCount).filter(function(m){ return m.sender_type==='admin'; });
+      if(newAdminMsgs.length && !_open){ lpSetUnread(_unread + newAdminMsgs.length); }
+      _lastMsgCount = data.length;
+    }
   }
 
   async function lpSubscribe(){
     if(!_ticketId) return;
     var sb = getSb();
     if(_channel) sb.removeChannel(_channel);
+    if(_pollInterval) clearInterval(_pollInterval);
+    // Realtime for authenticated users
     _channel = sb.channel('ticket-'+_ticketId)
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages',filter:'ticket_id=eq.'+_ticketId},function(payload){
         var m = payload.new;
-        lpAppendMsg(m.sender_type, m.message, m.created_at);
+        // avoid duplicate if poll already caught it
+        var msgs = document.getElementById('lp-chat-msgs');
+        var existing = msgs.querySelectorAll('[data-msgid="'+m.id+'"]');
+        if(existing.length) return;
+        lpAppendMsg(m.sender_type, m.message, m.created_at, m.id);
+        _lastMsgCount++;
         if(m.sender_type==='admin' && !_open){ lpSetUnread(_unread+1); }
       })
       .subscribe();
+    // Polling fallback every 4s (covers guests + realtime gaps)
+    _pollInterval = setInterval(lpPoll, 4000);
   }
 
   async function lpGetOrCreateTicket(){
