@@ -918,7 +918,8 @@ async function loadSupport(){
     .on('postgres_changes',{event:'*',schema:'public',table:'support_tickets'},()=>loadSupport())
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},payload=>{
       const m = payload.new;
-      if(_spActiveTicket && m.ticket_id === _spActiveTicket.id){
+      // Only auto-append user messages — admin messages are appended immediately on send
+      if(m.sender_type==='user' && _spActiveTicket && m.ticket_id === _spActiveTicket.id){
         spAppendMsg(m.sender_type, m.message, m.created_at);
       }
       if(m.sender_type==='user') updateSupportBadge();
@@ -1008,9 +1009,12 @@ async function supportSendReply(){
     'https://ktrbbaakmlwmhyvpufcs.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
   );
-  await sb.from('support_messages').insert({ticket_id:_spActiveTicket.id, sender_type:'admin', message:text});
-  await sb.from('support_tickets').update({last_message_at:new Date().toISOString(), status:'pending'}).eq('id',_spActiveTicket.id);
-  toast('Reply sent');
+  const now = new Date().toISOString();
+  const {error} = await sb.from('support_messages').insert({ticket_id:_spActiveTicket.id, sender_type:'admin', message:text, created_at:now});
+  if(error){ toast('Error: ' + error.message); return; }
+  await sb.from('support_tickets').update({last_message_at:now, status:'pending', unread_admin:0}).eq('id',_spActiveTicket.id);
+  spAppendMsg('admin', text, now);
+  _spActiveTicket.status = 'pending';
 }
 
 async function supportToggleResolve(){
@@ -1020,10 +1024,21 @@ async function supportToggleResolve(){
     'https://ktrbbaakmlwmhyvpufcs.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q'
   );
-  await sb.from('support_tickets').update({status:newStatus}).eq('id',_spActiveTicket.id);
+  const {error} = await sb.from('support_tickets').update({status:newStatus}).eq('id',_spActiveTicket.id);
+  if(error){ toast('Error: ' + error.message); return; }
   _spActiveTicket.status = newStatus;
-  document.getElementById('support-resolve-btn').textContent = newStatus==='resolved' ? '↩ Reopen' : '✓ Resolve';
-  document.getElementById('support-resolve-btn').className = 'action-btn ' + (newStatus==='resolved'?'':'success');
+  // Update resolve button
+  const resolveBtn = document.getElementById('support-resolve-btn');
+  resolveBtn.textContent = newStatus==='resolved' ? '↩ Reopen' : '✓ Resolve';
+  resolveBtn.className = 'action-btn ' + (newStatus==='resolved'?'':'success');
+  // Update header badge
+  const statusBadge = s => s==='open'?'<span class="badge red">open</span>':s==='pending'?'<span class="badge amber">pending</span>':'<span class="badge green">resolved</span>';
+  const t = _spActiveTicket;
+  document.getElementById('support-convo-header').innerHTML = `
+    <div>
+      <div class="card-title" style="margin-bottom:2px;">${escHtml(t.user_email)}</div>
+      <div style="display:flex;gap:6px;align-items:center;">${statusBadge(newStatus)}<span style="font-size:0.65rem;color:var(--t3);">${escHtml(t.subject||'Support Request')}</span></div>
+    </div>`;
   toast(newStatus==='resolved' ? 'Ticket resolved' : 'Ticket reopened');
   loadSupport();
 }
