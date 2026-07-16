@@ -853,51 +853,99 @@ body {
 /* ── THEMES ── */
 
 
-/* ── REPORT TABS ── */
-.report-tab {
-  padding: 10px 20px; border: none; background: none;
-  color: var(--t3); font-family: 'Geist Sans', sans-serif;
-  font-size: 0.78rem; font-weight: 700; cursor: pointer;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: all 0.12s; white-space: nowrap;
+/* ── REPORT VIEWER — sticky sidebar + scrollable document ── */
+.rv-shell {
+  display: flex; align-items: stretch; width: 100%;
+  margin: -32px; min-height: calc(100vh - 56px);
+  background: var(--bg);
 }
-.report-tab:hover { color: var(--t1); }
-.report-tab.active { color: var(--red); border-bottom-color: var(--red); }
-.report-tab-panel { min-height: 200px; }
-.report-tab-bar { overflow-x: auto; overflow-y: visible; scrollbar-width: none; justify-content: space-evenly; }
-.report-tab-bar::-webkit-scrollbar { display: none; }
-.report-tab-bar .report-tab { flex: 0 0 auto; }
+.rv-sidebar {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  width: 280px; flex-shrink: 0;
+  background: var(--bg); border-right: 1px solid var(--border);
+  padding: 24px 20px; display: flex; flex-direction: column; gap: 22px;
+}
+.rv-address { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+.rv-risk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 20px; color: #fff; margin-bottom: 14px; }
+.rv-stat-pills { display: flex; gap: 6px; }
+.rv-stat-pill { flex: 1; min-width: 0; padding: 8px 4px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+.rv-stat-pill-val { font-size: 0.92rem; font-weight: 800; font-family: 'DM Mono', monospace; line-height: 1.1; }
+.rv-stat-pill-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-faint); margin-top: 3px; }
+.rv-divider { border-top: 1px solid var(--border); }
 
-/* ── REPORT TWO-PANE LAYOUT ── */
-.report-two-pane {
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
+.rv-ai-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+.rv-ai-row:last-of-type { margin-bottom: 0; }
+.rv-ai-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.rv-ai-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); margin-bottom: 2px; }
+.rv-ai-value { font-size: 0.82rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+.rv-ia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
+.rv-ia-pill { padding: 8px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+.rv-ia-pill-icon { font-size: 0.95rem; margin-bottom: 2px; }
+.rv-ia-pill-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; color: var(--text-faint); }
+.rv-summary-toggle { background: none; border: none; color: var(--accent); font-family: 'Geist Sans', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; padding: 0; margin-top: 14px; display: flex; align-items: center; gap: 4px; }
+.rv-summary-body { display: none; margin-top: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+.rv-summary-body.open { display: block; }
+
+.rv-jump-links { display: flex; flex-direction: column; gap: 1px; }
+.rv-jump-link { padding: 7px 10px; border-radius: var(--radius-sm); font-size: 0.78rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.12s; background: none; border: none; text-align: left; font-family: 'Geist Sans', sans-serif; width: 100%; }
+.rv-jump-link:hover { color: var(--text); background: var(--surface-2); }
+.rv-jump-link.active { color: var(--accent); background: var(--surface-2); font-weight: 700; }
+.rv-actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 16px; }
+.rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.12s; }
+.rv-action-btn:hover { color: var(--text); border-color: var(--text-faint); }
+
+/* Main document area — always light, like a printed page inside the dark shell */
+.rv-main { flex: 1; min-width: 0; background: #fafafa; color: #18181b; padding: 56px 64px 40px; }
+.rv-doc-section { margin-bottom: 64px; scroll-margin-top: 24px; }
+.rv-doc-section:last-of-type { margin-bottom: 0; }
+.rv-section-title { display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 32px; }
+.rv-section-title::before, .rv-section-title::after { content: ''; flex: 1; height: 1px; background: #e4e4e7; }
+.rv-section-title-text { font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #3f3f46; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+
+.rv-row { display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+.rv-row:last-child { border-bottom: none; }
+.rv-row-label { font-size: 0.8rem; color: #71717a; flex-shrink: 0; width: 180px; }
+.rv-row-value { font-size: 0.88rem; color: #18181b; font-weight: 600; text-align: right; flex: 1; }
+
+.rv-flag-row { padding: 18px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 20px; }
+.rv-flag-row:last-child { border-bottom: none; }
+.rv-flag-title { font-size: 0.92rem; font-weight: 700; color: #18181b; margin-bottom: 5px; }
+.rv-flag-desc { font-size: 0.82rem; color: #71717a; line-height: 1.6; }
+.rv-flag-meta { font-size: 0.72rem; color: #a1a1aa; font-style: italic; margin-top: 6px; }
+.rv-sev-badge { flex-shrink: 0; font-size: 10px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; height: fit-content; white-space: nowrap; }
+
+.rv-cost-table { width: 100%; border-collapse: collapse; }
+.rv-cost-table th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa; padding: 0 0 10px; border-bottom: 1px solid #e4e4e7; }
+.rv-cost-table th:last-child, .rv-cost-table td:last-child { text-align: right; }
+.rv-cost-table td { padding: 14px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; color: #18181b; vertical-align: top; }
+.rv-cost-table tr:last-child td { border-bottom: none; }
+.rv-cost-desc-label { font-weight: 700; }
+.rv-cost-desc-sub { font-size: 0.74rem; color: #a1a1aa; margin-top: 3px; }
+.rv-cost-amount { font-family: 'DM Mono', monospace; font-weight: 700; white-space: nowrap; }
+
+.rv-numbered-row { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
+.rv-numbered-row:last-child { border-bottom: none; }
+.rv-numbered-num { font-family: 'DM Mono', monospace; font-weight: 800; color: #a1a1aa; flex-shrink: 0; }
+
+.rv-doc-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+.rv-doc-row:last-child { border-bottom: none; }
+.rv-doc-name { font-size: 0.85rem; color: #18181b; font-weight: 600; }
+.rv-doc-pages { font-size: 0.78rem; color: #a1a1aa; font-family: 'DM Mono', monospace; }
+
+.rv-empty { text-align: center; padding: 20px 0; color: #a1a1aa; font-size: 0.82rem; }
+.rv-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid #e4e4e7; font-size: 0.76rem; color: #a1a1aa; }
+.rv-footer-title { font-weight: 700; color: #71717a; margin-bottom: 8px; }
+
+/* Search — slide-over on top of the document, not a permanent third column */
+.rv-search-overlay {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 92vw;
+  background: var(--surface); border-left: 1px solid var(--border);
+  box-shadow: -16px 0 50px rgba(0,0,0,0.35); z-index: 400;
+  transform: translateX(100%); transition: transform 0.25s ease;
+  padding: 20px; overflow-y: auto;
 }
-.report-left-pane {
-  flex: 0 0 100%;
-  min-width: 0;
-  padding-right: 0;
-  box-sizing: border-box;
-  transition: flex 0.2s ease, padding 0.2s ease;
-}
-.report-two-pane.search-open .report-left-pane {
-  flex: 0 0 50%;
-  min-width: 480px;
-  padding-right: 20px;
-}
-.report-right-pane {
-  display: none;
-  flex: 0 0 50%;
-  box-sizing: border-box;
-  position: sticky;
-  top: 0;
-  height: calc(100vh - 76px);
-  overflow-y: auto;
-  border-left: 1px solid var(--b1);
-  padding-left: 20px;
-}
-.report-two-pane.search-open .report-right-pane { display: block; }
+.rv-search-overlay.open { transform: translateX(0); }
+.rv-search-close { position: absolute; top: 16px; right: 16px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); width: 28px; height: 28px; border-radius: var(--radius-sm); cursor: pointer; }
 /* Viewer back button */
 .search-viewer-back {
   display: inline-flex; align-items: center; gap: 5px;
@@ -906,15 +954,24 @@ body {
   padding: 0; margin-bottom: 14px; font-family: 'Geist Sans', sans-serif;
 }
 .search-viewer-back:hover { opacity: 0.75; }
-@media (max-width: 1024px) {
-  .report-two-pane { flex-direction: column; }
-  .report-two-pane.search-open .report-left-pane,
-  .report-left-pane { flex: none; width: 100%; min-width: 0; padding-right: 0; }
-  .report-right-pane, .report-two-pane.search-open .report-right-pane {
-    display: block; flex: none; width: 100%; position: static;
-    height: auto; overflow-y: visible;
-    border-left: none; border-top: 1px solid var(--b1);
-    padding-left: 0; padding-top: 20px; margin-top: 24px;
+
+.rv-mobile-bar { display: none; }
+@media (max-width: 768px) {
+  .rv-shell { flex-direction: column; margin: -16px; min-height: 0; }
+  .rv-sidebar { position: static; height: auto; overflow-y: visible; width: 100%; }
+  .rv-jump-links, .rv-actions { display: none; }
+  .rv-main { padding: 32px 20px 88px; }
+  .rv-search-overlay { width: 100%; max-width: 100%; }
+  .rv-mobile-bar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 150;
+    background: var(--surface); border-top: 1px solid var(--border);
+    overflow-x: auto; padding: 8px 10px; gap: 6px;
+  }
+  .rv-mobile-bar-btn {
+    flex-shrink: 0; padding: 7px 12px; border-radius: var(--radius-sm);
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted);
+    font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+    font-family: 'Geist Sans', sans-serif; cursor: pointer;
   }
 }
 
@@ -991,16 +1048,6 @@ body {
   .drop-zone { padding: 28px 18px; }
   .drop-icon { font-size: 2.2rem; }
   .drop-title { font-size: 1.1rem; }
-
-  /* ── Report tab bar (mobile sizing) ── */
-  .report-tab-bar { -webkit-overflow-scrolling: touch; }
-  .report-tab-bar .report-tab { padding: 9px 11px; font-size: 0.71rem; }
-
-  /* ── Verdict + Mortgage: stack vertically ── */
-  .verdict-mortgage-grid { grid-template-columns: 1fr !important; }
-
-  /* ── Investor assessment: 2×2 instead of 4×1 ── */
-  .ia-check-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* ── Queue panel: edge-to-edge ── */
   #queue-panel { left: 10px; right: 10px; width: auto; bottom: 12px; }
@@ -2731,365 +2778,188 @@ function renderResult(result, packName) {
   const uploadedFiles = result._uploadedFiles || [];
   const pubSlug = addressToSlug(result.address);
 
-  el.innerHTML = `<div class="report-two-pane">
-  <div class="report-left-pane">
+  // ── Row builders (shared by the sections below) ──
+  const rvRow = (label, value) => value ? `<div class="rv-row"><div class="rv-row-label">${label}</div><div class="rv-row-value">${value}</div></div>` : '';
+  const rvEmpty = (msg) => `<div class="rv-empty">${msg}</div>`;
 
-  <!-- ① COMPACT HEADER — always visible -->
-  <div style="padding:16px 20px;margin-bottom:0;background:${rm.bg};border:1.5px solid ${rm.border};border-bottom:none;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ffffff;opacity:0.85;margin-bottom:4px;">${rm.label}</div>
-      <div style="font-size:1.1rem;font-weight:800;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${packName||'Legal Pack'}</div>
+  // ── Property & Tenure rows ──
+  const ta = result.titleAnalysis || {};
+  const notNone = (v) => v && !/^none found$/i.test(String(v).trim());
+  const propertyRows = [
+    rvRow('Tenure', result.tenure),
+    rvRow('Lease Remaining', result.leaseYears ? `${result.leaseYears} years` : ''),
+    rvRow('Title Number', result.titleNumber),
+    rvRow('Seller', result.seller),
+    notNone(ta.restrictiveCovenants) ? rvRow('Restrictive Covenants', ta.restrictiveCovenants) : '',
+    notNone(ta.easements) ? rvRow('Easements', ta.easements) : '',
+    notNone(ta.overage) ? rvRow('Overage', ta.overage) : '',
+    notNone(ta.charges) ? rvRow('Charges', ta.charges) : '',
+    notNone(ta.accessIssues) ? rvRow('Access Issues', ta.accessIssues) : '',
+  ].filter(Boolean).join('');
+
+  // ── Auction rows ──
+  const lm = result._listingMeta || {};
+  const auctionRows = [
+    rvRow('Guide Price', result.guidePrice || lm.guidePrice),
+    rvRow('Auction House', result.auctionHouse || lm.auctionHouse),
+    rvRow('Auction Date', lm.auctionDate),
+    rvRow('Auction Time', lm.auctionTime),
+    rvRow('Venue', lm.auctionVenue),
+    rvRow('Lot Number', lm.lotNumber),
+  ].filter(Boolean).join('');
+
+  // ── Flags rows (critical, then warning, then note/info — no grouping headers) ──
+  const orderedFlags = [...criticalFlags, ...warningFlags, ...noteFlags];
+  const flagRows = orderedFlags.map(f => renderFlagRow(f)).join('');
+
+  // ── Costs table ──
+  const costRows = costs.map(c => `<tr>
+      <td><div class="rv-cost-desc-label">${c.label}${c.mandatory ? ' <span style="color:#dc2626;font-size:9px;font-weight:800;letter-spacing:0.3px;">MANDATORY</span>' : ''}</div>${c.evidence ? `<div class="rv-cost-desc-sub">${c.evidence}</div>` : ''}</td>
+      <td class="rv-cost-amount">${c.amount || '—'}${c.vatApplies ? ' + VAT' : ''}</td>
+      <td>${c.frequency && c.frequency !== 'unknown' ? c.frequency.replace(/\b\w/g, m => m.toUpperCase()) : 'One-off'}</td>
+    </tr>`).join('');
+
+  // ── Special Conditions — numbered rows, derived from flags tagged as special/auction conditions ──
+  const specialFlags = flags.filter(f => {
+    const cat=(f.category||'').toLowerCase(), title=(f.title||'').toLowerCase(), src=(f.documentSource||'').toLowerCase();
+    return cat.includes('special')||cat.includes('auction')||cat.includes('condition')||title.includes('special condition')||title.includes('auction condition')||title.includes('seller legal fee')||title.includes('buyer legal fee')||title.includes('completion')||title.includes('deposit')||src.includes('special condition')||src.includes('auction condition');
+  });
+  const specialRows = specialFlags.map((f,i) => `<div class="rv-numbered-row">
+      <div class="rv-numbered-num">${i+1}.</div>
+      <div><div class="rv-flag-title">${f.title}</div><div class="rv-flag-desc">${f.detail || f.buyerImpact || ''}</div></div>
+    </div>`).join('');
+
+  // ── Documents list ──
+  const docRows = (ds.provided || []).map(d => `<div class="rv-doc-row"><div class="rv-doc-name">${d.document}</div><div class="rv-doc-pages">${d.evidence || '—'}</div></div>`).join('');
+
+  // ── Missing documents ──
+  const missingRows = (result.missingDocuments || []).map(d => {
+    const doc = typeof d === 'string' ? d : d.document;
+    const risk = typeof d === 'object' ? d.risk : null;
+    return `<div class="rv-flag-row"><div><div class="rv-flag-title">${doc}</div>${risk ? `<div class="rv-flag-desc">${risk}</div>` : ''}</div></div>`;
+  }).join('');
+
+  const riskWord = risk.replace(/^SEVERE$/,'SEVERE').toUpperCase();
+  const address = result.address || packName || 'Legal Pack';
+  const costPillVal = confirmedTotal >= 1000 ? `£${Math.round(confirmedTotal/1000)}k` : `£${confirmedTotal.toLocaleString()}`;
+
+  el.innerHTML = `<div class="rv-shell">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div class="rv-sidebar">
+
+    <!-- Top block -->
+    <div>
+      <div class="rv-address">${address}</div>
+      <div class="rv-risk-badge" style="background:${rm.bg};">${riskWord} RISK</div>
+      <div class="rv-stat-pills">
+        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#dc2626;">${critical}</div><div class="rv-stat-pill-label">Critical</div></div>
+        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#d97706;">${warnings}</div><div class="rv-stat-pill-label">Warnings</div></div>
+        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:var(--text);">${costPillVal}</div><div class="rv-stat-pill-label">Costs</div></div>
+      </div>
     </div>
-    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-      <div style="display:flex;gap:6px;">
-        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
-          <div style="font-size:1.4rem;font-weight:800;color:#dc2626;line-height:1;">${critical}</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Critical ↗</div>
-        </button>
-        <button onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
-          <div style="font-size:1.4rem;font-weight:800;color:#d97706;line-height:1;">${warnings}</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Warnings ↗</div>
-        </button>
-        ${confirmedTotal > 0 ? `<button onclick="showReportTab('costs',document.querySelectorAll('.report-tab')[0])" style="padding:7px 14px;background:rgba(255,255,255,0.92);border-radius:8px;border:1px solid rgba(255,255,255,0.3);cursor:pointer;text-align:center;" onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.92)'">
-          <div style="font-size:1rem;font-weight:800;color:#222;line-height:1.2;">£${(confirmedTotal/1000).toFixed(0)}k</div>
-          <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;color:#555;letter-spacing:0.5px;">Costs ↗</div>
-        </button>` : ''}
-      </div>
-      <div style="display:flex;gap:5px;">
-        <button id="search-toggle-btn" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="toggleSearchPane()">🔍 Search</button>
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="shareReport()">🔗 Share</button>
-        ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;text-decoration:none;">🌐 Public Page</a>` : ''}
-        <button class="btn btn-outline" style="font-size:0.72rem;padding:5px 10px;border-color:rgba(255,255,255,0.45);color:#fff;" onclick="showUploadArea()">+ New</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- ② TAB BAR — directly under header -->
-  <div class="report-tab-bar" style="display:flex;gap:0;border:1.5px solid ${rm.border};border-top:none;border-radius:0 0 14px 14px;background:var(--bg);margin-bottom:18px;">
-    <button class="report-tab active" onclick="showReportTab('overview',this)"  style="border-radius:0;">Overview</button>
-    <button class="report-tab"        onclick="showReportTab('flags',this)"     style="border-radius:0;">Flags (${flags.length})</button>
-    <button class="report-tab"        onclick="showReportTab('costs',this)"     style="border-radius:0;">Costs</button>
-    <button class="report-tab"        onclick="showReportTab('special',this)"   style="border-radius:0;">Special Conditions</button>
-    <button class="report-tab"        onclick="showReportTab('docs',this)"      style="border-radius:0;">Documents</button>
-    <button class="report-tab"        onclick="showReportTab('missing',this)"   style="border-radius:0;">Missing${result.missingDocuments?.length?' ('+result.missingDocuments.length+')':''}</button>
-    <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;">Checklist</button>
-    <button class="report-tab"        onclick="showReportTab('notes',this)"     style="border-radius:0;">Notes</button>
-  </div>
+    <div class="rv-divider"></div>
 
-  ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs. Ask your solicitor to verify key findings.</div>` : ''}
-
-  <!-- ③ TAB: OVERVIEW -->
-  <div id="rtab-overview" class="report-tab-panel">
-
-    <!-- Verdict + Mortgage -->
-    <div class="verdict-mortgage-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <div style="padding:16px 18px;background:${vt.bg};border:1.5px solid ${vt.border};border-radius:13px;">
-        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">Investor Verdict</div>
-        <div style="font-size:1.05rem;font-weight:800;color:${vt.col};margin-bottom:4px;">${vt.icon} ${vt.text}</div>
-        <div style="font-size:0.82rem;color:var(--t2);line-height:1.5;">${vt.sub}</div>
+    <!-- AI Panel -->
+    <div>
+      <div class="rv-ai-row">
+        <div class="rv-ai-dot" style="background:${vt.col};"></div>
+        <div><div class="rv-ai-label">Investor Verdict</div><div class="rv-ai-value">${vt.text}</div></div>
       </div>
-      <div style="padding:16px 18px;background:var(--bg);border:1.5px solid var(--b1);border-radius:13px;">
-        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">Can I Mortgage This?</div>
-        <div style="font-size:1.05rem;font-weight:800;color:${mortgageColor};margin-bottom:4px;">${mortgage}</div>
-        <div style="font-size:0.82rem;color:var(--t2);line-height:1.5;">${result.suitableFor||(mortgage==='Standard'?'Standard residential mortgage likely acceptable':mortgage==='Cash Only'?'Most lenders will refuse — cash or bridging only':'Check with mortgage broker before bidding')}</div>
+      <div class="rv-ai-row">
+        <div class="rv-ai-dot" style="background:${mortgageColor};"></div>
+        <div><div class="rv-ai-label">Mortgageability</div><div class="rv-ai-value" style="color:${mortgageColor};">${mortgage}</div></div>
       </div>
+      <div class="rv-ia-grid">
+        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.mortgageable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Mortgageable</div></div>
+        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.resaleable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Resaleable</div></div>
+        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.tenantable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Tenantable</div></div>
+        <div class="rv-ia-pill"><div class="rv-ia-pill-icon" style="font-size:0.66rem;font-weight:800;color:var(--text);">${ia.insurable || '—'}</div><div class="rv-ia-pill-label">Insurable</div></div>
+      </div>
+      <button class="rv-summary-toggle" onclick="const b=document.getElementById('rv-summary-body');const open=b.classList.toggle('open');this.textContent='Read AI summary '+(open?'▴':'▾');">Read AI summary ▾</button>
+      <div class="rv-summary-body" id="rv-summary-body">${result.summary || 'Analysis complete.'}</div>
     </div>
 
-    <!-- AI Summary -->
-    <div style="padding:16px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:12px;margin-bottom:16px;">
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">AI Summary</div>
-      <div style="font-size:0.9rem;color:var(--t2);line-height:1.7;">${result.summary||'Analysis complete.'}</div>
+    <div class="rv-divider"></div>
+
+    <!-- Section nav + actions -->
+    <div class="rv-jump-links">
+      <button class="rv-jump-link" data-target="report-section-property" onclick="scrollToReportSection('report-section-property')">Property</button>
+      <button class="rv-jump-link" data-target="report-section-auction" onclick="scrollToReportSection('report-section-auction')">Auction</button>
+      <button class="rv-jump-link" data-target="report-section-flags" onclick="scrollToReportSection('report-section-flags')">Flags</button>
+      <button class="rv-jump-link" data-target="report-section-costs" onclick="scrollToReportSection('report-section-costs')">Costs</button>
+      <button class="rv-jump-link" data-target="report-section-special" onclick="scrollToReportSection('report-section-special')">Special Conditions</button>
+      <button class="rv-jump-link" data-target="report-section-docs" onclick="scrollToReportSection('report-section-docs')">Documents</button>
+      <button class="rv-jump-link" data-target="report-section-missing" onclick="scrollToReportSection('report-section-missing')">Missing</button>
     </div>
 
-    <!-- Biggest Problems -->
-    ${criticalFlags.length ? `
-    <div style="padding:18px 20px;background:var(--bg);border:1.5px solid rgba(220,38,38,0.35);border-radius:13px;margin-bottom:16px;">
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:14px;">🚨 Biggest Problems Found</div>
-      ${criticalFlags.slice(0,5).map((f,i) => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(220,38,38,0.12);cursor:pointer;" onclick="showReportTab('flags',document.querySelectorAll('.report-tab')[1]);setTimeout(()=>{const el=document.querySelectorAll('#rtab-flags [id^=flag-]')[${i}];if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},100)">
-        <div style="font-size:0.95rem;font-weight:800;color:#dc2626;font-family:'DM Mono',monospace;min-width:20px;flex-shrink:0;">${i+1}.</div>
-        <div style="flex:1;">
-          <div style="font-size:0.92rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${f.title}</div>
-          <div style="font-size:0.8rem;color:var(--t2);line-height:1.5;">${f.buyerImpact||f.detail?.substring(0,140)||''}</div>
-          <div style="font-size:0.68rem;color:var(--accent);margin-top:3px;font-weight:600;">${f.documentSource ? '📄 ' + f.documentSource + ' · ' : ''}Click to view full analysis ↗</div>
-        </div>
-      </div>`).join('')}
-    </div>` : `
-    <div style="padding:16px 18px;background:rgba(22,163,74,0.1);border:1.5px solid rgba(22,163,74,0.3);border-radius:13px;margin-bottom:16px;text-align:center;">
-      <div style="font-size:1.1rem;margin-bottom:6px;">✅</div>
-      <div style="font-size:0.9rem;font-weight:700;color:var(--ok);">No critical issues found</div>
-      <div style="font-size:0.8rem;color:var(--t2);margin-top:4px;">Standard due diligence applies — see Flags tab for any warnings</div>
-    </div>`}
+    <div class="rv-actions">
+      <button class="rv-action-btn" onclick="toggleSearchPane()">🔍 Search</button>
+      <button class="rv-action-btn" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
+      <button class="rv-action-btn" onclick="shareReport()">🔗 Share</button>
+      ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
+      <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
+    </div>
 
-    <!-- Key Property Facts — two grouped blocks -->
-    ${(() => {
-      const card = ([lbl,val,col]) => `<div style="padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;">
-        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:7px;">${lbl}</div>
-        <div style="font-size:0.97rem;font-weight:700;color:${col||'var(--t1)'};line-height:1.3;">${val}</div>
-      </div>`;
-      const propFacts = [
-        result.tenure ? ['Tenure', result.tenure, null] : null,
-        result.leaseYears ? ['Lease Remaining', result.leaseYears+' years', result.leaseYears<85?'#dc2626':null] : null,
-        result.groundRent&&result.groundRent!=='N/A' ? ['Ground Rent', result.groundRent, null] : null,
-        result.serviceCharge&&result.serviceCharge!=='N/A' ? ['Service Charge', result.serviceCharge, null] : null,
-        result.titleNumber ? ['Title Number', result.titleNumber, null] : null,
-        result.seller ? ['Seller', result.seller, null] : null,
-      ].filter(Boolean);
-      const auctionFacts = [
-        (result.guidePrice || result._listingMeta?.guidePrice) ? ['Guide Price', result.guidePrice || result._listingMeta?.guidePrice, null] : null,
-        (result.auctionHouse || result._listingMeta?.auctionHouse) ? ['Auction House', result.auctionHouse || result._listingMeta?.auctionHouse, null] : null,
-        result._listingMeta?.auctionDate ? ['Auction Date', result._listingMeta.auctionDate, null] : null,
-        result._listingMeta?.auctionTime ? ['Auction Time', result._listingMeta.auctionTime, null] : null,
-        result._listingMeta?.auctionVenue ? ['Venue', result._listingMeta.auctionVenue, null] : null,
-        result._listingMeta?.lotNumber ? ['Lot Number', result._listingMeta.lotNumber, null] : null,
-      ].filter(Boolean);
-      const sectionLabel = txt => `<div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">${txt}</div>`;
-      const grid = cards => `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">${cards.map(card).join('')}</div>`;
-      return [
-        propFacts.length ? sectionLabel('Property') + grid(propFacts) : '',
-        auctionFacts.length ? `<div style="margin-top:${propFacts.length?'14px':'0'};">` + sectionLabel('Auction') + grid(auctionFacts) + '</div>' : '',
-      ].join('');
-    })()}
+  </div><!-- /rv-sidebar -->
 
-    ${ia.cautionaryNote ? `
-    <div style="margin-top:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:11px;">
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Investor Assessment</div>
+  <!-- ═══ MAIN DOCUMENT ═══ -->
+  <div class="rv-main">
 
-      <!-- Verdict pills -->
-      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
-        ${(()=>{
-          const pills=[];
-          const mtg=mortgage||'';
-          if(mtg==='Standard')       pills.push(['✅','Standard Mortgage Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
-          else if(mtg==='Restricted')pills.push(['⚠️','Restricted Mortgage','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
-          else if(mtg==='Bridging Only') pills.push(['🟠','Bridging / Specialist Finance','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
-          else if(mtg==='Cash Only'||ia.mortgageable===false) pills.push(['❌','Standard Mortgage Unlikely','rgba(220,38,38,0.1)','#dc2626','rgba(220,38,38,0.3)']);
-          if(mtg==='Cash Only'||mtg==='Bridging Only') pills.push(['✅','Cash Buyer Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
-          if(critical>0)             pills.push(['⚠️','Solicitor Review Required','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
-          if(ia.resaleable===false)  pills.push(['🟠','Resale Risk','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
-          return pills.map(([icon,label,bg,col,border])=>`<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid ${border};background:${bg};font-size:0.75rem;font-weight:700;color:${col};">${icon} ${label}</span>`).join('');
-        })()}
-      </div>
+    ${result._ocrUsed ? `<div style="margin-bottom:32px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.8rem;color:#1d4ed8;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Ask your solicitor to verify key findings.</div>` : ''}
 
-      <!-- ✅/❌ grid -->
-      <div class="ia-check-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
-        ${[['Mortgageable',ia.mortgageable],['Resaleable',ia.resaleable],['Tenantable',ia.tenantable]].map(([l,v])=>`<div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:1.2rem;margin-bottom:3px;">${v?'✅':'❌'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">${l}</div></div>`).join('')}
-        <div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:0.82rem;font-weight:800;color:var(--t1);margin-bottom:3px;">${ia.insurable||'—'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">Insurable</div></div>
-      </div>
-      <div style="font-size:0.82rem;color:var(--t2);line-height:1.6;font-style:italic;">${ia.cautionaryNote}</div>
+    <div class="rv-doc-section" id="report-section-property">
+      <div class="rv-section-title"><div class="rv-section-title-text">🏠 Property &amp; Tenure</div></div>
+      ${propertyRows || rvEmpty('No property details extracted from this pack')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-auction">
+      <div class="rv-section-title"><div class="rv-section-title-text">🔨 Auction</div></div>
+      ${auctionRows || rvEmpty('No auction details found for this pack')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-flags">
+      <div class="rv-section-title"><div class="rv-section-title-text">🚩 Flags</div></div>
+      ${flagRows || rvEmpty('No significant flags found')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-costs">
+      <div class="rv-section-title"><div class="rv-section-title-text">💰 Costs</div></div>
+      ${costs.length ? `<table class="rv-cost-table">
+        <thead><tr><th>Description</th><th>Amount</th><th>When Due</th></tr></thead>
+        <tbody>${costRows}${confirmedTotal > 0 ? `<tr><td style="font-weight:800;">Total confirmed costs</td><td class="rv-cost-amount" style="font-weight:800;">£${confirmedTotal.toLocaleString()}</td><td></td></tr>` : ''}</tbody>
+      </table>${summary?.unquantifiedLiabilities?.length ? `<div style="margin-top:24px;font-size:0.78rem;color:#71717a;line-height:1.7;"><strong style="color:#3f3f46;">Unquantified liabilities:</strong> ${summary.unquantifiedLiabilities.join(' · ')}</div>` : ''}
+      <div style="margin-top:16px;font-size:0.72rem;color:#a1a1aa;font-style:italic;">${summary?.costWarning || 'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>` : rvEmpty('No confirmed buyer cost figures found in documents')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-special">
+      <div class="rv-section-title"><div class="rv-section-title-text">📜 Special Conditions</div></div>
+      ${specialRows || rvEmpty(result.specialConditions || 'No separate Special Conditions document was identified. Always verify with your solicitor before bidding.')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-docs">
+      <div class="rv-section-title"><div class="rv-section-title-text">📁 Documents</div></div>
+      ${docRows || rvEmpty('No document breakdown available for this pack')}
+    </div>
+
+    <div class="rv-doc-section" id="report-section-missing">
+      <div class="rv-section-title"><div class="rv-section-title-text">📂 Missing</div></div>
+      ${missingRows || rvEmpty('No missing documents flagged')}
+    </div>
+
+    ${uploadedFiles.length ? `<div class="rv-footer">
+      <div class="rv-footer-title">Documents used to generate this report:</div>
+      ${uploadedFiles.join(', ')}
     </div>` : ''}
 
-    ${result.titleAnalysis?.whatBuyerCannotDo ? `
-    <div style="margin-top:14px;padding:14px 16px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.3);border-radius:11px;">
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:7px;">What the Buyer Cannot Do</div>
-      <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${result.titleAnalysis.whatBuyerCannotDo}</div>
-    </div>` : ''}
+  </div><!-- /rv-main -->
 
-    <!-- Before Bidding Verify -->
-    ${(()=>{
-      const checks=[]
-        .concat(result.mortgageability!=='Standard'?['Verify lender acceptability with a mortgage broker before bidding']:[])
-        .concat(result.leaseYears&&result.leaseYears<85?['Get a lease extension quote — budget £5k–£20k+ for short leases']:[])
-        .concat(critical>0?['Instruct a solicitor to review the full legal pack before placing a bid']:[])
-        .concat(result.missingDocuments?.length?['Obtain missing documents: '+result.missingDocuments.slice(0,2).map(d=>typeof d==='string'?d:d.document).join(', ')]:[])
-        .concat(['Confirm the seller has legal authority to sell at auction','Set your maximum bid limit before auction day — do not exceed it','Calculate total budget including SDLT, solicitor fees and any renovation']);
-      return `<div style="margin-top:16px;padding:16px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:13px;">
-        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:11px;">Before Bidding, Verify:</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          ${checks.slice(0,5).map(item=>`<label style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-radius:9px;cursor:pointer;user-select:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-bg,#f5f3ff)'" onmouseout="this.style.borderColor='var(--b1)';this.style.background='var(--bg)'">
-            <input type="checkbox" style="margin-top:2px;flex-shrink:0;accent-color:var(--accent);width:14px;height:14px;">
-            <span style="font-size:0.84rem;color:var(--t1);line-height:1.5;">${item}</span>
-          </label>`).join('')}
-        </div>
-      </div>`;
-    })()}
-
-    <!-- Property Intel prompt — populated after background fetch -->
-    <div id="intel-prompt-card" style="margin-top:14px;"></div>
-  </div>
-
-  <!-- ④ TAB: FLAGS -->
-  <div id="rtab-flags" class="report-tab-panel" style="display:none;">
-    ${flags.length ? `
-      <div style="display:flex;justify-content:flex-end;gap:7px;margin-bottom:14px;">
-        <button onclick="expandAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'Geist Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.12s;" onmouseover="this.style.borderColor='var(--t2)'" onmouseout="this.style.borderColor='var(--b1)'">▼ Expand all</button>
-        <button onclick="collapseAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'Geist Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;transition:border-color 0.12s;" onmouseover="this.style.borderColor='var(--t2)'" onmouseout="this.style.borderColor='var(--b1)'">▶ Collapse all</button>
-      </div>
-      ${criticalFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:10px;">Critical (${criticalFlags.length})</div>${criticalFlags.map((f,i)=>renderFlagCard(f,i)).join('')}` : ''}
-      ${warningFlags.length  ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d97706;margin:14px 0 10px;">Warnings (${warningFlags.length})</div>${warningFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+i)).join('')}` : ''}
-      ${noteFlags.length     ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin:14px 0 10px;">Notes (${noteFlags.length})</div>${noteFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+warningFlags.length+i)).join('')}` : ''}
-    ` : `<div style="padding:24px;text-align:center;color:var(--ok);">✅ No significant flags found</div>`}
-  </div>
-
-  <!-- ⑤ TAB: COSTS -->
-  <div id="rtab-costs" class="report-tab-panel" style="display:none;">
-    ${costs.length ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);">Confirmed Buyer Costs — Expressly Stated in Documents</div>
-      ${confirmedTotal > 0 ? `<div style="font-size:1.4rem;font-weight:800;color:#d97706;font-family:'DM Mono',monospace;">£${confirmedTotal.toLocaleString()}</div>` : ''}
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-      ${costs.map(cost => `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;">
-        <div style="flex:1;">
-          <div style="font-size:0.9rem;font-weight:700;color:var(--t1);margin-bottom:4px;">${cost.label}${cost.mandatory?'<span style="font-size:0.58rem;font-weight:800;color:#dc2626;background:#fef2f2;padding:2px 6px;border-radius:4px;margin-left:6px;">MANDATORY</span>':''}</div>
-          ${cost.evidence?`<div style="font-size:0.7rem;color:var(--t3);line-height:1.5;margin-top:2px;">📄 ${cost.evidence}</div>`:''}
-        </div>
-        <div style="text-align:right;flex-shrink:0;">
-          <div style="font-family:'DM Mono',monospace;font-weight:800;font-size:1.05rem;color:#d97706;">${cost.amount||'—'}${cost.vatApplies?'<span style="font-size:0.68rem;color:var(--t3);"> + VAT</span>':''}</div>
-          ${cost.frequency&&cost.frequency!=='one-off'&&cost.frequency!=='unknown'?`<div style="font-size:0.65rem;color:var(--t3);">${cost.frequency}</div>`:''}
-        </div>
-      </div>`).join('')}
-    </div>` : `<div style="padding:20px;text-align:center;color:var(--t3);">No confirmed buyer cost figures found in documents</div>`}
-    ${summary?.unquantifiedLiabilities?.length ? `
-    <div style="margin-top:18px;border:1.5px solid rgba(245,158,11,0.45);border-radius:13px;overflow:hidden;">
-      <div style="padding:13px 18px;background:rgba(245,158,11,0.1);border-bottom:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;gap:10px;">
-        <span style="font-size:1rem;">⚠️</span>
-        <div>
-          <div style="font-size:0.82rem;font-weight:800;color:var(--warn);">Potential Buyer Liabilities — No Figure Stated</div>
-          <div style="font-size:0.7rem;color:var(--t2);margin-top:2px;">These obligations were identified in the documents but no cost figure was given. They may represent significant financial exposure.</div>
-        </div>
-      </div>
-      <div style="background:rgba(245,158,11,0.04);padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
-        ${summary.unquantifiedLiabilities.map(l=>{
-          const dotIdx = l.indexOf('.');
-          const hasTitle = dotIdx > 0 && dotIdx < 80;
-          const title = hasTitle ? l.slice(0, dotIdx).trim() : null;
-          const desc  = hasTitle ? l.slice(dotIdx + 1).trim() : l;
-          return `<div style="padding:11px 14px;background:var(--bg);border:1px solid rgba(245,158,11,0.3);border-radius:9px;">
-            ${title ? `<div style="font-size:0.8rem;font-weight:700;color:var(--warn);margin-bottom:4px;">⚠ ${title}</div>` : `<div style="font-size:0.72rem;font-weight:700;color:var(--warn);margin-bottom:3px;">⚠ Unquantified Liability</div>`}
-            ${desc ? `<div style="font-size:0.83rem;color:var(--t1);line-height:1.55;font-weight:500;">${desc}</div>` : ''}
-          </div>`;
-        }).join('')}
-      </div>
-    </div>` : ''}
-    <div style="font-size:0.68rem;color:var(--t3);font-style:italic;line-height:1.6;">${summary?.costWarning||'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>
-  </div>
-
-  <!-- ⑥ TAB: SPECIAL CONDITIONS -->
-  <div id="rtab-special" class="report-tab-panel" style="display:none;">
-    ${(() => {
-      const sc = result.specialConditions;
-      const specialFlags = flags.filter(f => {
-        const cat=(f.category||'').toLowerCase(), title=(f.title||'').toLowerCase(), src=(f.documentSource||'').toLowerCase();
-        return cat.includes('special')||cat.includes('auction')||cat.includes('condition')||title.includes('special condition')||title.includes('auction condition')||title.includes('seller legal fee')||title.includes('buyer legal fee')||title.includes('completion')||title.includes('deposit')||src.includes('special condition')||src.includes('auction condition');
-      });
-      const cacFlags = flags.filter(f => {const s=(f.documentSource||'').toLowerCase(),t=(f.title||'').toLowerCase();return s.includes('common auction')||t.includes('common auction');});
-      return `
-      <div style="padding:13px 15px;background:var(--accent-bg);border:1px solid var(--accent-mid);border-radius:11px;font-size:0.84rem;color:var(--t2);line-height:1.65;margin-bottom:18px;">
-        Auction properties are sold under <strong style="color:var(--t1);">Common Auction Conditions</strong> plus any <strong style="color:var(--t1);">Special Conditions of Sale</strong> added by the seller. Special conditions can impose extra fees, shorter completion timelines, and other obligations not reflected in the guide price.
-      </div>
-      ${cacFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Common Auction Conditions — Issues Found</div>${cacFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">No specific issues flagged in Common Auction Conditions.</div>`}
-      ${specialFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin:14px 0 10px;">Special Conditions — Issues Found (${specialFlags.length})</div>${specialFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">${sc||'No separate Special Conditions document was identified. Always verify with your solicitor before bidding.'}</div>`}
-      <div style="padding:12px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:0.78rem;color:var(--warn);line-height:1.6;">
-        ⚠️ <strong>Always read the full Special Conditions before bidding.</strong> They are legally binding from the moment the hammer falls and cannot be renegotiated.
-      </div>`;
-    })()}
-  </div>
-
-  <!-- ⑦ TAB: DOCUMENTS -->
-  <div id="rtab-docs" class="report-tab-panel" style="display:none;">
-    ${(() => {
-      const byDoc = {};
-      for (const f of flags) { const src=f.documentSource||'Unspecified'; if(!byDoc[src])byDoc[src]=[]; byDoc[src].push(f); }
-      const sc = (c,s) => c==='critical'||c==='high'?'#dc2626':c==='warning'||c==='medium'?'#d97706':'var(--t3)';
-
-      return `
-      ${uploadedFiles.length ? `<div style="margin-bottom:16px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">📦 Uploaded Files</div>
-        <div style="padding:12px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;">
-          ${uploadedFiles.map(f=>`<div style="font-size:0.8rem;color:var(--t2);padding:3px 0;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:7px;"><span style="color:var(--accent);">📄</span>${f}</div>`).join('')}
-        </div></div>` : ''}
-      ${ds.provided?.length ? `<div style="margin-bottom:16px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ok);margin-bottom:10px;">✓ Provided & Reviewed (${ds.provided.length})</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          ${ds.provided.map(doc => {
-            const docFlags = byDoc[doc.document] || Object.entries(byDoc).find(([k])=>k.toLowerCase().includes((doc.document||'').toLowerCase().slice(0,10)))?.[1] || [];
-            const crit = docFlags.filter(f=>f.severity==='critical'||f.severity==='high').length;
-            const warn = docFlags.filter(f=>f.severity==='warning'||f.severity==='medium').length;
-            return `<div style="background:var(--bg);border:1px solid var(--b1);border-radius:11px;overflow:hidden;">
-              <div style="padding:11px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="const d=this.nextElementSibling;const ch=this.querySelector('.doc-chev');const open=d.style.display==='none';d.style.display=open?'block':'none';ch.textContent=open?'▴':'▾';">
-                <span>📄</span>
-                <div style="flex:1;"><div style="font-size:0.86rem;font-weight:700;color:var(--t1);">${doc.document}</div>${doc.evidence?`<div style="font-size:0.68rem;color:var(--t3);margin-top:1px;">${doc.evidence}</div>`:''}</div>
-                <div style="display:flex;gap:5px;align-items:center;">
-                  ${crit?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(220,38,38,0.12);color:#dc2626;">${crit} critical</span>`:''}
-                  ${warn?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:#d97706;">${warn} warning</span>`:''}
-                  ${!crit&&!warn?`<span style="font-size:0.6rem;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--okbg);color:var(--ok);">✓ clear</span>`:''}
-                  <span class="doc-chev" style="color:var(--t3);font-size:0.75rem;">▾</span>
-                </div>
-              </div>
-              <div style="display:none;border-top:1px solid var(--b1);padding:12px 14px;">
-                ${docFlags.length ? docFlags.map(f=>`<div style="padding:7px 10px;border-radius:7px;border-left:3px solid ${sc(f.severity)};background:var(--bg2);margin-bottom:5px;">
-                  <div style="font-size:0.82rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${f.title}</div>
-                  <div style="font-size:0.74rem;color:var(--t2);line-height:1.5;">${f.buyerImpact||f.detail?.substring(0,120)||''}</div>
-                  ${f.evidence?`<div style="font-size:0.67rem;color:var(--t3);margin-top:3px;font-style:italic;">"${f.evidence}"</div>`:''}
-                </div>`).join('') : `<div style="font-size:0.82rem;color:var(--ok);">✓ No specific issues flagged from this document.</div>`}
-              </div>
-            </div>`;
-          }).join('')}
-        </div></div>` : ''}
-      ${ds.notIdentified?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--warn);margin-bottom:10px;">⚠ Not Found (${ds.notIdentified.length})</div>
-        ${ds.notIdentified.map(doc=>`<div style="padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-left:3px solid ${doc.importance==='critical'?'#dc2626':'#d97706'};border-radius:0 9px 9px 0;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${doc.importance==='critical'?'🔴':'🟡'} ${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
-        </div>` : ''}
-      ${ds.referencedButNotFound?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">🔗 Referenced But Not Provided</div>
-        ${ds.referencedButNotFound.map(doc=>`<div style="padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-left:3px solid var(--t3);border-radius:0 9px 9px 0;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
-        </div>` : ''}
-      ${ds.optionalBuyerDueDiligence?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">☑ Optional Buyer Due Diligence</div>
-        <div style="font-size:0.78rem;color:var(--t2);margin-bottom:8px;">Not normally expected in an auction legal pack — arrange independently if needed.</div>
-        ${ds.optionalBuyerDueDiligence.map(doc=>`<div style="padding:10px 13px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:2px;">📋 ${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
-        </div>` : ''}
-      `;
-    })()}
-  </div>
-
-  <!-- ⑧ TAB: MISSING -->
-  <div id="rtab-missing" class="report-tab-panel" style="display:none;">
-    ${result.missingDocuments?.length ? `
-      <div style="padding:13px 15px;background:rgba(220,38,38,0.09);border:1.5px solid rgba(220,38,38,0.35);border-radius:11px;margin-bottom:14px;">
-        <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:4px;">⚠️ ${result.missingDocuments.length} document${result.missingDocuments.length!==1?'s':''} missing</div>
-        <div style="font-size:0.8rem;color:var(--t2);">You are bidding without full information. Each absence increases risk.</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        ${result.missingDocuments.map(d => {
-          const doc=typeof d==='string'?d:d.document;
-          const risk=typeof d==='object'?d.risk:null;
-          const imp=typeof d==='object'?d.importance:'moderate';
-          return `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-left:4px solid ${imp==='critical'?'#dc2626':'#d97706'};border-radius:0 10px 10px 0;">
-            <div style="font-size:0.88rem;font-weight:700;color:var(--t1);margin-bottom:${risk?'5px':'0'};">${imp==='critical'?'🔴':'🟡'} ${doc}</div>
-            ${risk?`<div style="font-size:0.78rem;color:var(--t2);line-height:1.5;">${risk}</div>`:''}
-          </div>`;
-        }).join('')}
-      </div>` : `<div style="padding:24px;text-align:center;color:var(--ok);font-size:0.95rem;">✅ No missing documents flagged</div>`}
-  </div>
-
-  <!-- ⑨ TAB: CHECKLIST -->
-  <div id="rtab-checklist" class="report-tab-panel" style="display:none;">
-    <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:12px;">Before Bidding, You Should Still Check:</div>
-    <div style="display:flex;flex-direction:column;gap:7px;">
-      ${([]
-        .concat(result.mortgageability !== 'Standard' ? ['Verify lender acceptability with a mortgage broker'] : [])
-        .concat(result.leaseYears && result.leaseYears < 85 ? ['Get a lease extension quote — budget £5k–£20k+'] : [])
-        .concat(critical > 0 ? ['Instruct a solicitor to review the full legal pack before bidding'] : [])
-        .concat(result.missingDocuments?.length ? result.missingDocuments.slice(0,3).map(d=>'Obtain: '+(typeof d==='string'?d:d.document)) : [])
-        .concat(['Book a structural survey if property condition is unknown','Calculate your total budget including SDLT, fees and renovation','Confirm seller has legal authority to sell at auction','Set your maximum bid limit before auction day and do not exceed it'])
-      ).map(item => `<label style="display:flex;align-items:flex-start;gap:10px;padding:11px 13px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;cursor:pointer;user-select:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-bg)'" onmouseout="this.style.borderColor='var(--b1)';this.style.background='var(--bg)'">
-        <input type="checkbox" style="margin-top:2px;flex-shrink:0;accent-color:var(--accent);width:15px;height:15px;">
-        <span style="font-size:0.86rem;color:var(--t1);line-height:1.55;">${item}</span>
-      </label>`).join('')}
-    </div>
-    <div style="margin-top:10px;font-size:0.68rem;color:var(--t3);font-style:italic;">Check items off as you complete them. Resets when you close the report.</div>
-  </div>
-
-  <!-- ⑩ TAB: NOTES -->
-  <div id="rtab-notes" class="report-tab-panel" style="display:none;">
-    <div style="font-size:0.85rem;color:var(--t2);margin-bottom:10px;line-height:1.6;">Add notes for your solicitor, surveyor or partners — saved against this report.</div>
-    <textarea id="report-notes" placeholder="e.g. Called solicitor — wants £850 for lease extension advice. Survey arranged for 14th..." style="width:100%;padding:13px;background:var(--bg);border:1.5px solid var(--b1);border-radius:10px;color:var(--t1);font-family:'Geist Sans',sans-serif;font-size:0.86rem;resize:vertical;min-height:130px;line-height:1.6;outline:none;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--b1)'"></textarea>
-    <button onclick="saveReportNotes()" class="btn btn-primary" style="margin-top:10px;">Save Notes</button>
-  </div>
-
-  </div><!-- /report-left-pane -->
-
-  <!-- ═══ RIGHT PANE — Search Documents ═══ -->
-  <div class="report-right-pane">
+  <!-- ═══ SEARCH OVERLAY ═══ -->
+  <div class="rv-search-overlay" id="rv-search-overlay">
+    <button class="rv-search-close" onclick="toggleSearchPane()">✕</button>
     <div style="font-size:0.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b1);">🔍 Search Documents</div>
 
-    <!-- Search results view -->
     <div id="search-pane-results">
       ${canAccessSearch() ? `
         <div style="position:relative;margin-bottom:12px;">
@@ -3113,121 +2983,74 @@ function renderResult(result, packName) {
       `}
     </div><!-- /search-pane-results -->
 
-    <!-- Document viewer (shown on result click) -->
     <div id="search-pane-viewer" style="display:none;"></div>
 
-  </div><!-- /report-right-pane -->
+  </div><!-- /rv-search-overlay -->
+
+  <!-- ═══ MOBILE BOTTOM BAR ═══ -->
+  <div class="rv-mobile-bar">
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-property')">Property</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-auction')">Auction</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-flags')">Flags</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-costs')">Costs</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-special')">Special</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-docs')">Docs</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-missing')">Missing</button>
+    <button class="rv-mobile-bar-btn" onclick="toggleSearchPane()">🔍</button>
+    <button class="rv-mobile-bar-btn" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
+    <button class="rv-mobile-bar-btn" onclick="shareReport()">🔗 Share</button>
+    ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-mobile-bar-btn" style="text-decoration:none;">🌐 Public</a>` : ''}
+    <button class="rv-mobile-bar-btn" onclick="showUploadArea()">+ New</button>
+  </div>
 
 </div>`;
+
+  initReportScrollSpy();
 }
 
-
-
-function renderFlagCard(f, index) {
+function renderFlagRow(f) {
   const sev = f.severity || 'note';
   const isCritical = sev==='critical'||sev==='high';
   const isWarning = sev==='warning'||sev==='medium';
-  const borderColor = isCritical?'#dc2626':isWarning?'#f59e0b':'rgba(148,163,184,0.4)';
-  const sevLabel = isCritical?'CRITICAL':isWarning?'WARNING':'NOTE';
-  const sevBg = isCritical?'rgba(220,38,38,0.12)':isWarning?'rgba(245,158,11,0.12)':'rgba(100,116,139,0.08)';
-  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'var(--t3)';
-  const highlightColor = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(245,158,11,0.1)':'rgba(100,116,139,0.07)';
-
-  const _t = ((f.category||'') + ' ' + (f.title||'') + ' ' + (f.buyerImpact||'')).toLowerCase();
-  const _impTags = [];
-  if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  'rgba(185,28,28,0.1)','#dc2626']);
-  if (/resale|re-sale|sell on|saleability|unmarketable/.test(_t))                              _impTags.push(['🟠','Resale Risk',    'rgba(194,65,12,0.1)','#ea580c']);
-  if (/covenant|dispute|adverse|possessory|easement|right of way|chancel|overriding|title/.test(_t)) _impTags.push(['🟡','Legal Risk',  'rgba(146,64,14,0.1)','#d97706']);
-  if (/completion|timescale|short lease|deadline|notice|vacant possession|delay/.test(_t))     _impTags.push(['🔵','Time Risk',      'rgba(30,64,175,0.1)','#3b82f6']);
-  if (/\bcost\b|fee|charge|sdlt|payment|contribution|levy|ground rent|service charge/.test(_t)) _impTags.push(['💷','Cost Risk',    'rgba(21,128,61,0.1)','#16a34a']);
-  if (/structural|survey|planning|repair|asbestos|damp|subsidence|drainage|condition|defect/.test(_t)) _impTags.push(['🏚','Condition Risk','rgba(109,40,217,0.1)','#7c3aed']);
-  const impTagsHtml = _impTags.map(([icon,label,bg,col]) =>
-    `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};border:1px solid ${col.replace(')',',0.3)').replace('rgb','rgba')};white-space:nowrap;">${icon} ${label}</span>`).join('');
-
-  const detail = f.detail || f.description || '';
-  const hasEvidence = f.documentSource || f.evidence;
-  const evidenceHtml = hasEvidence ? `
-    <div style="margin-top:12px;padding:10px 12px;background:${highlightColor};border-radius:8px;border-left:3px solid ${borderColor};">
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${sevColor};margin-bottom:5px;">📄 Evidence</div>
-      ${f.documentSource ? `<div style="font-size:0.78rem;font-weight:600;color:var(--t1);margin-bottom:${f.evidence?'4px':'0'};">
-        <span style="background:${highlightColor};border:1px solid ${borderColor};padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--t2);">${f.documentSource}</span>
-      </div>` : ''}
-      ${f.evidence ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.55;font-style:italic;">"${f.evidence}"</div>` : ''}
-    </div>` : '';
-
-  const idx = index === undefined ? 0 : index;
-  const isFirst = idx === 0;
-  const cardBorderColor = isFirst ? borderColor : 'var(--b1)';
-  const cardShadow = isFirst ? '0 2px 12px rgba(0,0,0,0.06)' : '';
-
-  return `<div id="flag-${idx}" data-border="${borderColor}" style="padding:14px 18px;background:var(--bg);border:1px solid ${cardBorderColor};border-left:4px solid ${borderColor};border-radius:0 14px 14px 0;margin-bottom:10px;transition:border-color 0.15s,box-shadow 0.15s;box-shadow:${cardShadow};">
-
-    <div onclick="toggleFlag(${idx})" style="cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;user-select:none;">
-      <div style="flex:1;min-width:0;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap;">
-          <span style="font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:4px;background:${sevBg};color:${sevColor};letter-spacing:0.5px;">${sevLabel}</span>
-          ${f.category ? `<span style="font-size:0.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">${f.category}</span>` : ''}
-          ${impTagsHtml}
-        </div>
-        <div style="font-size:0.97rem;font-weight:700;color:var(--t1);line-height:1.35;">${f.title}</div>
-      </div>
-      <span id="flag-chev-${idx}" style="color:var(--t3);font-size:0.7rem;flex-shrink:0;padding-top:4px;">${isFirst ? '▼' : '▶'}</span>
+  const sevLabel = isCritical?'Critical':isWarning?'Warning':'Info';
+  const sevBg = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(217,119,6,0.1)':'rgba(113,113,122,0.1)';
+  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'#71717a';
+  const detail = f.detail || f.description || f.buyerImpact || '';
+  const metaParts = [];
+  if (f.documentSource) metaParts.push(f.documentSource);
+  if (f.evidence) metaParts.push(`"${f.evidence}"`);
+  return `<div class="rv-flag-row">
+    <div style="flex:1;min-width:0;">
+      <div class="rv-flag-title">${f.title}</div>
+      ${detail ? `<div class="rv-flag-desc">${detail}</div>` : ''}
+      ${metaParts.length ? `<div class="rv-flag-meta">${metaParts.join(' — ')}</div>` : ''}
     </div>
-
-    <div id="flag-body-${idx}" style="display:${isFirst ? 'block' : 'none'};">
-      ${detail ? `
-      <div style="margin-top:10px;margin-bottom:${(f.buyerImpact||f.investorImpact)?'10px':'0'};">
-        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">What this means</div>
-        <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${detail}</div>
-      </div>` : ''}
-      ${(f.buyerImpact||f.investorImpact) ? `
-      <div style="padding:10px 12px;background:${sevBg};border-radius:8px;">
-        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:${sevColor};margin-bottom:4px;">Buyer Impact</div>
-        <div style="font-size:0.84rem;font-weight:600;color:${isCritical?'#dc2626':isWarning?'#d97706':'var(--t2)'};line-height:1.55;">⚡ ${f.buyerImpact||f.investorImpact}</div>
-      </div>` : ''}
-      ${evidenceHtml}
-    </div>
-
+    <div class="rv-sev-badge" style="background:${sevBg};color:${sevColor};">${sevLabel}</div>
   </div>`;
 }
 
-function toggleFlag(idx) {
-  const body = document.getElementById('flag-body-' + idx);
-  const chev = document.getElementById('flag-chev-' + idx);
-  const card = document.getElementById('flag-' + idx);
-  if (!body) return;
-  const willOpen = body.style.display === 'none';
-  body.style.display = willOpen ? 'block' : 'none';
-  if (chev) chev.textContent = willOpen ? '▼' : '▶';
-  if (card) {
-    card.style.borderColor = willOpen ? (card.dataset.border || 'var(--b1)') : 'var(--b1)';
-    card.style.boxShadow = willOpen ? '0 2px 12px rgba(0,0,0,0.06)' : '';
-  }
+function initReportScrollSpy() {
+  if (window._reportScrollObserver) { window._reportScrollObserver.disconnect(); window._reportScrollObserver = null; }
+  const sections = document.querySelectorAll('.rv-doc-section');
+  const links = document.querySelectorAll('.rv-jump-link');
+  if (!sections.length || typeof IntersectionObserver === 'undefined') return;
+  const root = document.querySelector('.content');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+      }
+    });
+  }, { root: root || null, rootMargin: '-10% 0px -75% 0px', threshold: 0 });
+  sections.forEach(s => observer.observe(s));
+  window._reportScrollObserver = observer;
 }
 
-function expandAllFlags() {
-  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
-    const idx = b.id.slice(10);
-    b.style.display = 'block';
-    const chev = document.getElementById('flag-chev-' + idx);
-    const card = document.getElementById('flag-' + idx);
-    if (chev) chev.textContent = '▼';
-    if (card) { card.style.borderColor = card.dataset.border || ''; card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }
-  });
+function scrollToReportSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
-function collapseAllFlags() {
-  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
-    const idx = b.id.slice(10);
-    b.style.display = 'none';
-    const chev = document.getElementById('flag-chev-' + idx);
-    const card = document.getElementById('flag-' + idx);
-    if (chev) chev.textContent = '▶';
-    if (card) { card.style.borderColor = 'var(--b1)'; card.style.boxShadow = ''; }
-  });
-}
-
-
 
 
 // ── COMPARE ───────────────────────────────────────────────────────────────────
@@ -4193,19 +4016,16 @@ async function exportReportPDF(packName) {
   pdf.text(packName || 'Legal Pack Analysis', margin + 28, 11);
   pdf.text(new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}), pageWidth-margin, 11, {align:'right'});
 
-  const tabs = ['costs','flags','special','docs','missing','details'];
-  const tabLabels = { costs:'💰 Costs', flags:'🚩 Risk Flags', special:'📜 Special Conditions', docs:'📁 Document Breakdown', missing:'📂 Missing Documents', details:'📋 Details' };
+  // Sections are all simultaneously visible in the new document layout (no
+  // tab toggling needed) — just screenshot each one directly, in reading order.
+  const sections = ['property','auction','flags','costs','special','docs','missing'];
+  const sectionLabels = { property:'🏠 Property & Tenure', auction:'🔨 Auction', flags:'🚩 Flags', costs:'💰 Costs', special:'📜 Special Conditions', docs:'📁 Documents', missing:'📂 Missing' };
   let firstPage = true;
   let yPos = firstPage ? 20 : margin;
 
-  for (const tab of tabs) {
-    // Show this tab
-    document.querySelectorAll('.report-tab-panel').forEach(p => p.style.display = 'none');
-    const panel = document.getElementById('rtab-' + tab);
+  for (const sec of sections) {
+    const panel = document.getElementById('report-section-' + sec);
     if (!panel || !panel.innerHTML.trim()) continue;
-    panel.style.display = 'block';
-
-    await new Promise(r => setTimeout(r, 150)); // let render settle
 
     try {
       const canvas = await html2canvas(panel, {
@@ -4220,7 +4040,7 @@ async function exportReportPDF(packName) {
         pdf.setFillColor(124, 58, 237);
         pdf.rect(0, 0, pageWidth, 12, 'F');
         pdf.setFontSize(9); pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold');
-        pdf.text(tabLabels[tab] || tab, margin, 8);
+        pdf.text(sectionLabels[sec] || sec, margin, 8);
         pdf.text('LegalPack AI', pageWidth-margin, 8, {align:'right'});
         yPos = 16;
       }
@@ -4249,18 +4069,12 @@ async function exportReportPDF(packName) {
           pdf.setFillColor(245,240,255);
           pdf.rect(0,0,pageWidth,6,'F');
           pdf.setFontSize(6); pdf.setTextColor(124,58,237);
-          pdf.text(tabLabels[tab] || tab, margin, 4.5);
+          pdf.text(sectionLabels[sec] || sec, margin, 4.5);
           pageY = 10;
         }
       }
-    } catch(e) { console.error('Tab capture error:', tab, e); }
+    } catch(e) { console.error('Section capture error:', sec, e); }
   }
-
-  // Restore first tab
-  document.querySelectorAll('.report-tab-panel').forEach(p => p.style.display = 'none');
-  const firstPanel = document.getElementById('rtab-costs');
-  if (firstPanel) firstPanel.style.display = 'block';
-  document.querySelectorAll('.report-tab').forEach((b,i) => { if(i===0) b.classList.add('active'); else b.classList.remove('active'); });
 
   // Footer on all pages
   const totalPages = pdf.internal.getNumberOfPages();
@@ -4452,15 +4266,6 @@ function printReport(packName) {
   setTimeout(() => win.print(), 800);
 }
 
-// ── REPORT TABS ──────────────────────────────────────────────────────────────
-function showReportTab(tab, btn) {
-  document.querySelectorAll('.report-tab-panel').forEach(p => p.style.display = 'none');
-  document.querySelectorAll('.report-tab').forEach(b => b.classList.remove('active'));
-  const panel = document.getElementById('rtab-' + tab);
-  if (panel) panel.style.display = 'block';
-  if (btn) btn.classList.add('active');
-}
-
 function canAccessSearch() {
   if (!currentUser) return false;
   const plan = currentUser.plan || 'pay_as_you_go';
@@ -4576,15 +4381,9 @@ function searchDocuments(query) {
 }
 
 function toggleSearchPane() {
-  const pane = document.querySelector('.report-two-pane');
+  const pane = document.getElementById('rv-search-overlay');
   if (!pane) return;
-  const willOpen = !pane.classList.contains('search-open');
-  pane.classList.toggle('search-open');
-  const btn = document.getElementById('search-toggle-btn');
-  if (btn) {
-    btn.style.background = willOpen ? 'rgba(255,255,255,0.22)' : '';
-    btn.style.fontWeight  = willOpen ? '800' : '';
-  }
+  pane.classList.toggle('open');
 }
 
 function openDocViewer(docIdx, charIdx, matchLen) {
