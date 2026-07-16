@@ -112,6 +112,53 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
 @keyframes pulse-red{0%,100%{opacity:1;}50%{opacity:0.25;}}
 .err-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse-red 1.4s ease-in-out infinite;vertical-align:middle;margin-left:5px;}
 .err-stack-row td{background:var(--bg2)!important;}
+/* USER DRAWER */
+.user-row{cursor:pointer;}
+.user-drawer-overlay{position:fixed;inset:0;z-index:450;background:rgba(0,0,0,0.65);display:flex;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity 0.2s ease;}
+.user-drawer-overlay.open{opacity:1;pointer-events:auto;}
+.user-drawer{position:relative;width:480px;max-width:92vw;height:100%;background:var(--bg2);border-left:1px solid var(--b1);overflow-y:auto;transform:translateX(100%);transition:transform 0.25s ease;box-shadow:-16px 0 50px rgba(0,0,0,0.4);}
+.user-drawer-overlay.open .user-drawer{transform:translateX(0);}
+.user-drawer-close{position:absolute;top:16px;right:16px;background:var(--bg3);border:1px solid var(--b1);color:var(--t2);width:28px;height:28px;border-radius:7px;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+.user-drawer-close:hover{border-color:var(--purple);color:var(--t1);}
+.ud-section{padding:18px 22px;border-bottom:1px solid var(--b1);}
+.ud-section:last-child{border-bottom:none;}
+.ud-section-title{font-size:0.6rem;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
+.ud-field{margin-bottom:10px;}
+.ud-field-label{font-size:0.62rem;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;}
+.ud-field-value{font-size:0.8rem;color:var(--t1);line-height:1.4;}
+.skeleton-line{height:12px;border-radius:4px;background:var(--bg4);margin-bottom:8px;animation:ud-skeleton-pulse 1.1s ease-in-out infinite;}
+@keyframes ud-skeleton-pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+/* REPORTS */
+.report-row{cursor:pointer;}
+.pg-btn{background:var(--bg3);border:1px solid var(--b1);color:var(--t2);font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:700;padding:5px 11px;border-radius:6px;cursor:pointer;}
+.pg-btn:hover:not(:disabled){border-color:var(--purple);color:var(--t1);}
+.pg-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.pg-info{font-size:0.72rem;color:var(--t3);}
+/* Ported dashboard report viewer — locally-scoped theme so it renders exactly as on the user dashboard */
+.dash-report-embed{
+  --bg:#0a0812;--bg2:#0f0c1a;--bg3:#161228;--bg4:#1d1733;
+  --t1:#f0eeff;--t2:#8b82aa;--t3:#4a4468;
+  --b1:#1e1a30;--b2:#17132a;
+  --danger:#dc2626;--dangerbg:#fef2f2;--dangermid:#fecaca;
+  --warn:#d97706;--warnbg:#fffbeb;--warnmid:#fef3c7;
+  --ok:#16a34a;--okbg:#f0fdf4;--okmid:#dcfce7;
+  --info:#2563eb;--infobg:#eff6ff;--infomid:#dbeafe;
+  --accent:#7c3aed;--accent-deep:#5b21b6;--accent-bg:#f5f0ff;--accent-mid:#ddd6fe;--accent-text:#6d28d9;
+  --red:var(--accent);--redbg:var(--accent-bg);--redmid:var(--accent-mid);
+  --amber:var(--warn);--amberbg:var(--warnbg);--ambermid:var(--warnmid);
+  --green:var(--ok);--greenbg:var(--okbg);--greenmid:var(--okmid);
+  --blue:var(--info);--bluemid:var(--infomid);
+  background:var(--bg2);border:1px solid var(--b1);border-radius:14px;padding:22px;color:var(--t1);font-family:'DM Sans',sans-serif;
+}
+.dash-report-embed .report-tab{padding:10px 20px;border:none;background:none;color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.12s;white-space:nowrap;}
+.dash-report-embed .report-tab:hover{color:var(--t1);}
+.dash-report-embed .report-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.dash-report-embed .report-tab-panel{min-height:200px;}
+.dash-report-embed .report-tab-bar{display:flex;overflow-x:auto;overflow-y:visible;scrollbar-width:none;justify-content:space-evenly;}
+.dash-report-embed .report-tab-bar::-webkit-scrollbar{display:none;}
+.dash-report-embed .report-tab-bar .report-tab{flex:0 0 auto;}
+.dash-report-embed .report-two-pane{display:flex;align-items:flex-start;width:100%;}
+.dash-report-embed .report-left-pane{flex:0 0 100%;min-width:0;box-sizing:border-box;}
 /* SUPPORT */
 .sp-ticket{padding:10px 13px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background 0.1s;}
 .sp-ticket:hover{background:var(--bg3);}
@@ -157,6 +204,7 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   <div class="sidebar-item" onclick="showPanel('revenue',this)">💰 Revenue</div>
   <div class="sidebar-section">Analyses</div>
   <div class="sidebar-item" onclick="showPanel('analyses',this)">📋 Analyses</div>
+  <div class="sidebar-item" onclick="showPanel('reports',this)">📄 Reports</div>
   <div class="sidebar-section">API & Costs</div>
   <div class="sidebar-item" onclick="showPanel('apicost',this)">⚡ API Cost</div>
   <div class="sidebar-item" onclick="showPanel('usage',this)">📈 Usage Chart</div>
@@ -245,6 +293,30 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
     </div>
     <div id="analyses-table"><div class="loading">Loading...</div></div>
   </div>
+</div>
+
+<!-- REPORTS -->
+<div class="panel" id="panel-reports">
+
+  <!-- LIST VIEW -->
+  <div id="reports-list-view">
+    <div class="page-title">Reports</div><div class="page-sub">Every generated analysis report — click a row to view in full</div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">All Reports</div>
+        <input class="search-input" id="reports-search" placeholder="Search email or property..." oninput="filterReports()" style="width:240px;">
+      </div>
+      <div id="reports-table"><div class="loading">Loading...</div></div>
+      <div id="reports-pagination" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-top:1px solid var(--b1);"></div>
+    </div>
+  </div>
+
+  <!-- FULL REPORT VIEWER -->
+  <div id="reports-viewer-view" style="display:none;">
+    <button class="btn-sm" onclick="closeReportViewer()" style="margin-bottom:14px;">← Back to Reports</button>
+    <div id="reports-viewer-adminbar"></div>
+    <div id="reports-viewer-body"></div>
+  </div>
+
 </div>
 
 <!-- API COST -->
@@ -485,6 +557,14 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:var(--bg3);}
   </div>
 </div>
 
+<!-- USER PROFILE DRAWER -->
+<div class="user-drawer-overlay" id="user-drawer-overlay" onclick="if(event.target===this)closeUserDrawer()">
+  <div class="user-drawer" id="user-drawer">
+    <button class="user-drawer-close" onclick="closeUserDrawer()">✕</button>
+    <div id="user-drawer-inner"></div>
+  </div>
+</div>
+
 <div id="admin-toast"></div>
 
 <script>
@@ -570,7 +650,7 @@ function renderUsersPanel(){
 
 function renderUsersTable(users){
   if(!users.length){document.getElementById('users-table').innerHTML='<div class="empty">No users found</div>';return;}
-  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Analyses</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${users.map(u=>`<tr><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td class="mono">${u.analyses_total||0}</td><td class="mono">${fmtDate(u.created_at)}</td><td style="display:flex;gap:4px;"><button class="action-btn success" onclick="quickGrant('${u.id}','${u.email}')">+ Credit</button>${(u.pay_as_you_go_credits||0)>0?`<button class="action-btn" style="border-color:var(--red);color:var(--red);" onclick="quickRemoveCredit('${u.id}','${u.email}')">- Credit</button>`:''}<button class="action-btn" onclick="quickPlan('${u.id}','${u.email}','${u.plan||'pay_as_you_go'}')">Plan</button></td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('users-table').innerHTML=`<table><thead><tr><th>Email</th><th>Name</th><th>Plan</th><th>Credits</th><th>Analyses</th><th>Joined</th></tr></thead><tbody>${users.map(u=>`<tr class="user-row" onclick="openUserDrawer('${u.id}')"><td class="mono" style="font-size:0.68rem;">${u.email||'—'}</td><td>${u.name||u.first_name||'—'}</td><td><span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span></td><td class="mono">${u.pay_as_you_go_credits||0}</td><td class="mono">${u.analyses_total||0}</td><td class="mono">${fmtDate(u.created_at)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function filterUsers(){
@@ -673,6 +753,691 @@ function populateUserSelects(){
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
+// ── USER PROFILE DRAWER ───────────────────────────────────────────────────────
+let currentDrawerUserId=null;
+
+function escAttr(s){return String(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+function skeletonLines(n){
+  let out='';
+  for(let i=0;i<n;i++){out+=`<div class="skeleton-line" style="width:${60+Math.round(Math.random()*30)}%;"></div>`;}
+  return out;
+}
+
+function renderUserDrawerSkeleton(){
+  document.getElementById('user-drawer-inner').innerHTML=`
+    <div style="padding:20px 22px;border-bottom:1px solid var(--b1);">
+      <div class="skeleton-line" style="width:55%;height:18px;"></div>
+      <div class="skeleton-line" style="width:70%;height:13px;margin-top:8px;"></div>
+      <div class="skeleton-line" style="width:35%;height:13px;margin-top:10px;"></div>
+    </div>
+    <div class="ud-section">${skeletonLines(3)}</div>
+    <div class="ud-section">${skeletonLines(3)}</div>
+    <div class="ud-section">${skeletonLines(2)}</div>
+  `;
+}
+
+function renderUserDrawerError(msg){
+  document.getElementById('user-drawer-inner').innerHTML=`<div class="empty" style="padding:60px 22px;">${msg}</div>`;
+}
+
+async function openUserDrawer(userId){
+  currentDrawerUserId=userId;
+  document.getElementById('user-drawer-overlay').classList.add('open');
+  renderUserDrawerSkeleton();
+  await loadUserDrawerData(userId);
+}
+
+function closeUserDrawer(){
+  document.getElementById('user-drawer-overlay').classList.remove('open');
+  currentDrawerUserId=null;
+}
+
+async function loadUserDrawerData(userId){
+  try{
+    const {data:user,error}=await sb.from('users').select('*').eq('id',userId).single();
+    if(error||!user){renderUserDrawerError('Could not load user data.');return;}
+    let sharedIpUsers=[];
+    if(user.signup_ip){
+      const {data:shared}=await sb.from('users').select('email').eq('signup_ip',user.signup_ip).neq('id',userId);
+      sharedIpUsers=shared||[];
+    }
+    if(currentDrawerUserId!==userId)return; // drawer closed or switched to another user before this resolved
+    renderUserDrawerContent(user,sharedIpUsers);
+  }catch(e){
+    console.error(e);
+    renderUserDrawerError('Could not load user data.');
+  }
+}
+
+function refreshUserDrawerIfOpen(userId){
+  if(currentDrawerUserId===userId&&document.getElementById('user-drawer-overlay').classList.contains('open')){
+    loadUserDrawerData(userId);
+  }
+}
+
+function renderUserDrawerContent(u,sharedIpUsers){
+  const name=u.name||u.first_name||u.full_name||'—';
+  const email=u.email||'—';
+  const credits=u.pay_as_you_go_credits||0;
+  const analyses=u.analyses_total||0;
+  const sourceLabel=u.signup_source==='funnel'?'Funnel signup':u.signup_source==='homepage'?'Homepage signup':(u.signup_source||'—');
+  const onbCompleted=!!u.onboarding_completed;
+  const ipClaimed=!!u.ip_credit_claimed;
+
+  document.getElementById('user-drawer-inner').innerHTML=`
+    <div style="padding:20px 22px;border-bottom:1px solid var(--b1);">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--t1);padding-right:34px;">${escHtml(name)}</div>
+      <div class="mono" style="font-size:0.78rem;color:var(--t2);margin-top:3px;">${escHtml(email)}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;">
+        <span class="badge ${planClass(u.plan)}">${planLabel(u.plan)}</span>
+        <span style="font-size:0.68rem;color:var(--t3);">Joined ${fmtDate(u.created_at)}</span>
+      </div>
+    </div>
+
+    <div class="ud-section">
+      <div class="ud-section-title">Account</div>
+      <div class="metric-row"><span class="metric-label">Credits remaining</span><span class="metric-value">${credits}</span></div>
+      <div class="metric-row"><span class="metric-label">Analyses run</span><span class="metric-value">${analyses}</span></div>
+      <div class="metric-row"><span class="metric-label">Signup source</span><span class="metric-value" style="font-size:0.74rem;">${sourceLabel}</span></div>
+    </div>
+
+    <div class="ud-section">
+      <div class="ud-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Onboarding Answers</span>
+        ${onbCompleted?'':'<span class="badge amber">Survey not completed</span>'}
+      </div>
+      <div class="ud-field"><div class="ud-field-label">Role</div><div class="ud-field-value">${escHtml(u.onboarding_role)||'—'}</div></div>
+      <div class="ud-field"><div class="ud-field-label">Intent</div><div class="ud-field-value">${escHtml(u.onboarding_intent)||'—'}</div></div>
+      <div class="ud-field" style="margin-bottom:0;"><div class="ud-field-label">Source</div><div class="ud-field-value">${escHtml(u.onboarding_source)||'—'}</div></div>
+    </div>
+
+    <div class="ud-section">
+      <div class="ud-section-title">Security</div>
+      <div class="ud-field"><div class="ud-field-label">Signup IP</div><div class="ud-field-value mono">${escHtml(u.signup_ip)||'—'}</div></div>
+      <div class="metric-row"><span class="metric-label">IP credit claimed</span><span class="badge ${ipClaimed?'green':'payg'}">${ipClaimed?'Claimed':'Not claimed'}</span></div>
+      ${sharedIpUsers.length?`<div style="margin-top:10px;padding:10px 12px;background:var(--redbg);border:1px solid var(--redmid);border-radius:8px;">
+        <div style="font-size:0.74rem;font-weight:700;color:var(--red);margin-bottom:6px;">⚠️ Multiple accounts on this IP</div>
+        <div style="font-size:0.72rem;color:var(--t2);line-height:1.7;">${sharedIpUsers.map(su=>escHtml(su.email)||'—').join('<br>')}</div>
+      </div>`:''}
+    </div>
+
+    <div class="ud-section">
+      <div class="ud-section-title">Actions</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="action-btn success" style="padding:7px 14px;font-size:0.72rem;" onclick="quickGrant('${u.id}','${escAttr(email)}')">+ Credit</button>
+        ${credits>0?`<button class="action-btn" style="padding:7px 14px;font-size:0.72rem;border-color:var(--red);color:var(--red);" onclick="quickRemoveCredit('${u.id}','${escAttr(email)}')">- Credit</button>`:''}
+        <button class="action-btn" style="padding:7px 14px;font-size:0.72rem;" onclick="quickPlan('${u.id}','${escAttr(email)}','${u.plan||'pay_as_you_go'}')">Plan</button>
+      </div>
+    </div>
+  `;
+}
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+let allReports=[], reportsPage=1;
+const REPORTS_PER_PAGE=25;
+
+async function loadReports(){
+  document.getElementById('reports-table').innerHTML='<div class="loading">Loading...</div>';
+  try{
+    const {data,error}=await sb.from('analyses')
+      .select('id,pack_name,verdict,risk_score,issues_count,high_count,user_id,created_at,overallRisk:result_json->>overallRisk')
+      .order('created_at',{ascending:false})
+      .limit(1000);
+    if(error){console.error(error);allReports=[];renderReportsList();return;}
+    const emailMap={};
+    allUsers.forEach(u=>{emailMap[u.id]=u.email;});
+    allReports=(data||[]).map(a=>({...a,user_email:emailMap[a.user_id]||null}));
+  }catch(e){console.error(e);allReports=[];}
+  reportsPage=1;
+  renderReportsList();
+}
+
+function riskInfo(a){
+  let level=a.overallRisk;
+  if(!level){
+    const hc=a.high_count||0, ic=a.issues_count||0;
+    level = hc>3?'SEVERE':hc>0?'HIGH':ic>0?'MODERATE':'LOW';
+  }
+  level=String(level).toUpperCase();
+  if(level==='SEVERE'||level==='HIGH') return {label:'High',cls:'red'};
+  if(level==='MODERATE'||level==='MEDIUM') return {label:'Medium',cls:'amber'};
+  return {label:'Low',cls:'green'};
+}
+
+function reportStatus(a){
+  return a.verdict ? {label:'Complete',cls:'green'} : {label:'Failed',cls:'red'};
+}
+
+function renderReportsList(){
+  const q=(document.getElementById('reports-search')||{}).value?.toLowerCase()||'';
+  const filtered=q?allReports.filter(a=>(a.user_email||'').toLowerCase().includes(q)||(a.pack_name||'').toLowerCase().includes(q)):allReports;
+  const totalPages=Math.max(1,Math.ceil(filtered.length/REPORTS_PER_PAGE));
+  if(reportsPage>totalPages)reportsPage=totalPages;
+  const start=(reportsPage-1)*REPORTS_PER_PAGE;
+  const pageItems=filtered.slice(start,start+REPORTS_PER_PAGE);
+
+  const tableEl=document.getElementById('reports-table');
+  if(!filtered.length){tableEl.innerHTML='<div class="empty">No reports found</div>';document.getElementById('reports-pagination').innerHTML='';return;}
+
+  tableEl.innerHTML=`<table><thead><tr><th>Property / Legal Pack</th><th>User</th><th>Date</th><th>Risk</th><th>Status</th></tr></thead><tbody>${pageItems.map(a=>{
+    const risk=riskInfo(a);
+    const status=reportStatus(a);
+    return `<tr class="report-row" onclick="openReportViewer('${a.id}')">
+      <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(a.pack_name||'Unknown')}</td>
+      <td class="mono" style="font-size:0.68rem;">${escHtml(a.user_email||(a.user_id||'').substring(0,8)+'...')}</td>
+      <td class="mono">${fmtDate(a.created_at)}</td>
+      <td><span class="badge ${risk.cls}">${risk.label}</span></td>
+      <td><span class="badge ${status.cls}">${status.label}</span></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+
+  const pag=document.getElementById('reports-pagination');
+  if(totalPages<=1){pag.innerHTML='';return;}
+  pag.innerHTML=`
+    <button class="pg-btn" ${reportsPage<=1?'disabled':''} onclick="goToReportsPage(${reportsPage-1})">‹ Prev</button>
+    <span class="pg-info">Page ${reportsPage} of ${totalPages} · ${filtered.length} report${filtered.length!==1?'s':''}</span>
+    <button class="pg-btn" ${reportsPage>=totalPages?'disabled':''} onclick="goToReportsPage(${reportsPage+1})">Next ›</button>
+  `;
+}
+
+function filterReports(){reportsPage=1;renderReportsList();}
+function goToReportsPage(n){reportsPage=n;renderReportsList();}
+
+async function openReportViewer(id){
+  document.getElementById('reports-list-view').style.display='none';
+  document.getElementById('reports-viewer-view').style.display='block';
+  document.getElementById('reports-viewer-adminbar').innerHTML='<div class="loading">Loading report...</div>';
+  document.getElementById('reports-viewer-body').innerHTML='';
+  try{
+    const {data:report,error}=await sb.from('analyses').select('*').eq('id',id).single();
+    if(error||!report){
+      document.getElementById('reports-viewer-adminbar').innerHTML='';
+      document.getElementById('reports-viewer-body').innerHTML='<div class="empty">Could not load this report.</div>';
+      return;
+    }
+    const user=allUsers.find(u=>u.id===report.user_id);
+    renderReportAdminBar(report,user);
+    const result=report.result_json||{};
+    document.getElementById('reports-viewer-body').innerHTML=`<div class="dash-report-embed">${renderStoredReport(result,report.pack_name)}</div>`;
+  }catch(e){
+    console.error(e);
+    document.getElementById('reports-viewer-adminbar').innerHTML='';
+    document.getElementById('reports-viewer-body').innerHTML='<div class="empty">Could not load this report.</div>';
+  }
+}
+
+function closeReportViewer(){
+  document.getElementById('reports-viewer-view').style.display='none';
+  document.getElementById('reports-list-view').style.display='block';
+}
+
+function renderReportAdminBar(report,user){
+  const email=user?.email||report.user_id||'Unknown user';
+  const plan=user?.plan||'pay_as_you_go';
+  const creditsLabel=plan==='pay_as_you_go' ? '1 credit (Pay As You Go)' : 'Subscription — no credit charged';
+  document.getElementById('reports-viewer-adminbar').innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;padding:14px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:11px;margin-bottom:16px;">
+      <div><div style="font-size:0.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;">User</div><div class="mono" style="font-size:0.78rem;color:var(--t1);">${escHtml(email)}</div></div>
+      <div><div style="font-size:0.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;">Date Generated</div><div class="mono" style="font-size:0.78rem;color:var(--t1);">${fmtDate(report.created_at)}</div></div>
+      <div><div style="font-size:0.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:3px;">Credits Used</div><div style="font-size:0.78rem;color:var(--t1);">${creditsLabel}</div></div>
+      <div style="margin-left:auto;">${user?`<button class="btn-sm" onclick="openUserDrawer('${user.id}')">View User Profile</button>`:''}</div>
+    </div>
+  `;
+}
+
+// ── Ported report renderer (mirrors dashboard.html renderResult/renderFlagCard for admin viewing) ──
+function renderStoredReport(result, packName){
+  if(!result || !Object.keys(result).length){
+    return '<div class="empty" style="padding:60px 20px;">No stored report data for this analysis.</div>';
+  }
+  const flags = result.flags || result.risks || [];
+  const criticalFlags = flags.filter(f => f.severity === 'critical' || f.severity === 'high');
+  const warningFlags  = flags.filter(f => f.severity === 'warning'  || f.severity === 'medium');
+  const noteFlags     = flags.filter(f => f.severity === 'note'     || f.severity === 'low');
+  const critical = criticalFlags.length, warnings = warningFlags.length;
+  const costs = result.buyerCostFigures || result.extraCosts || [];
+  const summary = result.buyerCostSummary;
+  const confirmedTotal = costs.reduce((s,c) => s + (c.numericAmount || 0), 0);
+  const risk = result.overallRisk || (critical > 3 ? 'SEVERE' : critical > 0 ? 'HIGH' : warnings > 0 ? 'MODERATE' : 'LOW');
+  const rm = {
+    LOW:     { bg:'#16a34a', border:'#16a34a', text:'#ffffff', label:'🟢 LOW RISK' },
+    MODERATE:{ bg:'#d97706', border:'#d97706', text:'#ffffff', label:'🟡 MODERATE RISK' },
+    HIGH:    { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' },
+    SEVERE:  { bg:'#b91c1c', border:'#b91c1c', text:'#ffffff', label:'🚨 SEVERE RISK' }
+  }[risk] || { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' };
+  const ia = result.investorAssessment || {};
+  const mortgage = result.mortgageability || '—';
+  const mortgageColor = (mortgage==='Cash Only'||mortgage==='Bridging Only') ? '#dc2626' : mortgage==='Restricted' ? '#d97706' : 'var(--ok)';
+  const vt = critical===0&&warnings<=2
+    ? {icon:'🟢',text:'Low legal complexity',   sub:'Appears suitable for standard buyers',                        col:'var(--ok)', bg:'rgba(22,163,74,0.1)',   border:'rgba(22,163,74,0.3)'}
+    : critical===0
+    ? {icon:'🟡',text:'Proceed with caution',   sub:'Warnings present — solicitor review advised',                col:'#d97706',   bg:'rgba(245,158,11,0.1)',  border:'rgba(245,158,11,0.3)'}
+    : critical<=3
+    ? {icon:'⚠️',text:'Solicitor review essential',sub:'Critical issues found — do not bid without legal advice', col:'var(--red)', bg:'rgba(220,38,38,0.1)',   border:'rgba(220,38,38,0.3)'}
+    : {icon:'🔴',text:'Cash buyers only likely',sub:'Multiple critical issues — high risk acquisition',           col:'#dc2626',   bg:'rgba(220,38,38,0.12)',  border:'rgba(220,38,38,0.35)'};
+
+  const ds = result.documentStatus || {};
+
+  return `<div class="report-two-pane">
+  <div class="report-left-pane">
+
+  <!-- COMPACT HEADER -->
+  <div style="padding:16px 20px;margin-bottom:0;background:${rm.bg};border:1.5px solid ${rm.border};border-bottom:none;border-radius:14px 14px 0 0;">
+    <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ffffff;opacity:0.85;margin-bottom:4px;">${rm.label}</div>
+    <div style="font-size:1.1rem;font-weight:800;color:#ffffff;line-height:1.2;">${escHtml(packName)||'Legal Pack'}</div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="report-tab-bar" style="display:flex;gap:0;border:1.5px solid ${rm.border};border-top:none;border-radius:0 0 14px 14px;background:var(--bg);margin-bottom:18px;">
+    <button class="report-tab active" onclick="showReportTab('overview',this)"  style="border-radius:0;">Overview</button>
+    <button class="report-tab"        onclick="showReportTab('flags',this)"     style="border-radius:0;">Flags (${flags.length})</button>
+    <button class="report-tab"        onclick="showReportTab('costs',this)"     style="border-radius:0;">Costs</button>
+    <button class="report-tab"        onclick="showReportTab('special',this)"   style="border-radius:0;">Special Conditions</button>
+    <button class="report-tab"        onclick="showReportTab('docs',this)"      style="border-radius:0;">Documents</button>
+    <button class="report-tab"        onclick="showReportTab('missing',this)"   style="border-radius:0;">Missing${result.missingDocuments?.length?' ('+result.missingDocuments.length+')':''}</button>
+    <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;">Checklist</button>
+  </div>
+
+  ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs.</div>` : ''}
+
+  <!-- TAB: OVERVIEW -->
+  <div id="rtab-overview" class="report-tab-panel">
+
+    <div class="verdict-mortgage-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div style="padding:16px 18px;background:${vt.bg};border:1.5px solid ${vt.border};border-radius:13px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">Investor Verdict</div>
+        <div style="font-size:1.05rem;font-weight:800;color:${vt.col};margin-bottom:4px;">${vt.icon} ${vt.text}</div>
+        <div style="font-size:0.82rem;color:var(--t2);line-height:1.5;">${vt.sub}</div>
+      </div>
+      <div style="padding:16px 18px;background:var(--bg);border:1.5px solid var(--b1);border-radius:13px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">Can I Mortgage This?</div>
+        <div style="font-size:1.05rem;font-weight:800;color:${mortgageColor};margin-bottom:4px;">${mortgage}</div>
+        <div style="font-size:0.82rem;color:var(--t2);line-height:1.5;">${result.suitableFor||(mortgage==='Standard'?'Standard residential mortgage likely acceptable':mortgage==='Cash Only'?'Most lenders will refuse — cash or bridging only':'Check with mortgage broker before bidding')}</div>
+      </div>
+    </div>
+
+    <div style="padding:16px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:12px;margin-bottom:16px;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">AI Summary</div>
+      <div style="font-size:0.9rem;color:var(--t2);line-height:1.7;">${result.summary||'Analysis complete.'}</div>
+    </div>
+
+    ${criticalFlags.length ? `
+    <div style="padding:18px 20px;background:var(--bg);border:1.5px solid rgba(220,38,38,0.35);border-radius:13px;margin-bottom:16px;">
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:14px;">🚨 Biggest Problems Found</div>
+      ${criticalFlags.slice(0,5).map((f,i) => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(220,38,38,0.12);">
+        <div style="font-size:0.95rem;font-weight:800;color:#dc2626;font-family:'DM Mono',monospace;min-width:20px;flex-shrink:0;">${i+1}.</div>
+        <div style="flex:1;">
+          <div style="font-size:0.92rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${f.title}</div>
+          <div style="font-size:0.8rem;color:var(--t2);line-height:1.5;">${f.buyerImpact||f.detail?.substring(0,140)||''}</div>
+          <div style="font-size:0.68rem;color:var(--accent);margin-top:3px;font-weight:600;">${f.documentSource ? '📄 ' + f.documentSource : ''}</div>
+        </div>
+      </div>`).join('')}
+    </div>` : `
+    <div style="padding:16px 18px;background:rgba(22,163,74,0.1);border:1.5px solid rgba(22,163,74,0.3);border-radius:13px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:1.1rem;margin-bottom:6px;">✅</div>
+      <div style="font-size:0.9rem;font-weight:700;color:var(--ok);">No critical issues found</div>
+      <div style="font-size:0.8rem;color:var(--t2);margin-top:4px;">Standard due diligence applies — see Flags tab for any warnings</div>
+    </div>`}
+
+    ${(() => {
+      const card = ([lbl,val,col]) => `<div style="padding:16px 18px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;">
+        <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:7px;">${lbl}</div>
+        <div style="font-size:0.97rem;font-weight:700;color:${col||'var(--t1)'};line-height:1.3;">${val}</div>
+      </div>`;
+      const propFacts = [
+        result.tenure ? ['Tenure', result.tenure, null] : null,
+        result.leaseYears ? ['Lease Remaining', result.leaseYears+' years', result.leaseYears<85?'#dc2626':null] : null,
+        result.groundRent&&result.groundRent!=='N/A' ? ['Ground Rent', result.groundRent, null] : null,
+        result.serviceCharge&&result.serviceCharge!=='N/A' ? ['Service Charge', result.serviceCharge, null] : null,
+        result.titleNumber ? ['Title Number', result.titleNumber, null] : null,
+        result.seller ? ['Seller', result.seller, null] : null,
+      ].filter(Boolean);
+      const auctionFacts = [
+        (result.guidePrice || result._listingMeta?.guidePrice) ? ['Guide Price', result.guidePrice || result._listingMeta?.guidePrice, null] : null,
+        (result.auctionHouse || result._listingMeta?.auctionHouse) ? ['Auction House', result.auctionHouse || result._listingMeta?.auctionHouse, null] : null,
+        result._listingMeta?.auctionDate ? ['Auction Date', result._listingMeta.auctionDate, null] : null,
+        result._listingMeta?.auctionTime ? ['Auction Time', result._listingMeta.auctionTime, null] : null,
+        result._listingMeta?.auctionVenue ? ['Venue', result._listingMeta.auctionVenue, null] : null,
+        result._listingMeta?.lotNumber ? ['Lot Number', result._listingMeta.lotNumber, null] : null,
+      ].filter(Boolean);
+      const sectionLabel = txt => `<div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:7px;">${txt}</div>`;
+      const grid = cards => `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">${cards.map(card).join('')}</div>`;
+      return [
+        propFacts.length ? sectionLabel('Property') + grid(propFacts) : '',
+        auctionFacts.length ? `<div style="margin-top:${propFacts.length?'14px':'0'};">` + sectionLabel('Auction') + grid(auctionFacts) + '</div>' : '',
+      ].join('');
+    })()}
+
+    ${ia.cautionaryNote ? `
+    <div style="margin-top:14px;padding:14px 16px;background:var(--bg2);border:1px solid var(--b1);border-radius:11px;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Investor Assessment</div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;">
+        ${(()=>{
+          const pills=[];
+          const mtg=mortgage||'';
+          if(mtg==='Standard')       pills.push(['✅','Standard Mortgage Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
+          else if(mtg==='Restricted')pills.push(['⚠️','Restricted Mortgage','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
+          else if(mtg==='Bridging Only') pills.push(['🟠','Bridging / Specialist Finance','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
+          else if(mtg==='Cash Only'||ia.mortgageable===false) pills.push(['❌','Standard Mortgage Unlikely','rgba(220,38,38,0.1)','#dc2626','rgba(220,38,38,0.3)']);
+          if(mtg==='Cash Only'||mtg==='Bridging Only') pills.push(['✅','Cash Buyer Possible','rgba(22,163,74,0.12)','#16a34a','rgba(22,163,74,0.35)']);
+          if(critical>0)             pills.push(['⚠️','Solicitor Review Required','rgba(245,158,11,0.12)','#d97706','rgba(245,158,11,0.35)']);
+          if(ia.resaleable===false)  pills.push(['🟠','Resale Risk','rgba(234,88,12,0.1)','#ea580c','rgba(234,88,12,0.3)']);
+          return pills.map(([icon,label,bg,col,border])=>`<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid ${border};background:${bg};font-size:0.75rem;font-weight:700;color:${col};">${icon} ${label}</span>`).join('');
+        })()}
+      </div>
+      <div class="ia-check-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">
+        ${[['Mortgageable',ia.mortgageable],['Resaleable',ia.resaleable],['Tenantable',ia.tenantable]].map(([l,v])=>`<div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:1.2rem;margin-bottom:3px;">${v?'✅':'❌'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">${l}</div></div>`).join('')}
+        <div style="text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--b1);"><div style="font-size:0.82rem;font-weight:800;color:var(--t1);margin-bottom:3px;">${ia.insurable||'—'}</div><div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--t3);">Insurable</div></div>
+      </div>
+      <div style="font-size:0.82rem;color:var(--t2);line-height:1.6;font-style:italic;">${ia.cautionaryNote}</div>
+    </div>` : ''}
+
+    ${result.titleAnalysis?.whatBuyerCannotDo ? `
+    <div style="margin-top:14px;padding:14px 16px;background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.3);border-radius:11px;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:7px;">What the Buyer Cannot Do</div>
+      <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${result.titleAnalysis.whatBuyerCannotDo}</div>
+    </div>` : ''}
+
+    ${(()=>{
+      const checks=[]
+        .concat(result.mortgageability!=='Standard'?['Verify lender acceptability with a mortgage broker before bidding']:[])
+        .concat(result.leaseYears&&result.leaseYears<85?['Get a lease extension quote — budget £5k–£20k+ for short leases']:[])
+        .concat(critical>0?['Instruct a solicitor to review the full legal pack before placing a bid']:[])
+        .concat(result.missingDocuments?.length?['Obtain missing documents: '+result.missingDocuments.slice(0,2).map(d=>typeof d==='string'?d:d.document).join(', ')]:[])
+        .concat(['Confirm the seller has legal authority to sell at auction','Set your maximum bid limit before auction day — do not exceed it','Calculate total budget including SDLT, solicitor fees and any renovation']);
+      return `<div style="margin-top:16px;padding:16px 18px;background:var(--bg2);border:1px solid var(--b1);border-radius:13px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:11px;">Before Bidding, Verify:</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${checks.slice(0,5).map(item=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-radius:9px;">
+            <span style="margin-top:2px;flex-shrink:0;">☐</span>
+            <span style="font-size:0.84rem;color:var(--t1);line-height:1.5;">${item}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    })()}
+  </div>
+
+  <!-- TAB: FLAGS -->
+  <div id="rtab-flags" class="report-tab-panel" style="display:none;">
+    ${flags.length ? `
+      <div style="display:flex;justify-content:flex-end;gap:7px;margin-bottom:14px;">
+        <button onclick="expandAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;">▼ Expand all</button>
+        <button onclick="collapseAllFlags()" style="background:none;border:1px solid var(--b1);color:var(--t3);font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:6px;cursor:pointer;">▶ Collapse all</button>
+      </div>
+      ${criticalFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin-bottom:10px;">Critical (${criticalFlags.length})</div>${criticalFlags.map((f,i)=>renderFlagCard(f,i)).join('')}` : ''}
+      ${warningFlags.length  ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#d97706;margin:14px 0 10px;">Warnings (${warningFlags.length})</div>${warningFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+i)).join('')}` : ''}
+      ${noteFlags.length     ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin:14px 0 10px;">Notes (${noteFlags.length})</div>${noteFlags.map((f,i)=>renderFlagCard(f,criticalFlags.length+warningFlags.length+i)).join('')}` : ''}
+    ` : `<div style="padding:24px;text-align:center;color:var(--ok);">✅ No significant flags found</div>`}
+  </div>
+
+  <!-- TAB: COSTS -->
+  <div id="rtab-costs" class="report-tab-panel" style="display:none;">
+    ${costs.length ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);">Confirmed Buyer Costs — Expressly Stated in Documents</div>
+      ${confirmedTotal > 0 ? `<div style="font-size:1.4rem;font-weight:800;color:#d97706;font-family:'DM Mono',monospace;">£${confirmedTotal.toLocaleString()}</div>` : ''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+      ${costs.map(cost => `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 16px;background:var(--bg);border:1px solid var(--b1);border-radius:12px;">
+        <div style="flex:1;">
+          <div style="font-size:0.9rem;font-weight:700;color:var(--t1);margin-bottom:4px;">${cost.label}${cost.mandatory?'<span style="font-size:0.58rem;font-weight:800;color:#dc2626;background:#fef2f2;padding:2px 6px;border-radius:4px;margin-left:6px;">MANDATORY</span>':''}</div>
+          ${cost.evidence?`<div style="font-size:0.7rem;color:var(--t3);line-height:1.5;margin-top:2px;">📄 ${cost.evidence}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'DM Mono',monospace;font-weight:800;font-size:1.05rem;color:#d97706;">${cost.amount||'—'}${cost.vatApplies?'<span style="font-size:0.68rem;color:var(--t3);"> + VAT</span>':''}</div>
+          ${cost.frequency&&cost.frequency!=='one-off'&&cost.frequency!=='unknown'?`<div style="font-size:0.65rem;color:var(--t3);">${cost.frequency}</div>`:''}
+        </div>
+      </div>`).join('')}
+    </div>` : `<div style="padding:20px;text-align:center;color:var(--t3);">No confirmed buyer cost figures found in documents</div>`}
+    ${summary?.unquantifiedLiabilities?.length ? `
+    <div style="margin-top:18px;border:1.5px solid rgba(245,158,11,0.45);border-radius:13px;overflow:hidden;">
+      <div style="padding:13px 18px;background:rgba(245,158,11,0.1);border-bottom:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1rem;">⚠️</span>
+        <div>
+          <div style="font-size:0.82rem;font-weight:800;color:var(--warn);">Potential Buyer Liabilities — No Figure Stated</div>
+          <div style="font-size:0.7rem;color:var(--t2);margin-top:2px;">These obligations were identified in the documents but no cost figure was given.</div>
+        </div>
+      </div>
+      <div style="background:rgba(245,158,11,0.04);padding:8px 12px;display:flex;flex-direction:column;gap:6px;">
+        ${summary.unquantifiedLiabilities.map(l=>{
+          const dotIdx = l.indexOf('.');
+          const hasTitle = dotIdx > 0 && dotIdx < 80;
+          const title = hasTitle ? l.slice(0, dotIdx).trim() : null;
+          const desc  = hasTitle ? l.slice(dotIdx + 1).trim() : l;
+          return `<div style="padding:11px 14px;background:var(--bg);border:1px solid rgba(245,158,11,0.3);border-radius:9px;">
+            ${title ? `<div style="font-size:0.8rem;font-weight:700;color:var(--warn);margin-bottom:4px;">⚠ ${title}</div>` : `<div style="font-size:0.72rem;font-weight:700;color:var(--warn);margin-bottom:3px;">⚠ Unquantified Liability</div>`}
+            ${desc ? `<div style="font-size:0.83rem;color:var(--t1);line-height:1.55;font-weight:500;">${desc}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : ''}
+    <div style="font-size:0.68rem;color:var(--t3);font-style:italic;line-height:1.6;">${summary?.costWarning||'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>
+  </div>
+
+  <!-- TAB: SPECIAL CONDITIONS -->
+  <div id="rtab-special" class="report-tab-panel" style="display:none;">
+    ${(() => {
+      const sc = result.specialConditions;
+      const specialFlags = flags.filter(f => {
+        const cat=(f.category||'').toLowerCase(), title=(f.title||'').toLowerCase(), src=(f.documentSource||'').toLowerCase();
+        return cat.includes('special')||cat.includes('auction')||cat.includes('condition')||title.includes('special condition')||title.includes('auction condition')||title.includes('seller legal fee')||title.includes('buyer legal fee')||title.includes('completion')||title.includes('deposit')||src.includes('special condition')||src.includes('auction condition');
+      });
+      const cacFlags = flags.filter(f => {const s=(f.documentSource||'').toLowerCase(),t=(f.title||'').toLowerCase();return s.includes('common auction')||t.includes('common auction');});
+      return `
+      <div style="padding:13px 15px;background:var(--accent-bg);border:1px solid var(--accent-mid);border-radius:11px;font-size:0.84rem;color:var(--t2);line-height:1.65;margin-bottom:18px;">
+        Auction properties are sold under <strong style="color:var(--t1);">Common Auction Conditions</strong> plus any <strong style="color:var(--t1);">Special Conditions of Sale</strong> added by the seller.
+      </div>
+      ${cacFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">Common Auction Conditions — Issues Found</div>${cacFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">No specific issues flagged in Common Auction Conditions.</div>`}
+      ${specialFlags.length ? `<div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#dc2626;margin:14px 0 10px;">Special Conditions — Issues Found (${specialFlags.length})</div>${specialFlags.map(f=>renderFlagCard(f)).join('')}` : `<div style="padding:11px 14px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;font-size:0.84rem;color:var(--t2);margin-bottom:14px;">${sc||'No separate Special Conditions document was identified.'}</div>`}
+      <div style="padding:12px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;font-size:0.78rem;color:var(--warn);line-height:1.6;">
+        ⚠️ <strong>Always read the full Special Conditions before bidding.</strong> They are legally binding from the moment the hammer falls and cannot be renegotiated.
+      </div>`;
+    })()}
+  </div>
+
+  <!-- TAB: DOCUMENTS -->
+  <div id="rtab-docs" class="report-tab-panel" style="display:none;">
+    ${(() => {
+      const byDoc = {};
+      for (const f of flags) { const src=f.documentSource||'Unspecified'; if(!byDoc[src])byDoc[src]=[]; byDoc[src].push(f); }
+      const sc = (c) => c==='critical'||c==='high'?'#dc2626':c==='warning'||c==='medium'?'#d97706':'var(--t3)';
+      return `
+      ${ds.provided?.length ? `<div style="margin-bottom:16px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ok);margin-bottom:10px;">✓ Provided & Reviewed (${ds.provided.length})</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          ${ds.provided.map(doc => {
+            const docFlags = byDoc[doc.document] || Object.entries(byDoc).find(([k])=>k.toLowerCase().includes((doc.document||'').toLowerCase().slice(0,10)))?.[1] || [];
+            const crit = docFlags.filter(f=>f.severity==='critical'||f.severity==='high').length;
+            const warn = docFlags.filter(f=>f.severity==='warning'||f.severity==='medium').length;
+            return `<div style="background:var(--bg);border:1px solid var(--b1);border-radius:11px;overflow:hidden;">
+              <div style="padding:11px 14px;display:flex;align-items:center;gap:10px;">
+                <span>📄</span>
+                <div style="flex:1;"><div style="font-size:0.86rem;font-weight:700;color:var(--t1);">${doc.document}</div>${doc.evidence?`<div style="font-size:0.68rem;color:var(--t3);margin-top:1px;">${doc.evidence}</div>`:''}</div>
+                <div style="display:flex;gap:5px;align-items:center;">
+                  ${crit?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(220,38,38,0.12);color:#dc2626;">${crit} critical</span>`:''}
+                  ${warn?`<span style="font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:#d97706;">${warn} warning</span>`:''}
+                  ${!crit&&!warn?`<span style="font-size:0.6rem;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--okbg);color:var(--ok);">✓ clear</span>`:''}
+                </div>
+              </div>
+              <div style="border-top:1px solid var(--b1);padding:12px 14px;">
+                ${docFlags.length ? docFlags.map(f=>`<div style="padding:7px 10px;border-radius:7px;border-left:3px solid ${sc(f.severity)};background:var(--bg2);margin-bottom:5px;">
+                  <div style="font-size:0.82rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${f.title}</div>
+                  <div style="font-size:0.74rem;color:var(--t2);line-height:1.5;">${f.buyerImpact||f.detail?.substring(0,120)||''}</div>
+                  ${f.evidence?`<div style="font-size:0.67rem;color:var(--t3);margin-top:3px;font-style:italic;">"${f.evidence}"</div>`:''}
+                </div>`).join('') : `<div style="font-size:0.82rem;color:var(--ok);">✓ No specific issues flagged from this document.</div>`}
+              </div>
+            </div>`;
+          }).join('')}
+        </div></div>` : ''}
+      ${ds.notIdentified?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--warn);margin-bottom:10px;">⚠ Not Found (${ds.notIdentified.length})</div>
+        ${ds.notIdentified.map(doc=>`<div style="padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-left:3px solid ${doc.importance==='critical'?'#dc2626':'#d97706'};border-radius:0 9px 9px 0;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${doc.importance==='critical'?'🔴':'🟡'} ${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
+        </div>` : ''}
+      ${ds.referencedButNotFound?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;">🔗 Referenced But Not Provided</div>
+        ${ds.referencedButNotFound.map(doc=>`<div style="padding:10px 13px;background:var(--bg);border:1px solid var(--b1);border-left:3px solid var(--t3);border-radius:0 9px 9px 0;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
+        </div>` : ''}
+      ${ds.optionalBuyerDueDiligence?.length ? `<div style="margin-bottom:14px;"><div style="font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px;">☑ Optional Buyer Due Diligence</div>
+        <div style="font-size:0.78rem;color:var(--t2);margin-bottom:8px;">Not normally expected in an auction legal pack — arrange independently if needed.</div>
+        ${ds.optionalBuyerDueDiligence.map(doc=>`<div style="padding:10px 13px;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;margin-bottom:6px;"><div style="font-size:0.84rem;font-weight:700;color:var(--t1);margin-bottom:2px;">📋 ${doc.document}</div><div style="font-size:0.76rem;color:var(--t2);">${doc.reason||''}</div></div>`).join('')}
+        </div>` : ''}
+      ${!ds.provided?.length && !ds.notIdentified?.length && !ds.referencedButNotFound?.length && !ds.optionalBuyerDueDiligence?.length ? `<div class="empty">No document status data available</div>` : ''}
+      `;
+    })()}
+  </div>
+
+  <!-- TAB: MISSING -->
+  <div id="rtab-missing" class="report-tab-panel" style="display:none;">
+    ${result.missingDocuments?.length ? `
+      <div style="padding:13px 15px;background:rgba(220,38,38,0.09);border:1.5px solid rgba(220,38,38,0.35);border-radius:11px;margin-bottom:14px;">
+        <div style="font-size:0.9rem;font-weight:700;color:#dc2626;margin-bottom:4px;">⚠️ ${result.missingDocuments.length} document${result.missingDocuments.length!==1?'s':''} missing</div>
+        <div style="font-size:0.8rem;color:var(--t2);">Buyer is bidding without full information. Each absence increases risk.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        ${result.missingDocuments.map(d => {
+          const doc=typeof d==='string'?d:d.document;
+          const risk=typeof d==='object'?d.risk:null;
+          const imp=typeof d==='object'?d.importance:'moderate';
+          return `<div style="padding:12px 14px;background:var(--bg);border:1px solid var(--b1);border-left:4px solid ${imp==='critical'?'#dc2626':'#d97706'};border-radius:0 10px 10px 0;">
+            <div style="font-size:0.88rem;font-weight:700;color:var(--t1);margin-bottom:${risk?'5px':'0'};">${imp==='critical'?'🔴':'🟡'} ${doc}</div>
+            ${risk?`<div style="font-size:0.78rem;color:var(--t2);line-height:1.5;">${risk}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>` : `<div style="padding:24px;text-align:center;color:var(--ok);font-size:0.95rem;">✅ No missing documents flagged</div>`}
+  </div>
+
+  <!-- TAB: CHECKLIST -->
+  <div id="rtab-checklist" class="report-tab-panel" style="display:none;">
+    <div style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:12px;">Before Bidding, Buyer Should Still Check:</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      ${([]
+        .concat(result.mortgageability !== 'Standard' ? ['Verify lender acceptability with a mortgage broker'] : [])
+        .concat(result.leaseYears && result.leaseYears < 85 ? ['Get a lease extension quote — budget £5k–£20k+'] : [])
+        .concat(critical > 0 ? ['Instruct a solicitor to review the full legal pack before bidding'] : [])
+        .concat(result.missingDocuments?.length ? result.missingDocuments.slice(0,3).map(d=>'Obtain: '+(typeof d==='string'?d:d.document)) : [])
+        .concat(['Book a structural survey if property condition is unknown','Calculate total budget including SDLT, fees and renovation','Confirm seller has legal authority to sell at auction','Set maximum bid limit before auction day and do not exceed it'])
+      ).map(item => `<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 13px;background:var(--bg);border:1px solid var(--b1);border-radius:10px;">
+        <span style="margin-top:2px;flex-shrink:0;">☐</span>
+        <span style="font-size:0.86rem;color:var(--t1);line-height:1.55;">${item}</span>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  </div><!-- /report-left-pane -->
+</div>`;
+}
+
+function showReportTab(tab, btn){
+  const scope = btn ? btn.closest('.dash-report-embed') : document.querySelector('.dash-report-embed');
+  if(!scope) return;
+  scope.querySelectorAll('.report-tab-panel').forEach(p => p.style.display = 'none');
+  scope.querySelectorAll('.report-tab').forEach(b => b.classList.remove('active'));
+  const panel = scope.querySelector('#rtab-' + tab);
+  if (panel) panel.style.display = 'block';
+  if (btn) btn.classList.add('active');
+}
+
+function renderFlagCard(f, index) {
+  const sev = f.severity || 'note';
+  const isCritical = sev==='critical'||sev==='high';
+  const isWarning = sev==='warning'||sev==='medium';
+  const borderColor = isCritical?'#dc2626':isWarning?'#f59e0b':'rgba(148,163,184,0.4)';
+  const sevLabel = isCritical?'CRITICAL':isWarning?'WARNING':'NOTE';
+  const sevBg = isCritical?'rgba(220,38,38,0.12)':isWarning?'rgba(245,158,11,0.12)':'rgba(100,116,139,0.08)';
+  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'var(--t3)';
+  const highlightColor = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(245,158,11,0.1)':'rgba(100,116,139,0.07)';
+
+  const _t = ((f.category||'') + ' ' + (f.title||'') + ' ' + (f.buyerImpact||'')).toLowerCase();
+  const _impTags = [];
+  if (/mortgage|lender|remortgage|unmortgageable|lend/.test(_t))                               _impTags.push(['🔴','Mortgage Risk',  'rgba(185,28,28,0.1)','#dc2626']);
+  if (/resale|re-sale|sell on|saleability|unmarketable/.test(_t))                              _impTags.push(['🟠','Resale Risk',    'rgba(194,65,12,0.1)','#ea580c']);
+  if (/covenant|dispute|adverse|possessory|easement|right of way|chancel|overriding|title/.test(_t)) _impTags.push(['🟡','Legal Risk',  'rgba(146,64,14,0.1)','#d97706']);
+  if (/completion|timescale|short lease|deadline|notice|vacant possession|delay/.test(_t))     _impTags.push(['🔵','Time Risk',      'rgba(30,64,175,0.1)','#3b82f6']);
+  if (/\bcost\b|fee|charge|sdlt|payment|contribution|levy|ground rent|service charge/.test(_t)) _impTags.push(['💷','Cost Risk',    'rgba(21,128,61,0.1)','#16a34a']);
+  if (/structural|survey|planning|repair|asbestos|damp|subsidence|drainage|condition|defect/.test(_t)) _impTags.push(['🏚','Condition Risk','rgba(109,40,217,0.1)','#7c3aed']);
+  const impTagsHtml = _impTags.map(([icon,label,bg,col]) =>
+    `<span style="font-size:0.59rem;font-weight:700;padding:2px 7px;border-radius:4px;background:${bg};color:${col};border:1px solid ${col.replace(')',',0.3)').replace('rgb','rgba')};white-space:nowrap;">${icon} ${label}</span>`).join('');
+
+  const detail = f.detail || f.description || '';
+  const hasEvidence = f.documentSource || f.evidence;
+  const evidenceHtml = hasEvidence ? `
+    <div style="margin-top:12px;padding:10px 12px;background:${highlightColor};border-radius:8px;border-left:3px solid ${borderColor};">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${sevColor};margin-bottom:5px;">📄 Evidence</div>
+      ${f.documentSource ? `<div style="font-size:0.78rem;font-weight:600;color:var(--t1);margin-bottom:${f.evidence?'4px':'0'};">
+        <span style="background:${highlightColor};border:1px solid ${borderColor};padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--t2);">${f.documentSource}</span>
+      </div>` : ''}
+      ${f.evidence ? `<div style="font-size:0.78rem;color:var(--t2);line-height:1.55;font-style:italic;">"${f.evidence}"</div>` : ''}
+    </div>` : '';
+
+  const idx = index === undefined ? 0 : index;
+  const isFirst = idx === 0;
+  const cardBorderColor = isFirst ? borderColor : 'var(--b1)';
+  const cardShadow = isFirst ? '0 2px 12px rgba(0,0,0,0.06)' : '';
+
+  return `<div id="flag-${idx}" data-border="${borderColor}" style="padding:14px 18px;background:var(--bg);border:1px solid ${cardBorderColor};border-left:4px solid ${borderColor};border-radius:0 14px 14px 0;margin-bottom:10px;transition:border-color 0.15s,box-shadow 0.15s;box-shadow:${cardShadow};">
+
+    <div onclick="toggleFlag(${idx})" style="cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;user-select:none;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap;">
+          <span style="font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:4px;background:${sevBg};color:${sevColor};letter-spacing:0.5px;">${sevLabel}</span>
+          ${f.category ? `<span style="font-size:0.62rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;">${f.category}</span>` : ''}
+          ${impTagsHtml}
+        </div>
+        <div style="font-size:0.97rem;font-weight:700;color:var(--t1);line-height:1.35;">${f.title}</div>
+      </div>
+      <span id="flag-chev-${idx}" style="color:var(--t3);font-size:0.7rem;flex-shrink:0;padding-top:4px;">${isFirst ? '▼' : '▶'}</span>
+    </div>
+
+    <div id="flag-body-${idx}" style="display:${isFirst ? 'block' : 'none'};">
+      ${detail ? `
+      <div style="margin-top:10px;margin-bottom:${(f.buyerImpact||f.investorImpact)?'10px':'0'};">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:5px;">What this means</div>
+        <div style="font-size:0.85rem;color:var(--t2);line-height:1.7;">${detail}</div>
+      </div>` : ''}
+      ${(f.buyerImpact||f.investorImpact) ? `
+      <div style="padding:10px 12px;background:${sevBg};border-radius:8px;">
+        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:${sevColor};margin-bottom:4px;">Buyer Impact</div>
+        <div style="font-size:0.84rem;font-weight:600;color:${isCritical?'#dc2626':isWarning?'#d97706':'var(--t2)'};line-height:1.55;">⚡ ${f.buyerImpact||f.investorImpact}</div>
+      </div>` : ''}
+      ${evidenceHtml}
+    </div>
+
+  </div>`;
+}
+
+function toggleFlag(idx) {
+  const body = document.getElementById('flag-body-' + idx);
+  const chev = document.getElementById('flag-chev-' + idx);
+  const card = document.getElementById('flag-' + idx);
+  if (!body) return;
+  const willOpen = body.style.display === 'none';
+  body.style.display = willOpen ? 'block' : 'none';
+  if (chev) chev.textContent = willOpen ? '▼' : '▶';
+  if (card) {
+    card.style.borderColor = willOpen ? (card.dataset.border || 'var(--b1)') : 'var(--b1)';
+    card.style.boxShadow = willOpen ? '0 2px 12px rgba(0,0,0,0.06)' : '';
+  }
+}
+
+function expandAllFlags() {
+  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
+    const idx = b.id.slice(10);
+    b.style.display = 'block';
+    const chev = document.getElementById('flag-chev-' + idx);
+    const card = document.getElementById('flag-' + idx);
+    if (chev) chev.textContent = '▼';
+    if (card) { card.style.borderColor = card.dataset.border || ''; card.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'; }
+  });
+}
+
+function collapseAllFlags() {
+  document.querySelectorAll('[id^="flag-body-"]').forEach(b => {
+    const idx = b.id.slice(10);
+    b.style.display = 'none';
+    const chev = document.getElementById('flag-chev-' + idx);
+    const card = document.getElementById('flag-' + idx);
+    if (chev) chev.textContent = '▶';
+    if (card) { card.style.borderColor = 'var(--b1)'; card.style.boxShadow = ''; }
+  });
+}
+
 function quickGrant(userId,email){
   const sel=document.getElementById('grant-user-select');
   if(sel)sel.value=userId;
@@ -697,6 +1462,7 @@ async function submitGrantCredits(){
     }
     toast('✓ Granted '+credits+' credit'+(credits>1?'s':'')+' to '+(user?.email||userId));
     await loadUsers();renderAll();
+    refreshUserDrawerIfOpen(userId);
   }catch(e){toast('Failed to grant credits');}
 }
 
@@ -708,7 +1474,7 @@ async function submitChangePlan(){
   try{
     const r=await fetch(API_BASE+'/admin/change-plan',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({userId,plan})});
     const d=await r.json();
-    if(d.ok){toast('✓ Plan updated for '+(user?.email||userId));await loadUsers();renderAll();}
+    if(d.ok){toast('✓ Plan updated for '+(user?.email||userId));await loadUsers();renderAll();refreshUserDrawerIfOpen(userId);}
     else toast('Failed: '+(d.error||'Unknown'));
   }catch(e){toast('Failed to change plan');}
 }
@@ -720,6 +1486,7 @@ function showPanel(id,el){
   el.classList.add('active');
   if(id==='errors')loadErrors();
   if(id==='support')loadSupport();
+  if(id==='reports')loadReports();
 }
 
 function calcMRR(){return allUsers.reduce((s,u)=>{if(u.plan==='standard')return s+69.99;if(u.plan==='pro')return s+119.99;return s;},0);}
@@ -782,7 +1549,7 @@ async function submitRemoveCredit(){
   try{
     const r=await fetch(API_BASE+'/admin/remove-credit',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+authToken},body:JSON.stringify({userId,amount})});
     const d=await r.json();
-    if(d.ok){toast('✓ Removed '+amount+' credit'+(amount>1?'s':'')+' from '+(user?.email||userId)+' (balance: '+d.newBalance+')');await loadUsers();renderAll();}
+    if(d.ok){toast('✓ Removed '+amount+' credit'+(amount>1?'s':'')+' from '+(user?.email||userId)+' (balance: '+d.newBalance+')');await loadUsers();renderAll();refreshUserDrawerIfOpen(userId);}
     else toast('Failed: '+(d.error||'Unknown'));
   }catch(e){toast('Failed to remove credits');}
 }

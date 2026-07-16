@@ -847,6 +847,7 @@ function closeSettings() { document.getElementById('drawer-overlay').classList.r
 var SUPABASE_URL = 'https://ktrbbaakmlwmhyvpufcs.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
 var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var pendingHomepageSignup = false;
 
 function initAuth() {
   // Check for existing session
@@ -862,6 +863,7 @@ function initAuth() {
     if (event === 'SIGNED_IN' && session) {
       authToken = session.access_token;
       localStorage.setItem('lp_token', authToken);
+      if (pendingHomepageSignup) return; // signUp() drives the onboarding survey + redirect for fresh signups
       closeModal();
       // Always redirect to dashboard after sign in
       window.location.href = '/dashboard.html';
@@ -936,6 +938,7 @@ async function signUp(email, password, firstName, lastName) {
   try {
     document.getElementById('auth-submit-btn').textContent = 'Creating account...';
     document.getElementById('auth-submit-btn').disabled = true;
+    pendingHomepageSignup = true;
     var result = await supabaseClient.auth.signUp({
       email: email,
       password: password,
@@ -948,21 +951,116 @@ async function signUp(email, password, firstName, lastName) {
       }
     });
     if (result.error) throw new Error(result.error.message);
-    // If session returned immediately (email confirm disabled), redirect
+    // If session returned immediately (email confirm disabled), show the onboarding survey then proceed
     if (result.data.session) {
-      window.location.href = '/dashboard.html';
+      authToken = result.data.session.access_token;
+      localStorage.setItem('lp_token', authToken);
+      pendingHomepageSignup = false;
+      closeModal();
+      await lpaiObMaybeStart(result.data.user.id);
       return;
     }
     // Email confirmation required — tell user clearly
+    pendingHomepageSignup = false;
     closeModal();
     showToast('Almost there! Check your email and click the confirmation link, then sign in.');
     document.getElementById('auth-submit-btn').textContent = 'Create Account';
     document.getElementById('auth-submit-btn').disabled = false;
   } catch(e) {
+    pendingHomepageSignup = false;
     document.getElementById('auth-error').textContent = e.message;
     document.getElementById('auth-error').style.display = 'block';
     document.getElementById('auth-submit-btn').textContent = 'Create Account';
     document.getElementById('auth-submit-btn').disabled = false;
+  }
+}
+
+// ── HOMEPAGE ONBOARDING SURVEY (fresh signups only) ─────────────────────────
+var lpaiObRole = null, lpaiObIntent = null, lpaiObSource = null;
+
+function proceedAfterSignup() {
+  // Whatever normally runs after a signed-in session is established
+  window.location.href = '/dashboard.html';
+}
+
+async function lpaiObMaybeStart(userId) {
+  try {
+    var profileResult = await supabaseClient.from('users').select('onboarding_completed').eq('id', userId).maybeSingle();
+    if (!profileResult.error && profileResult.data && profileResult.data.onboarding_completed) {
+      proceedAfterSignup();
+      return;
+    }
+  } catch (e) {
+    console.error('Onboarding status check failed:', e);
+  }
+  lpaiObOpen();
+}
+
+function lpaiObOpen() {
+  lpaiObRole = null; lpaiObIntent = null; lpaiObSource = null;
+  document.querySelectorAll('#lpai-ob-overlay .lpai-ob-option').forEach(function(opt) { opt.classList.remove('selected'); });
+  document.getElementById('lpai-ob-error').style.display = 'none';
+  document.getElementById('lpai-ob-spinner').style.display = 'block';
+  document.getElementById('lpai-ob-loading-text').style.display = 'block';
+  lpaiObGoToStep(1);
+  document.getElementById('lpai-ob-overlay').classList.add('open');
+}
+
+function lpaiObGoToStep(step) {
+  document.querySelectorAll('#lpai-ob-overlay .lpai-ob-step').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('lpai-ob-step-' + step).classList.add('active');
+  var numStep = (step === 'loading') ? 3 : step;
+  for (var i = 1; i <= 3; i++) {
+    var label = document.getElementById('lpai-ob-label-' + i);
+    if (i <= numStep) label.classList.add('active'); else label.classList.remove('active');
+  }
+  document.getElementById('lpai-ob-progress-fill').style.width = ((step === 'loading') ? 100 : (step * 100 / 3)) + '%';
+}
+
+function lpaiObSelectOption(step, btnEl) {
+  var value = btnEl.getAttribute('data-value');
+  var container = btnEl.parentElement;
+  Array.prototype.forEach.call(container.querySelectorAll('.lpai-ob-option'), function(opt) { opt.classList.remove('selected'); });
+  btnEl.classList.add('selected');
+  if (step === 1) lpaiObRole = value;
+  if (step === 2) lpaiObIntent = value;
+  if (step === 3) lpaiObSource = value;
+  setTimeout(function() {
+    if (step < 3) {
+      lpaiObGoToStep(step + 1);
+    } else {
+      lpaiObGoToStep('loading');
+      lpaiObSubmit();
+    }
+  }, 220);
+}
+
+async function lpaiObSubmit() {
+  document.getElementById('lpai-ob-error').style.display = 'none';
+  document.getElementById('lpai-ob-spinner').style.display = 'block';
+  document.getElementById('lpai-ob-loading-text').style.display = 'block';
+  try {
+    var resp = await fetch(API_BASE + '/api/onboarding', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: JSON.stringify({
+        role: lpaiObRole,
+        intent: lpaiObIntent,
+        source: lpaiObSource,
+        signup_source: 'homepage'
+      })
+    });
+    if (!resp.ok) throw new Error('Could not save your answers. Please try again.');
+    document.getElementById('lpai-ob-overlay').classList.remove('open');
+    proceedAfterSignup();
+  } catch (e) {
+    document.getElementById('lpai-ob-spinner').style.display = 'none';
+    document.getElementById('lpai-ob-loading-text').style.display = 'none';
+    document.getElementById('lpai-ob-error-text').textContent = e.message || 'Something went wrong. Please try again.';
+    document.getElementById('lpai-ob-error').style.display = 'block';
   }
 }
 
@@ -1837,6 +1935,11 @@ applySettings(currentSettings);
 initAuth();
 updateCount();
 
+// Auto-open the sign-in modal when linked here with ?login=1 (e.g. "Sign in" link from the onboarding funnel)
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  openModal('login');
+}
+
 // ── ACCOUNT MODAL ─────────────────────────────────────────────────────────────
 function openAccountModal() {
   closeSettings();
@@ -1959,6 +2062,100 @@ openSettings = function() {
   </div>
   <div class="token-sidebar-footer">
     <button class="token-close-btn" onclick="hideTokenSidebar()">Hide counter</button>
+  </div>
+</div>
+
+<!-- HOMEPAGE ONBOARDING SURVEY MODAL -->
+<style>
+.lpai-ob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px;}
+.lpai-ob-overlay.open{display:flex;}
+.lpai-ob-shell{background:var(--bg2);border:1px solid var(--b1);border-radius:20px;padding:36px 32px;width:min(460px,100%);box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+.lpai-ob-progress-wrap{margin-bottom:28px;}
+.lpai-ob-progress-steps{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;}
+.lpai-ob-progress-steps span.active{color:var(--red);}
+.lpai-ob-progress-track{width:100%;height:6px;background:var(--bg4);border-radius:99px;overflow:hidden;}
+.lpai-ob-progress-fill{height:100%;width:33.33%;background:linear-gradient(90deg,var(--red),#a78bfa);border-radius:99px;transition:width 0.35s ease;}
+.lpai-ob-step{display:none;}
+.lpai-ob-step.active{display:block;animation:lpaiObFade 0.3s ease;}
+@keyframes lpaiObFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.lpai-ob-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--t3);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:18px;transition:color 0.15s;}
+.lpai-ob-back:hover{color:var(--red);}
+.lpai-ob-h1{font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;line-height:1.25;color:var(--t1);}
+.lpai-ob-sub{font-size:0.88rem;color:var(--t2);margin-bottom:26px;line-height:1.5;}
+.lpai-ob-options{display:flex;flex-direction:column;gap:12px;}
+.lpai-ob-option{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:15px 17px;background:var(--bg3);border:1.5px solid var(--b1);border-radius:14px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:600;color:var(--t1);transition:all 0.15s ease;}
+.lpai-ob-option:hover{border-color:var(--red);background:var(--bg4);transform:translateY(-1px);}
+.lpai-ob-option.selected{border-color:var(--red);background:var(--bg4);box-shadow:0 0 0 3px rgba(124,58,237,0.25);}
+.lpai-ob-option-icon{font-size:20px;flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:1px solid var(--b1);border-radius:10px;}
+.lpai-ob-loading{text-align:center;padding:20px 0 4px;}
+.lpai-ob-spinner-big{width:34px;height:34px;border:3px solid var(--bg4);border-top-color:var(--red);border-radius:50%;margin:0 auto 18px;animation:lpaiObSpin 0.8s linear infinite;}
+@keyframes lpaiObSpin{to{transform:rotate(360deg)}}
+.lpai-ob-loading-text{font-size:0.92rem;font-weight:600;color:var(--t2);}
+.lpai-ob-error{display:none;margin-top:18px;}
+.lpai-ob-error-text{background:var(--redbg);border:1px solid var(--redmid);color:var(--red);font-size:0.82rem;font-weight:600;padding:10px 14px;border-radius:10px;margin-bottom:14px;line-height:1.4;}
+.lpai-ob-retry-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:800;cursor:pointer;}
+</style>
+<div class="lpai-ob-overlay" id="lpai-ob-overlay">
+  <div class="lpai-ob-shell">
+    <div class="lpai-ob-progress-wrap">
+      <div class="lpai-ob-progress-steps">
+        <span class="active" id="lpai-ob-label-1">Role</span>
+        <span id="lpai-ob-label-2">Intent</span>
+        <span id="lpai-ob-label-3">Source</span>
+      </div>
+      <div class="lpai-ob-progress-track"><div class="lpai-ob-progress-fill" id="lpai-ob-progress-fill"></div></div>
+    </div>
+
+    <!-- STEP 1 — ROLE -->
+    <div class="lpai-ob-step active" id="lpai-ob-step-1">
+      <h1 class="lpai-ob-h1">What best describes you?</h1>
+      <p class="lpai-ob-sub">We'll tailor your experience based on your answer.</p>
+      <div class="lpai-ob-options">
+        <button type="button" class="lpai-ob-option" data-value="First-time auction buyer" onclick="lpaiObSelectOption(1,this)"><span class="lpai-ob-option-icon">🏠</span> First-time auction buyer</button>
+        <button type="button" class="lpai-ob-option" data-value="Experienced property investor" onclick="lpaiObSelectOption(1,this)"><span class="lpai-ob-option-icon">📈</span> Experienced property investor</button>
+        <button type="button" class="lpai-ob-option" data-value="Property professional (solicitor, surveyor, agent)" onclick="lpaiObSelectOption(1,this)"><span class="lpai-ob-option-icon">💼</span> Property professional (solicitor, surveyor, agent)</button>
+        <button type="button" class="lpai-ob-option" data-value="Just exploring" onclick="lpaiObSelectOption(1,this)"><span class="lpai-ob-option-icon">🔍</span> Just exploring</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 — INTENT -->
+    <div class="lpai-ob-step" id="lpai-ob-step-2">
+      <button type="button" class="lpai-ob-back" onclick="lpaiObGoToStep(1)">← Back</button>
+      <h1 class="lpai-ob-h1">Do you have a legal pack ready to analyse?</h1>
+      <p class="lpai-ob-sub">This helps us get you to the right place.</p>
+      <div class="lpai-ob-options">
+        <button type="button" class="lpai-ob-option" data-value="Yes, ready to upload now" onclick="lpaiObSelectOption(2,this)"><span class="lpai-ob-option-icon">✅</span> Yes, ready to upload now</button>
+        <button type="button" class="lpai-ob-option" data-value="Getting one soon" onclick="lpaiObSelectOption(2,this)"><span class="lpai-ob-option-icon">📅</span> Getting one soon</button>
+        <button type="button" class="lpai-ob-option" data-value="Just researching for now" onclick="lpaiObSelectOption(2,this)"><span class="lpai-ob-option-icon">🔎</span> Just researching for now</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — SOURCE -->
+    <div class="lpai-ob-step" id="lpai-ob-step-3">
+      <button type="button" class="lpai-ob-back" onclick="lpaiObGoToStep(2)">← Back</button>
+      <h1 class="lpai-ob-h1">How did you find Legal Pack AI?</h1>
+      <p class="lpai-ob-sub">Just curious — helps us know what's working.</p>
+      <div class="lpai-ob-options">
+        <button type="button" class="lpai-ob-option" data-value="Google search" onclick="lpaiObSelectOption(3,this)"><span class="lpai-ob-option-icon">🔍</span> Google search</button>
+        <button type="button" class="lpai-ob-option" data-value="Social media" onclick="lpaiObSelectOption(3,this)"><span class="lpai-ob-option-icon">📱</span> Social media</button>
+        <button type="button" class="lpai-ob-option" data-value="A friend or colleague" onclick="lpaiObSelectOption(3,this)"><span class="lpai-ob-option-icon">👥</span> A friend or colleague</button>
+        <button type="button" class="lpai-ob-option" data-value="YouTube / content" onclick="lpaiObSelectOption(3,this)"><span class="lpai-ob-option-icon">🎥</span> YouTube / content</button>
+        <button type="button" class="lpai-ob-option" data-value="Other" onclick="lpaiObSelectOption(3,this)"><span class="lpai-ob-option-icon">💬</span> Other</button>
+      </div>
+    </div>
+
+    <!-- LOADING / SUBMIT STATE -->
+    <div class="lpai-ob-step" id="lpai-ob-step-loading">
+      <div class="lpai-ob-loading">
+        <div class="lpai-ob-spinner-big" id="lpai-ob-spinner"></div>
+        <div class="lpai-ob-loading-text" id="lpai-ob-loading-text">Setting things up…</div>
+        <div class="lpai-ob-error" id="lpai-ob-error">
+          <div class="lpai-ob-error-text" id="lpai-ob-error-text"></div>
+          <button type="button" class="lpai-ob-retry-btn" onclick="lpaiObSubmit()">Retry</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 

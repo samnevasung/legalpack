@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Started — Legal Pack AI</title>
+<meta name="description" content="Tell us a bit about yourself and create your free Legal Pack AI account — your first legal pack analysis is on us.">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<link rel="canonical" href="https://legalpackai.com/onboarding">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7ff;
+  --bg2:#f2f1fc;
+  --bg3:#eae9f8;
+  --surface:#ffffff;
+  --t1:#0d0c1a;
+  --t2:#4a4863;
+  --t3:#9490b0;
+  --b1:#e2e0f0;
+  --b2:#d4d1ec;
+  --purple:#6d28d9;
+  --purple2:#7c3aed;
+  --purplelight:#8b5cf6;
+  --purplebg:#f5f0ff;
+  --purplemid:#ddd6fe;
+  --red:#dc2626;
+  --redbg:#fef2f2;
+}
+html{font-size:16px}
+body{
+  background:var(--bg);
+  color:var(--t1);
+  font-family:'DM Sans',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:40px 20px 60px;
+}
+
+/* ─── TOP LOGO ─── */
+.ob-logo{
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:17px;
+  font-weight:800;
+  color:var(--t1);
+  letter-spacing:-0.5px;
+  margin-bottom:32px;
+}
+.ob-logo-icon{
+  width:32px;height:32px;
+  background:var(--purple);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(109,40,217,0.35);
+}
+
+/* ─── PROGRESS BAR ─── */
+.ob-progress-wrap{
+  width:100%;
+  max-width:520px;
+  margin-bottom:36px;
+}
+.ob-progress-steps{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.4px;
+  text-transform:uppercase;
+  color:var(--t3);
+  margin-bottom:10px;
+}
+.ob-progress-steps span.active{color:var(--purple)}
+.ob-progress-track{
+  width:100%;
+  height:6px;
+  background:var(--bg3);
+  border-radius:99px;
+  overflow:hidden;
+}
+.ob-progress-fill{
+  height:100%;
+  width:25%;
+  background:linear-gradient(90deg,var(--purple),var(--purplelight));
+  border-radius:99px;
+  transition:width 0.35s ease;
+}
+
+/* ─── CARD SHELL ─── */
+.ob-shell{
+  width:100%;
+  max-width:520px;
+  background:var(--surface);
+  border:1px solid var(--b1);
+  border-radius:20px;
+  padding:40px 36px;
+  box-shadow:0 24px 60px rgba(13,12,26,0.08),0 4px 16px rgba(109,40,217,0.06);
+}
+
+.ob-step{display:none}
+.ob-step.active{display:block;animation:ob-fade 0.3s ease}
+@keyframes ob-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.ob-back{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:none;
+  border:none;
+  color:var(--t3);
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  padding:0;
+  margin-bottom:18px;
+  transition:color 0.15s;
+}
+.ob-back:hover{color:var(--purple)}
+
+.ob-h1{
+  font-size:1.5rem;
+  font-weight:800;
+  letter-spacing:-0.5px;
+  margin-bottom:8px;
+  line-height:1.25;
+}
+.ob-sub{
+  font-size:0.9rem;
+  color:var(--t2);
+  margin-bottom:28px;
+  line-height:1.5;
+}
+
+/* ─── OPTION CARDS ─── */
+.ob-options{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.ob-option{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+  text-align:left;
+  padding:16px 18px;
+  background:var(--bg);
+  border:1.5px solid var(--b1);
+  border-radius:14px;
+  cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.95rem;
+  font-weight:600;
+  color:var(--t1);
+  transition:all 0.15s ease;
+}
+.ob-option:hover{
+  border-color:var(--purplemid);
+  background:var(--purplebg);
+  transform:translateY(-1px);
+}
+.ob-option.selected{
+  border-color:var(--purple);
+  background:var(--purplebg);
+  box-shadow:0 0 0 3px rgba(109,40,217,0.12);
+}
+.ob-option-icon{
+  font-size:22px;
+  flex-shrink:0;
+  width:36px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--surface);
+  border:1px solid var(--b1);
+  border-radius:10px;
+}
+
+/* ─── FORM (STEP 4) ─── */
+.ob-field{margin-bottom:16px}
+.ob-label{
+  display:block;
+  font-size:0.75rem;
+  font-weight:700;
+  color:var(--t2);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:7px;
+}
+.ob-input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1.5px solid var(--b1);
+  background:var(--bg);
+  color:var(--t1);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.92rem;
+  outline:none;
+  transition:border-color 0.15s;
+}
+.ob-input:focus{border-color:var(--purple)}
+.ob-pass-wrap{position:relative}
+.ob-pass-toggle{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+  color:var(--t3);
+  font-family:'DM Sans',sans-serif;
+}
+.ob-pass-toggle:hover{color:var(--purple)}
+
+.ob-error{
+  display:none;
+  background:var(--redbg);
+  border:1px solid #fecaca;
+  color:var(--red);
+  font-size:0.82rem;
+  font-weight:600;
+  padding:10px 14px;
+  border-radius:10px;
+  margin-bottom:16px;
+}
+
+.ob-submit{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:none;
+  background:var(--purple);
+  color:#fff;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.98rem;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(109,40,217,0.35);
+  transition:all 0.18s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-top:6px;
+}
+.ob-submit:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(109,40,217,0.45)}
+.ob-submit:disabled{opacity:0.65;cursor:not-allowed;transform:none}
+
+.ob-spinner{
+  width:15px;height:15px;
+  border:2px solid rgba(255,255,255,0.4);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:ob-spin 0.7s linear infinite;
+  display:none;
+}
+.ob-submit.loading .ob-spinner{display:inline-block}
+@keyframes ob-spin{to{transform:rotate(360deg)}}
+
+.ob-signin{
+  text-align:center;
+  font-size:0.85rem;
+  color:var(--t2);
+  margin-top:18px;
+}
+.ob-signin a{color:var(--purple);font-weight:700;text-decoration:none}
+.ob-signin a:hover{text-decoration:underline}
+
+@media(max-width:560px){
+  .ob-shell{padding:28px 22px;border-radius:16px}
+  .ob-h1{font-size:1.28rem}
+}
+</style>
+</head>
+<body>
+
+<a class="ob-logo" href="/">
+  <div class="ob-logo-icon">🔨</div>
+  LegalPack AI
+</a>
+
+<div class="ob-progress-wrap">
+  <div class="ob-progress-steps">
+    <span id="ob-step-label-1" class="active">Role</span>
+    <span id="ob-step-label-2">Intent</span>
+    <span id="ob-step-label-3">Source</span>
+    <span id="ob-step-label-4">Sign Up</span>
+  </div>
+  <div class="ob-progress-track">
+    <div class="ob-progress-fill" id="ob-progress-fill"></div>
+  </div>
+</div>
+
+<div class="ob-shell">
+
+  <!-- STEP 1 — ROLE -->
+  <div class="ob-step active" id="ob-step-1">
+    <h1 class="ob-h1">What best describes you?</h1>
+    <p class="ob-sub">We'll tailor your experience based on your answer.</p>
+    <div class="ob-options">
+      <button type="button" class="ob-option" data-value="First-time auction buyer" onclick="selectOption(1,this)">
+        <span class="ob-option-icon">🏠</span> First-time auction buyer
+      </button>
+      <button type="button" class="ob-option" data-value="Experienced property investor" onclick="selectOption(1,this)">
+        <span class="ob-option-icon">📈</span> Experienced property investor
+      </button>
+      <button type="button" class="ob-option" data-value="Property professional (solicitor, surveyor, agent)" onclick="selectOption(1,this)">
+        <span class="ob-option-icon">💼</span> Property professional (solicitor, surveyor, agent)
+      </button>
+      <button type="button" class="ob-option" data-value="Just exploring" onclick="selectOption(1,this)">
+        <span class="ob-option-icon">🔍</span> Just exploring
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 2 — INTENT -->
+  <div class="ob-step" id="ob-step-2">
+    <button type="button" class="ob-back" onclick="goToStep(1)">← Back</button>
+    <h1 class="ob-h1">Do you have a legal pack ready to analyse?</h1>
+    <p class="ob-sub">This helps us get you to the right place.</p>
+    <div class="ob-options">
+      <button type="button" class="ob-option" data-value="Yes, ready to upload now" onclick="selectOption(2,this)">
+        <span class="ob-option-icon">✅</span> Yes, ready to upload now
+      </button>
+      <button type="button" class="ob-option" data-value="Getting one soon" onclick="selectOption(2,this)">
+        <span class="ob-option-icon">📅</span> Getting one soon
+      </button>
+      <button type="button" class="ob-option" data-value="Just researching for now" onclick="selectOption(2,this)">
+        <span class="ob-option-icon">🔎</span> Just researching for now
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — SOURCE -->
+  <div class="ob-step" id="ob-step-3">
+    <button type="button" class="ob-back" onclick="goToStep(2)">← Back</button>
+    <h1 class="ob-h1">How did you find Legal Pack AI?</h1>
+    <p class="ob-sub">Just curious — helps us know what's working.</p>
+    <div class="ob-options">
+      <button type="button" class="ob-option" data-value="Google search" onclick="selectOption(3,this)">
+        <span class="ob-option-icon">🔍</span> Google search
+      </button>
+      <button type="button" class="ob-option" data-value="Social media" onclick="selectOption(3,this)">
+        <span class="ob-option-icon">📱</span> Social media
+      </button>
+      <button type="button" class="ob-option" data-value="A friend or colleague" onclick="selectOption(3,this)">
+        <span class="ob-option-icon">👥</span> A friend or colleague
+      </button>
+      <button type="button" class="ob-option" data-value="YouTube / content" onclick="selectOption(3,this)">
+        <span class="ob-option-icon">🎥</span> YouTube / content
+      </button>
+      <button type="button" class="ob-option" data-value="Other" onclick="selectOption(3,this)">
+        <span class="ob-option-icon">💬</span> Other
+      </button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — SIGNUP -->
+  <div class="ob-step" id="ob-step-4">
+    <button type="button" class="ob-back" onclick="goToStep(3)">← Back</button>
+    <h1 class="ob-h1">Create your free account</h1>
+    <p class="ob-sub">Your first analysis is on us.</p>
+
+    <div class="ob-error" id="ob-error"></div>
+
+    <form id="ob-signup-form" onsubmit="handleSignup(event)">
+      <div class="ob-field">
+        <label class="ob-label" for="ob-name">Full name</label>
+        <input class="ob-input" id="ob-name" type="text" autocomplete="name" required>
+      </div>
+      <div class="ob-field">
+        <label class="ob-label" for="ob-email">Email</label>
+        <input class="ob-input" id="ob-email" type="email" autocomplete="email" required>
+      </div>
+      <div class="ob-field">
+        <label class="ob-label" for="ob-password">Password</label>
+        <div class="ob-pass-wrap">
+          <input class="ob-input" id="ob-password" type="password" autocomplete="new-password" minlength="8" placeholder="Min 8 characters" required style="padding-right:52px;">
+          <button type="button" class="ob-pass-toggle" id="ob-pass-toggle" onclick="togglePassword()">SHOW</button>
+        </div>
+      </div>
+
+      <button type="submit" class="ob-submit" id="ob-submit-btn">
+        <span class="ob-spinner" id="ob-spinner"></span>
+        <span id="ob-submit-text">Create Account &amp; Continue</span>
+      </button>
+    </form>
+
+    <p class="ob-signin">Already have an account? <a href="/legal-pack-ai?login=1">Sign in</a></p>
+  </div>
+
+</div>
+
+<script>
+// ─── SUPABASE ───
+var SUPABASE_URL = 'https://ktrbbaakmlwmhyvpufcs.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmJiYWFrbWx3bWh5dnB1ZmNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjA3NTEsImV4cCI6MjA5MzE5Njc1MX0.qwcf5P9m_aTVd9oLMhaK085MQTP7IM9LrYrYq1PIY0Q';
+var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var API_BASE = 'https://legalpack-backend-production.up.railway.app';
+
+// ─── FUNNEL STATE (kept in JS vars only, not localStorage) ───
+var ob_role = null;
+var ob_intent = null;
+var ob_source = null;
+var ob_currentStep = 1;
+
+function goToStep(step) {
+  document.querySelectorAll('.ob-step').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('ob-step-' + step).classList.add('active');
+  for (var i = 1; i <= 4; i++) {
+    var label = document.getElementById('ob-step-label-' + i);
+    if (i <= step) label.classList.add('active'); else label.classList.remove('active');
+  }
+  document.getElementById('ob-progress-fill').style.width = (step * 25) + '%';
+  ob_currentStep = step;
+}
+
+function selectOption(step, btnEl) {
+  var value = btnEl.getAttribute('data-value');
+  var container = btnEl.parentElement;
+  Array.prototype.forEach.call(container.querySelectorAll('.ob-option'), function(opt) {
+    opt.classList.remove('selected');
+  });
+  btnEl.classList.add('selected');
+
+  if (step === 1) ob_role = value;
+  if (step === 2) ob_intent = value;
+  if (step === 3) ob_source = value;
+
+  setTimeout(function() {
+    if (step < 4) goToStep(step + 1);
+  }, 220);
+}
+
+function togglePassword() {
+  var input = document.getElementById('ob-password');
+  var toggle = document.getElementById('ob-pass-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    toggle.textContent = 'HIDE';
+  } else {
+    input.type = 'password';
+    toggle.textContent = 'SHOW';
+  }
+}
+
+function showError(msg) {
+  var errEl = document.getElementById('ob-error');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+function hideError() {
+  var errEl = document.getElementById('ob-error');
+  errEl.style.display = 'none';
+  errEl.textContent = '';
+}
+function setSubmitLoading(loading) {
+  var btn = document.getElementById('ob-submit-btn');
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+  document.getElementById('ob-submit-text').textContent = loading ? 'Creating account…' : 'Create Account & Continue';
+}
+
+async function handleSignup(event) {
+  event.preventDefault();
+  hideError();
+
+  var name = document.getElementById('ob-name').value.trim();
+  var email = document.getElementById('ob-email').value.trim();
+  var password = document.getElementById('ob-password').value;
+
+  if (!name || !email || !password) {
+    showError('Please fill in all fields.');
+    return;
+  }
+  if (password.length < 8) {
+    showError('Password must be at least 8 characters.');
+    return;
+  }
+
+  setSubmitLoading(true);
+  try {
+    var result = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { full_name: name }
+      }
+    });
+    if (result.error) throw new Error(result.error.message);
+
+    var session = result.data.session;
+    var token = session ? session.access_token : null;
+
+    if (token) {
+      try {
+        await fetch(API_BASE + '/api/onboarding', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            role: ob_role,
+            intent: ob_intent,
+            source: ob_source,
+            signup_source: 'funnel'
+          })
+        });
+      } catch (onboardErr) {
+        // Non-fatal — account was created successfully either way
+      }
+    }
+
+    var destination = ob_intent === 'Yes, ready to upload now'
+      ? '/dashboard?upload=true'
+      : '/dashboard';
+    window.location.href = destination;
+
+  } catch (e) {
+    showError(e.message || 'Something went wrong. Please try again.');
+    setSubmitLoading(false);
+  }
+}
+</script>
+</body>
+</html>
