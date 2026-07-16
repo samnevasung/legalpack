@@ -863,8 +863,9 @@ body {
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
   width: 280px; flex-shrink: 0;
   background: var(--bg); border-right: 1px solid var(--border);
-  padding: 24px 20px; display: flex; flex-direction: column; gap: 22px;
+  padding: 24px 20px; display: flex; flex-direction: column;
 }
+.rv-sidebar-state { display: flex; flex-direction: column; gap: 22px; flex: 1; min-height: 100%; }
 .rv-address { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
 .rv-risk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 20px; color: #fff; margin-bottom: 14px; }
 .rv-stat-pills { display: flex; gap: 6px; }
@@ -911,8 +912,10 @@ body {
 .rv-flag-row:last-child { border-bottom: none; }
 .rv-flag-title { font-size: 0.92rem; font-weight: 700; color: #18181b; margin-bottom: 5px; }
 .rv-flag-desc { font-size: 0.82rem; color: #71717a; line-height: 1.6; }
-.rv-flag-meta { font-size: 0.72rem; color: #a1a1aa; font-style: italic; margin-top: 6px; }
 .rv-sev-badge { flex-shrink: 0; font-size: 10px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; height: fit-content; white-space: nowrap; }
+.rv-clickable { cursor: pointer; margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 6px; transition: background 0.12s; }
+.rv-clickable:hover { background: #f4f4f5; }
+.rv-arrow { flex-shrink: 0; color: #a1a1aa; font-size: 0.85rem; align-self: center; }
 
 .rv-cost-table { width: 100%; border-collapse: collapse; }
 .rv-cost-table th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa; padding: 0 0 10px; border-bottom: 1px solid #e4e4e7; }
@@ -1946,9 +1949,6 @@ async function lpaiObSubmit() {
       ? sessionResult.data.session.access_token
       : authToken;
 
-    // TEMPORARY DEBUG — confirm the exact URL being hit and that the token isn't empty
-    console.log('[lpaiObSubmit] DEBUG fetch URL:', API_BASE + '/api/onboarding', '| token starts with:', String(freshToken || '').slice(0, 20));
-
     var resp = await fetch(API_BASE + '/api/onboarding', {
       method: 'POST',
       headers: {
@@ -2782,6 +2782,18 @@ function renderResult(result, packName) {
   const rvRow = (label, value) => value ? `<div class="rv-row"><div class="rv-row-label">${label}</div><div class="rv-row-value">${value}</div></div>` : '';
   const rvEmpty = (msg) => `<div class="rv-empty">${msg}</div>`;
 
+  // ── Detail lookup — verbose text lives here, not in the main document ──
+  const rvDetailItems = [];
+  const addDetail = (item) => { rvDetailItems.push(item); return rvDetailItems.length - 1; };
+  const rvSynopsis = (text, maxLen) => {
+    if (!text) return '';
+    const s = String(text).trim();
+    const m = s.match(/^[^.!?]*[.!?]/);
+    let first = m ? m[0].trim() : s;
+    if (first.length > maxLen) first = first.slice(0, maxLen - 1).trim() + '…';
+    return first;
+  };
+
   // ── Property & Tenure rows ──
   const ta = result.titleAnalysis || {};
   const notNone = (v) => v && !/^none found$/i.test(String(v).trim());
@@ -2810,7 +2822,20 @@ function renderResult(result, packName) {
 
   // ── Flags rows (critical, then warning, then note/info — no grouping headers) ──
   const orderedFlags = [...criticalFlags, ...warningFlags, ...noteFlags];
-  const flagRows = orderedFlags.map(f => renderFlagRow(f)).join('');
+  const flagRows = orderedFlags.map(f => {
+    const detail = f.detail || f.description || f.buyerImpact || '';
+    const source = [f.documentSource, f.evidence ? `"${f.evidence}"` : ''].filter(Boolean).join(' — ');
+    const idx = detail ? addDetail({
+      severity: f.severity,
+      title: f.title,
+      body: [
+        detail ? { label: 'Details', text: detail } : null,
+        f.buyerImpact && f.buyerImpact !== detail ? { label: 'Investor Impact', text: f.buyerImpact } : null,
+        source ? { label: 'Source', text: source } : null,
+      ].filter(Boolean)
+    }) : -1;
+    return renderFlagRow(f, idx, rvSynopsis(detail, 110));
+  }).join('');
 
   // ── Costs table ──
   const costRows = costs.map(c => `<tr>
@@ -2824,20 +2849,37 @@ function renderResult(result, packName) {
     const cat=(f.category||'').toLowerCase(), title=(f.title||'').toLowerCase(), src=(f.documentSource||'').toLowerCase();
     return cat.includes('special')||cat.includes('auction')||cat.includes('condition')||title.includes('special condition')||title.includes('auction condition')||title.includes('seller legal fee')||title.includes('buyer legal fee')||title.includes('completion')||title.includes('deposit')||src.includes('special condition')||src.includes('auction condition');
   });
-  const specialRows = specialFlags.map((f,i) => `<div class="rv-numbered-row">
+  const specialRows = specialFlags.map((f,i) => {
+    const detail = f.detail || f.buyerImpact || '';
+    const idx = detail ? addDetail({ title: f.title, body: [{ label: 'Details', text: detail }] }) : -1;
+    return `<div class="rv-numbered-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
       <div class="rv-numbered-num">${i+1}.</div>
-      <div><div class="rv-flag-title">${f.title}</div><div class="rv-flag-desc">${f.detail || f.buyerImpact || ''}</div></div>
-    </div>`).join('');
+      <div style="flex:1;min-width:0;"><div class="rv-flag-title">${f.title}</div>${detail ? `<div class="rv-flag-desc">${rvSynopsis(detail, 110)}</div>` : ''}</div>
+      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
+    </div>`;
+  }).join('');
 
   // ── Documents list ──
-  const docRows = (ds.provided || []).map(d => `<div class="rv-doc-row"><div class="rv-doc-name">${d.document}</div><div class="rv-doc-pages">${d.evidence || '—'}</div></div>`).join('');
+  const docRows = (ds.provided || []).map(d => {
+    const idx = d.evidence ? addDetail({ title: d.document, body: [{ label: 'Evidence', text: d.evidence }] }) : -1;
+    return `<div class="rv-doc-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
+      <div class="rv-doc-name">${d.document}</div>
+      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
+    </div>`;
+  }).join('');
 
   // ── Missing documents ──
   const missingRows = (result.missingDocuments || []).map(d => {
     const doc = typeof d === 'string' ? d : d.document;
     const risk = typeof d === 'object' ? d.risk : null;
-    return `<div class="rv-flag-row"><div><div class="rv-flag-title">${doc}</div>${risk ? `<div class="rv-flag-desc">${risk}</div>` : ''}</div></div>`;
+    const idx = risk ? addDetail({ title: doc, body: [{ label: 'Risk', text: risk }] }) : -1;
+    return `<div class="rv-flag-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
+      <div style="flex:1;min-width:0;"><div class="rv-flag-title">${doc}</div>${risk ? `<div class="rv-flag-desc">${rvSynopsis(risk, 100)}</div>` : ''}</div>
+      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
+    </div>`;
   }).join('');
+
+  window._rvDetailItems = rvDetailItems;
 
   const riskWord = risk.replace(/^SEVERE$/,'SEVERE').toUpperCase();
   const address = result.address || packName || 'Legal Pack';
@@ -2847,6 +2889,7 @@ function renderResult(result, packName) {
 
   <!-- ═══ SIDEBAR ═══ -->
   <div class="rv-sidebar">
+  <div id="rv-sidebar-default" class="rv-sidebar-state">
 
     <!-- Top block -->
     <div>
@@ -2901,6 +2944,10 @@ function renderResult(result, packName) {
       ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
       <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
     </div>
+
+  </div><!-- /rv-sidebar-default -->
+
+  <div id="rv-sidebar-detail" class="rv-sidebar-state" style="display:none"></div>
 
   </div><!-- /rv-sidebar -->
 
@@ -3008,25 +3055,47 @@ function renderResult(result, packName) {
   initReportScrollSpy();
 }
 
-function renderFlagRow(f) {
+function renderFlagRow(f, idx, synopsis) {
   const sev = f.severity || 'note';
   const isCritical = sev==='critical'||sev==='high';
   const isWarning = sev==='warning'||sev==='medium';
   const sevLabel = isCritical?'Critical':isWarning?'Warning':'Info';
   const sevBg = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(217,119,6,0.1)':'rgba(113,113,122,0.1)';
   const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'#71717a';
-  const detail = f.detail || f.description || f.buyerImpact || '';
-  const metaParts = [];
-  if (f.documentSource) metaParts.push(f.documentSource);
-  if (f.evidence) metaParts.push(`"${f.evidence}"`);
-  return `<div class="rv-flag-row">
+  const clickable = idx > -1;
+  return `<div class="rv-flag-row${clickable ? ' rv-clickable' : ''}"${clickable ? ` onclick="showReportDetail(${idx})"` : ''}>
     <div style="flex:1;min-width:0;">
       <div class="rv-flag-title">${f.title}</div>
-      ${detail ? `<div class="rv-flag-desc">${detail}</div>` : ''}
-      ${metaParts.length ? `<div class="rv-flag-meta">${metaParts.join(' — ')}</div>` : ''}
+      ${synopsis ? `<div class="rv-flag-desc">${synopsis}</div>` : ''}
     </div>
     <div class="rv-sev-badge" style="background:${sevBg};color:${sevColor};">${sevLabel}</div>
+    ${clickable ? '<span class="rv-arrow">&rarr;</span>' : ''}
   </div>`;
+}
+
+function showReportDetail(idx) {
+  const item = (window._rvDetailItems || [])[idx];
+  const def = document.getElementById('rv-sidebar-default');
+  const det = document.getElementById('rv-sidebar-detail');
+  if (!item || !def || !det) return;
+  const sevColors = { critical:'#dc2626', high:'#dc2626', warning:'#d97706', medium:'#d97706', note:'#71717a', low:'#71717a' };
+  const badge = item.severity ? `<div class="rv-risk-badge" style="background:${sevColors[item.severity]||'#71717a'};">${(item.severity==='high'?'critical':item.severity).toUpperCase()}</div>` : '';
+  det.innerHTML = `
+    <button class="rv-action-btn" onclick="hideReportDetail()" style="margin-bottom:18px;">&larr; Back</button>
+    ${badge}
+    <div class="rv-address" style="margin-top:${badge?'14px':'0'};">${item.title}</div>
+    <div class="rv-divider" style="margin:16px 0;"></div>
+    ${item.body.map(b => `<div class="rv-ai-row" style="align-items:flex-start;"><div style="flex:1;"><div class="rv-ai-label">${b.label}</div><div class="rv-ai-value" style="font-weight:500;line-height:1.55;margin-top:4px;">${b.text}</div></div></div>`).join('')}
+  `;
+  def.style.display = 'none';
+  det.style.display = 'flex';
+}
+
+function hideReportDetail() {
+  const def = document.getElementById('rv-sidebar-default');
+  const det = document.getElementById('rv-sidebar-detail');
+  if (def) def.style.display = '';
+  if (det) det.style.display = 'none';
 }
 
 function initReportScrollSpy() {
