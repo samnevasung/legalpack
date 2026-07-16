@@ -795,12 +795,21 @@ function closeUserDrawer(){
 
 async function loadUserDrawerData(userId){
   try{
-    const {data:user,error}=await sb.from('users').select('*').eq('id',userId).single();
-    if(error||!user){renderUserDrawerError('Could not load user data.');return;}
+    // Query the backend admin endpoint (service-role key server-side) instead of
+    // the Supabase client directly — the anon key's RLS policies block reading
+    // other users' rows, which is why the direct sb.from('users') query here
+    // always failed. /admin/users already does select('*'), so this also covers
+    // the onboarding columns (onboarding_role/intent/source/completed,
+    // signup_source, signup_ip, ip_credit_claimed) with no backend change needed.
+    const r=await fetch(API_BASE+'/admin/users',{headers:{Authorization:'Bearer '+authToken}});
+    if(!r.ok){renderUserDrawerError('Could not load user data.');return;}
+    const d=await r.json();
+    const freshUsers=d.users||[];
+    const user=freshUsers.find(u=>u.id===userId);
+    if(!user){renderUserDrawerError('Could not load user data.');return;}
     let sharedIpUsers=[];
     if(user.signup_ip){
-      const {data:shared}=await sb.from('users').select('email').eq('signup_ip',user.signup_ip).neq('id',userId);
-      sharedIpUsers=shared||[];
+      sharedIpUsers=freshUsers.filter(u=>u.id!==userId&&u.signup_ip===user.signup_ip).map(u=>({email:u.email}));
     }
     if(currentDrawerUserId!==userId)return; // drawer closed or switched to another user before this resolved
     renderUserDrawerContent(user,sharedIpUsers);
