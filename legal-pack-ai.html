@@ -999,14 +999,31 @@ function proceedAfterSignup() {
 async function lpaiObMaybeStart(userId) {
   try {
     var profileResult = await supabaseClient.from('users').select('onboarding_completed').eq('id', userId).maybeSingle();
-    if (!profileResult.error && profileResult.data && profileResult.data.onboarding_completed) {
+
+    if (profileResult.error) {
+      console.log('[lpaiObMaybeStart] Query error — showing survey as a safe default:', profileResult.error);
+      lpaiObOpen();
+      return;
+    }
+
+    if (!profileResult.data) {
+      console.log('[lpaiObMaybeStart] No users row yet (still being created server-side) — showing survey.');
+      lpaiObOpen();
+      return;
+    }
+
+    if (profileResult.data.onboarding_completed === true) {
+      console.log('[lpaiObMaybeStart] onboarding_completed is explicitly true — skipping survey.');
       proceedAfterSignup();
       return;
     }
+
+    console.log('[lpaiObMaybeStart] users row found but onboarding_completed is', profileResult.data.onboarding_completed, '— showing survey.');
+    lpaiObOpen();
   } catch (e) {
-    console.error('Onboarding status check failed:', e);
+    console.log('[lpaiObMaybeStart] Unexpected exception — showing survey as a safe default:', e);
+    lpaiObOpen();
   }
-  lpaiObOpen();
 }
 
 function lpaiObOpen() {
