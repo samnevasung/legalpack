@@ -1899,6 +1899,9 @@ async function lpaiObSubmit() {
       ? sessionResult.data.session.access_token
       : authToken;
 
+    // TEMPORARY DEBUG — confirm the exact URL being hit and that the token isn't empty
+    console.log('[lpaiObSubmit] DEBUG fetch URL:', API_BASE + '/api/onboarding', '| token starts with:', String(freshToken || '').slice(0, 20));
+
     var resp = await fetch(API_BASE + '/api/onboarding', {
       method: 'POST',
       headers: {
