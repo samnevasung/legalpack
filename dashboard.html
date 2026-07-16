@@ -1660,9 +1660,6 @@ body {
 .lpai-ob-spinner-big{width:34px;height:34px;border:3px solid var(--bg4);border-top-color:var(--red);border-radius:50%;margin:0 auto 18px;animation:lpaiObSpin 0.8s linear infinite;}
 @keyframes lpaiObSpin{to{transform:rotate(360deg)}}
 .lpai-ob-loading-text{font-size:0.92rem;font-weight:600;color:var(--t2);}
-.lpai-ob-error{display:none;margin-top:18px;}
-.lpai-ob-error-text{background:var(--redbg);border:1px solid var(--redmid);color:var(--red);font-size:0.82rem;font-weight:600;padding:10px 14px;border-radius:10px;margin-bottom:14px;line-height:1.4;}
-.lpai-ob-retry-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--red);color:#fff;font-family:'Geist Sans',sans-serif;font-size:0.9rem;font-weight:800;cursor:pointer;}
 </style>
 <div class="lpai-ob-overlay" id="lpai-ob-overlay">
   <div class="lpai-ob-shell">
@@ -1718,10 +1715,6 @@ body {
       <div class="lpai-ob-loading">
         <div class="lpai-ob-spinner-big" id="lpai-ob-spinner"></div>
         <div class="lpai-ob-loading-text" id="lpai-ob-loading-text">Setting things up…</div>
-        <div class="lpai-ob-error" id="lpai-ob-error">
-          <div class="lpai-ob-error-text" id="lpai-ob-error-text"></div>
-          <button type="button" class="lpai-ob-retry-btn" onclick="lpaiObSubmit()">Retry</button>
-        </div>
       </div>
     </div>
 
@@ -1863,9 +1856,6 @@ async function lpaiObMaybeStart(userId) {
 function lpaiObOpen() {
   lpaiObRole = null; lpaiObIntent = null; lpaiObSource = null;
   document.querySelectorAll('#lpai-ob-overlay .lpai-ob-option').forEach(function(opt) { opt.classList.remove('selected'); });
-  document.getElementById('lpai-ob-error').style.display = 'none';
-  document.getElementById('lpai-ob-spinner').style.display = 'block';
-  document.getElementById('lpai-ob-loading-text').style.display = 'block';
   lpaiObGoToStep(1);
   document.getElementById('lpai-ob-overlay').classList.add('open');
 }
@@ -1900,15 +1890,20 @@ function lpaiObSelectOption(step, btnEl) {
 }
 
 async function lpaiObSubmit() {
-  document.getElementById('lpai-ob-error').style.display = 'none';
-  document.getElementById('lpai-ob-spinner').style.display = 'block';
-  document.getElementById('lpai-ob-loading-text').style.display = 'block';
   try {
+    // Fetch a fresh session token rather than relying on whatever `authToken`
+    // held at init time — the survey can fire immediately on page load,
+    // before that value is guaranteed to be populated/valid.
+    var sessionResult = await sb.auth.getSession();
+    var freshToken = (sessionResult.data && sessionResult.data.session)
+      ? sessionResult.data.session.access_token
+      : authToken;
+
     var resp = await fetch(API_BASE + '/api/onboarding', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + authToken
+        'Authorization': 'Bearer ' + freshToken
       },
       body: JSON.stringify({
         role: lpaiObRole,
@@ -1917,15 +1912,19 @@ async function lpaiObSubmit() {
         signup_source: 'homepage'
       })
     });
-    if (!resp.ok) throw new Error('Could not save your answers. Please try again.');
-    document.getElementById('lpai-ob-overlay').classList.remove('open');
-    proceedAfterSignup();
+
+    if (!resp.ok) {
+      var bodyText = await resp.text().catch(function() { return '(could not read response body)'; });
+      console.error('[lpaiObSubmit] POST /api/onboarding failed:', resp.status, bodyText);
+    }
   } catch (e) {
-    document.getElementById('lpai-ob-spinner').style.display = 'none';
-    document.getElementById('lpai-ob-loading-text').style.display = 'none';
-    document.getElementById('lpai-ob-error-text').textContent = e.message || 'Something went wrong. Please try again.';
-    document.getElementById('lpai-ob-error').style.display = 'block';
+    console.error('[lpaiObSubmit] POST /api/onboarding threw:', e);
   }
+
+  // Survey answers are non-critical — never block the user on this. Whether
+  // the save succeeded or failed, close the modal and let the tour start.
+  document.getElementById('lpai-ob-overlay').classList.remove('open');
+  proceedAfterSignup();
 }
 
 async function loadUser() {
