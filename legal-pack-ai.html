@@ -241,14 +241,6 @@ body {
 .results-body { flex: 1; overflow-y: auto; padding-bottom: 20px; }
 
 /* verdict */
-.verdict {
-  margin: 12px 24px; padding: 14px 16px;
-  border-radius: 12px; display: flex; gap: 12px;
-  align-items: flex-start; border: 1px solid;
-}
-.verdict.caution { background: var(--amberbg); border-color: var(--ambermid); }
-.verdict.no { background: var(--redbg); border-color: var(--redmid); }
-.verdict.yes { background: var(--greenbg); border-color: var(--greenmid); }
 .verdict-icon { font-size: 1.8571rem; line-height: 1; flex-shrink: 0; }
 .verdict-txt { flex: 1; min-width: 0; }
 .verdict-txt small {
@@ -274,10 +266,6 @@ body {
 .metric-val.green { color: var(--green); }
 
 /* extra costs */
-.extra-costs-box {
-  margin: 0 24px 14px; padding: 12px 14px;
-  border-radius: 11px; background: var(--redbg); border: 1px solid var(--redmid);
-}
 .extra-costs-title {
   font-size: 0.6429rem; font-weight: 800; letter-spacing: 0.8px;
   text-transform: uppercase; color: var(--red); margin-bottom: 8px;
@@ -295,42 +283,13 @@ body {
   font-family: 'DM Mono', monospace; display: block;
 }
 
-/* tabs */
-.tabs { display: flex; gap: 6px; padding: 0 24px; margin-bottom: 12px; }
-.tab {
-  flex: 1; padding: 8px 4px; font-size: 0.857rem; font-weight: 700;
-  border-radius: 7px; border: 1px solid var(--b1);
-  background: var(--bg2); cursor: pointer; color: var(--t2);
-  font-family: 'Geist Sans', sans-serif; transition: all 0.15s;
-}
-.tab.active { background: var(--t1); color: var(--bg); border-color: transparent; }
-.panel { display: none; padding: 0 24px; }
-.panel.active { display: block; }
-
 /* risks */
 .risks { display: flex; flex-direction: column; gap: 7px; }
-.risk {
-  padding: 12px 13px; border-radius: 10px;
-  background: var(--bg2); border: 1px solid var(--b1);
-}
-.risk-head { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 6px; }
-.sev {
-  font-size: 0.5714rem; font-weight: 800; padding: 2px 7px;
-  border-radius: 20px; letter-spacing: 0.4px; flex-shrink: 0; margin-top: 2px;
-}
-.sev.high { background: var(--redmid); color: var(--red); }
-.sev.medium { background: var(--ambermid); color: var(--amber); }
-.sev.low { background: var(--bluemid); color: var(--blue); }
 .risk-title { font-size: 1rem; font-weight: 700; line-height: 1.3; }
 .risk-desc { font-size: 0.857rem; color: var(--t2); line-height: 1.6; }
 .risk-impact { font-size: 0.857rem; color: var(--amber); margin-top: 5px; font-weight: 600; }
 
 /* facts */
-.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.fact {
-  background: var(--bg2); border: 1px solid var(--b1);
-  border-radius: 9px; padding: 10px 12px;
-}
 .fact-lbl {
   font-size: 0.6429rem; font-weight: 700; letter-spacing: 0.5px;
   text-transform: uppercase; color: var(--t2); margin-bottom: 4px;
@@ -341,12 +300,6 @@ body {
 .fact-val.good { color: var(--green); }
 
 /* impact */
-.impacts { display: flex; flex-direction: column; gap: 6px; }
-.impact {
-  display: flex; align-items: center; gap: 9px;
-  padding: 10px 12px; background: var(--bg2);
-  border-radius: 9px; border: 1px solid var(--b1);
-}
 .impact-label { font-size: 0.857rem; flex: 1; font-weight: 500; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .dot.red { background: var(--red); }
@@ -358,7 +311,6 @@ body {
 .impact-txt.green { color: var(--green); }
 
 /* bottom row */
-.bottom-row { display: flex; gap: 8px; padding: 12px 24px 0; }
 .btn-sec {
   flex: 1; padding: 11px; border-radius: var(--radius-sm);
   border: 1px solid var(--border); background: transparent;
@@ -550,15 +502,8 @@ body {
 }
 
 /* ── LIGHT THEME OVERRIDES ── */
-body.theme-light .verdict.no { background: #fff0f0; border-color: #ffcccc; }
-body.theme-light .verdict.caution { background: #fffbf0; border-color: #ffe0a0; }
-body.theme-light .verdict.yes { background: #f0fff8; border-color: #b3f0d5; }
-body.theme-light .extra-costs-box { background: #fff0f0; border-color: #ffcccc; }
 body.theme-light .extra-costs-title { color: #cc2222; }
 body.theme-light .extra-cost-amount { color: #cc2222; }
-body.theme-light .sev.high { background: #ffdddd; color: #cc2222; }
-body.theme-light .sev.medium { background: #fff3cc; color: #9a5a00; }
-body.theme-light .sev.low { background: #ddeeff; color: #1a5fa8; }
 body.theme-light .risk-impact { color: #9a5a00; }
 body.theme-light .token-sidebar { background: #fff; border-color: #ddd; }
 body.theme-light .token-cost-box { background: #fff0f0; border-color: #ffcccc; }
@@ -641,6 +586,70 @@ input[type=file] { display: none; }
 }
 .app-info-row:last-child { border-bottom: none; }
 .app-info-val { color: var(--t1); font-weight: 600; font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+
+/* ── REPORT VIEWER v3 ─────────────────────── */
+body.showing-results .app { max-width: none; padding: 0; margin: 0; }
+.rv-shell { display: flex; height: 100vh; overflow: hidden; background: var(--bg); }
+.rv-sidebar { width: 264px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; }
+.rv-sidebar-inner { padding: 24px 16px; display: flex; flex-direction: column; gap: 20px; min-height: 100%; }
+.rv-prop-addr { font-size: 0.8125rem; font-weight: 600; color: var(--t1); line-height: 1.45; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.rv-ai-summary { display: flex; flex-direction: column; }
+.rv-summary-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: none; padding: 0; cursor: pointer; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--t2); font-family: 'Geist Sans', sans-serif; }
+.rv-chevron { transition: transform 0.2s; color: var(--t2); }
+.rv-chevron.open { transform: rotate(180deg); }
+.rv-summary-body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.rv-summary-body.collapsed { display: none; }
+.rv-verdict-chip { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.4px; width: fit-content; }
+.rv-verdict-chip.yes { background: rgba(34,197,94,0.12); color: #22c55e; }
+.rv-verdict-chip.caution { background: rgba(245,158,11,0.12); color: #f59e0b; }
+.rv-verdict-chip.no { background: rgba(239,68,68,0.12); color: #ef4444; }
+.rv-verdict-summary-txt { font-size: 0.75rem; line-height: 1.55; color: var(--t2); margin: 0; }
+.rv-nav { display: flex; flex-direction: column; gap: 2px; }
+.rv-nav-link { font-size: 0.8125rem; font-weight: 500; color: var(--t2); text-decoration: none; padding: 6px 8px; border-radius: 6px; transition: background 0.1s, color 0.1s; display: block; }
+.rv-nav-link:hover, .rv-nav-link.active { background: var(--surface-2); color: var(--t1); font-weight: 600; }
+.rv-actions { display: flex; flex-direction: column; gap: 6px; padding-top: 16px; border-top: 1px solid var(--border); margin-top: auto; }
+.rv-action-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--t1); font-size: 0.8125rem; font-weight: 500; padding: 8px 12px; border-radius: 7px; cursor: pointer; font-family: 'Geist Sans', sans-serif; text-align: left; }
+.rv-action-btn:hover { background: rgba(255,255,255,0.06); }
+.rv-back-btn { background: none; border: none; color: var(--t2); font-size: 0.8125rem; cursor: pointer; font-family: 'Geist Sans', sans-serif; padding: 0 0 16px 0; display: block; }
+.rv-back-btn:hover { color: var(--t1); }
+#rv-detail-content { font-size: 0.8125rem; color: var(--t2); line-height: 1.6; }
+#rv-detail-content .rv-detail-title { font-size: 0.875rem; font-weight: 600; color: var(--t1); margin-bottom: 10px; display: block; }
+#rv-detail-content .rv-detail-meta { font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--t2); margin-bottom: 8px; display: block; }
+#rv-detail-content p { margin: 0 0 10px 0; }
+#rv-detail-content .rv-detail-impact { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.75rem; }
+.rv-main { flex: 1; overflow-y: auto; background: #fafafa; padding: 56px 80px 80px; color: #111; font-family: 'Geist Sans', sans-serif; }
+.rv-section { margin-bottom: 64px; }
+.rv-section-title { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+.rv-section-title hr { flex: 1; border: none; border-top: 1px solid #e0e0e0; margin: 0; }
+.rv-section-title span { font-size: 0.6875rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #999; white-space: nowrap; }
+.rv-row { display: flex; gap: 24px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.875rem; }
+.rv-row:last-child { border-bottom: none; }
+.rv-row-label { width: 200px; flex-shrink: 0; color: #888; font-weight: 600; font-size: 0.8125rem; padding-top: 2px; display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.rv-row-value { flex: 1; color: #111; line-height: 1.6; }
+.rv-row-value p { margin: 0 0 8px 0; }
+.rv-row-value p:last-child { margin-bottom: 0; }
+.rv-row-value.na { color: #bbb; font-style: italic; }
+.rv-row-value ol { margin: 0; padding-left: 18px; }
+.rv-row-value li { margin-bottom: 6px; }
+.rv-row.rv-clickable { cursor: pointer; }
+.rv-row.rv-clickable:hover { background: #f5f5f5; margin: 0 -8px; padding: 12px 8px; }
+.rv-arrow { color: #ccc; font-size: 0.75rem; flex-shrink: 0; margin-top: 2px; }
+.rv-fees-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.rv-fees-table th { text-align: left; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #999; padding: 0 16px 10px 0; border-bottom: 1px solid #e0e0e0; }
+.rv-fees-table td { padding: 10px 16px 10px 0; border-bottom: 1px solid #f0f0f0; color: #111; vertical-align: top; }
+.rv-fees-table tr:last-child td { border-bottom: none; }
+.rv-fees-table .rv-fees-amount { font-weight: 600; white-space: nowrap; }
+.rv-footer { padding-top: 32px; border-top: 1px solid #e0e0e0; margin-top: 40px; }
+.rv-footer-disclaimer { font-size: 0.8125rem; color: #aaa; margin-bottom: 20px; }
+.rv-footer-label { font-size: 0.6875rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #aaa; margin-bottom: 10px; }
+.rv-footer-doc { font-size: 0.8125rem; color: #777; padding: 3px 0; }
+.rv-mobile-bar { display: none; }
+@media (max-width: 768px) {
+  .rv-sidebar { display: none; }
+  .rv-mobile-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 8px 12px; gap: 6px; z-index: 100; overflow-x: auto; }
+  .rv-mobile-bar button { flex-shrink: 0; background: var(--surface-2); border: 1px solid var(--border); color: var(--t1); font-size: 0.75rem; font-weight: 500; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-family: 'Geist Sans', sans-serif; }
+  .rv-main { padding: 24px 20px 80px; }
+}
 </style>
 </head>
 <body>
@@ -700,33 +709,88 @@ input[type=file] { display: none; }
   </div>
 
   <div id="s-results" class="screen">
-    <div class="results-body">
-      <div class="verdict caution" id="verdict-box">
-        <div class="verdict-icon" id="v-icon">&#9888;&#65039;</div>
-        <div class="verdict-txt">
-          <small>Investor Verdict</small>
-          <div class="va" id="v-answer">Analysing...</div>
-          <p id="v-summary"></p>
+    <div class="rv-shell">
+      <aside class="rv-sidebar" id="rv-sidebar">
+        <div class="rv-sidebar-inner">
+          <div class="rv-prop-addr" id="rv-addr">—</div>
+          <div class="rv-ai-summary">
+            <button class="rv-summary-toggle" onclick="toggleAiSummary()">
+              <span>AI Summary</span>
+              <svg class="rv-chevron" id="rv-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="rv-summary-body" id="rv-summary-body">
+              <div class="rv-verdict-chip" id="rv-verdict-chip">—</div>
+              <p class="rv-verdict-summary-txt" id="rv-verdict-summary-txt"></p>
+            </div>
+          </div>
+          <div id="rv-sidebar-default">
+            <nav class="rv-nav">
+              <a class="rv-nav-link" href="#s-tenure">Property &amp; Tenure</a>
+              <a class="rv-nav-link" href="#s-tenancies">Tenancies</a>
+              <a class="rv-nav-link" href="#s-planning">Planning</a>
+              <a class="rv-nav-link" href="#s-auction">Auction</a>
+              <a class="rv-nav-link" href="#s-fees">Fee's</a>
+              <a class="rv-nav-link" href="#s-conditions">Special Conditions</a>
+              <a class="rv-nav-link" href="#s-misc">Miscellaneous</a>
+              <a class="rv-nav-link" href="#s-flags" id="rv-flags-link" style="display:none">Risks &amp; Flags</a>
+            </nav>
+            <div class="rv-actions">
+              <button class="rv-action-btn" onclick="reset()">+ New Analysis</button>
+              <button class="rv-action-btn" onclick="exportReport()">Export Report</button>
+            </div>
+          </div>
+          <div id="rv-sidebar-detail" style="display:none">
+            <button class="rv-back-btn" onclick="hideReportDetail()">← Back</button>
+            <div id="rv-detail-content"></div>
+          </div>
         </div>
+      </aside>
+      <div class="rv-mobile-bar">
+        <button onclick="scrollToSection('s-tenure')">Tenure</button>
+        <button onclick="scrollToSection('s-planning')">Planning</button>
+        <button onclick="scrollToSection('s-fees')">Fee's</button>
+        <button onclick="scrollToSection('s-misc')">Misc</button>
+        <button onclick="reset()">+ New</button>
       </div>
-      <div class="metrics">
-        <div class="metric"><div class="metric-label">Risk Score</div><div class="metric-val red" id="m-score">--</div></div>
-        <div class="metric"><div class="metric-label">Issues</div><div class="metric-val" id="m-issues">--</div></div>
-        <div class="metric"><div class="metric-label">High</div><div class="metric-val red" id="m-high">--</div></div>
-      </div>
-      <div class="extra-costs-box" id="extra-costs-box" style="display:none"></div>
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('risks',this)">Risks</button>
-        <button class="tab" onclick="switchTab('facts',this)">Key Facts</button>
-        <button class="tab" onclick="switchTab('impact',this)">Impact</button>
-      </div>
-      <div class="panel active" id="p-risks"><div class="risks" id="risks-list"></div></div>
-      <div class="panel" id="p-facts"><div class="facts" id="facts-grid"></div></div>
-      <div class="panel" id="p-impact"><div class="impacts" id="impact-list"></div></div>
-      <div class="bottom-row">
-        <button class="btn-sec" onclick="reset()">+ New Pack</button>
-        <button class="btn-red" onclick="exportReport()">Export &#8595;</button>
-      </div>
+      <main class="rv-main" id="rv-main">
+        <section class="rv-section" id="s-tenure">
+          <div class="rv-section-title"><hr><span>Property &amp; Tenure</span><hr></div>
+          <div id="rv-tenure-rows"></div>
+        </section>
+        <section class="rv-section" id="s-tenancies">
+          <div class="rv-section-title"><hr><span>Tenancies</span><hr></div>
+          <div id="rv-tenancy-rows"></div>
+        </section>
+        <section class="rv-section" id="s-planning">
+          <div class="rv-section-title"><hr><span>Planning</span><hr></div>
+          <div id="rv-planning-rows"></div>
+        </section>
+        <section class="rv-section" id="s-auction">
+          <div class="rv-section-title"><hr><span>Auction</span><hr></div>
+          <div id="rv-auction-rows"></div>
+        </section>
+        <section class="rv-section" id="s-fees">
+          <div class="rv-section-title"><hr><span>Fee's</span><hr></div>
+          <div id="rv-fees-rows"></div>
+        </section>
+        <section class="rv-section" id="s-conditions">
+          <div class="rv-section-title"><hr><span>Special Conditions</span><hr></div>
+          <div id="rv-conditions-rows"></div>
+        </section>
+        <section class="rv-section" id="s-misc">
+          <div class="rv-section-title"><hr><span>Miscellaneous</span><hr></div>
+          <div id="rv-misc-rows"></div>
+        </section>
+        <section class="rv-section" id="s-flags" style="display:none">
+          <div class="rv-section-title"><hr><span>Risks &amp; Flags</span><hr></div>
+          <div id="rv-flags-rows"></div>
+        </section>
+        <footer class="rv-footer">
+          <div class="rv-footer-disclaimer">⚠ LegalPack AI can make mistakes. Check important info.</div>
+          <div class="rv-footer-label">Documents used to generate this report</div>
+          <div id="rv-footer-docs"></div>
+        </footer>
+      </main>
     </div>
   </div>
 </div>
@@ -1402,7 +1466,7 @@ function buildPrompt(packName, batchNum, totalBatches) {
     ? 'NOTE: This is batch '+batchNum+' of '+totalBatches+' from the same legal pack. Extract all risks and costs you find in THIS batch — do not skip anything because it might appear elsewhere. The results will be merged.\n\n'
     : '';
 
-  return batchNote + 'Analyse this legal pack content for property: "' + packName + '".\n\nRead every page thoroughly. For LOCAL AUTHORITY SEARCHES (LLC1/CON29) flag:\n- All registered land charges (number and description)\n- Planning permissions with conditions\n- Enforcement notices or contraventions\n- Smoke control areas or environmental designations\n- Radon affected area (flag if yes)\n- Unadopted access roads (buyer pays maintenance — flag specifically)\n- Road/CPO schemes within 200m\n- Contaminated land notices\n- Tree preservation orders\n- Conservation area or listed building designations\n- CIL liability\n- Minerals development policies\n- Missing building regs or completion certificates\n\nFor ALL DOCUMENTS flag:\n- Every extra cost beyond purchase price (legal fees passed to buyer, VAT, late completion penalties, indemnities)\n- All special conditions — every single one\n- Lease issues (length, ground rent, escalation, forfeiture)\n- Title issues (unregistered, recent purchase not yet registered at HMLR)\n- Planning issues and permitted development restrictions\n- Environmental risks (Japanese Knotweed, flooding, contamination, radon)\n- Structural disclaimers (sold as seen, no survey rights, buyer accepts all defects)\n- Access and easement issues\n- Any clause limiting buyer rights or remedies\n- Missing certificates (gas, electric, EPC, asbestos, building regs)\n- Probate complications\n- Overage, clawback, or ransom strip clauses\n- Any indemnity insurance buyer must obtain at their own cost\n\nReturn ONLY valid JSON:\n{\n  "tenure": "Freehold" or "Leasehold" or "Commonhold" or "Unknown",\n  "leaseYears": number or null,\n  "groundRent": "exact details or N/A",\n  "serviceCharge": "exact details or N/A",\n  "titleNumber": "string or Unregistered",\n  "specialConditions": number,\n  "verdict": "yes" or "caution" or "no",\n  "verdictAnswer": "short verdict title",\n  "verdictSummary": "2-3 sentence plain English investor summary",\n  "riskScore": 0-100,\n  "mortgageability": "Good" or "Restricted" or "Unlikely" or "Cash Only",\n  "resaleImpact": "Positive" or "Neutral" or "Reduced" or "Significantly Reduced",\n  "rentalPotential": "High" or "Medium" or "Low",\n  "extraCosts": [\n    { "label": "exact description quoting clause/page", "amount": "exact amount", "mandatory": true or false }\n  ],\n  "risks": [\n    { "severity": "high" or "medium" or "low", "title": "specific title", "description": "plain English with clause/page/figure refs", "investorImpact": "exact financial or practical impact" }\n  ]\n}\nriskScore: yes=0-35, caution=36-65, no=66-100. Return ONLY JSON.';
+  return batchNote + 'Analyse this legal pack content for property: "' + packName + '".\n\nRead every page thoroughly. For LOCAL AUTHORITY SEARCHES (LLC1/CON29) flag:\n- All registered land charges (number and description)\n- Planning permissions with conditions\n- Enforcement notices or contraventions\n- Smoke control areas or environmental designations\n- Radon affected area (flag if yes)\n- Unadopted access roads (buyer pays maintenance — flag specifically)\n- Road/CPO schemes within 200m\n- Contaminated land notices\n- Tree preservation orders\n- Conservation area or listed building designations\n- CIL liability\n- Minerals development policies\n- Missing building regs or completion certificates\n\nFor ALL DOCUMENTS flag:\n- Every extra cost beyond purchase price (legal fees passed to buyer, VAT, late completion penalties, indemnities)\n- All special conditions — every single one\n- Lease issues (length, ground rent, escalation, forfeiture)\n- Title issues (unregistered, recent purchase not yet registered at HMLR)\n- Planning issues and permitted development restrictions\n- Environmental risks (Japanese Knotweed, flooding, contamination, radon)\n- Structural disclaimers (sold as seen, no survey rights, buyer accepts all defects)\n- Access and easement issues\n- Any clause limiting buyer rights or remedies\n- Missing certificates (gas, electric, EPC, asbestos, building regs)\n- Probate complications\n- Overage, clawback, or ransom strip clauses\n- Any indemnity insurance buyer must obtain at their own cost\n\nYou are extracting factual information from a UK property auction legal pack. Extract and organise what the documents actually say — quote or paraphrase faithfully, do not generate opinions.\n\nReturn ONLY valid JSON:\n{\n  "propertyAddress": "full property address",\n  "tenure": "Freehold" or "Leasehold" or "Commonhold" or "Unknown",\n  "leaseYears": number or null,\n  "groundRent": "exact text or null",\n  "serviceCharge": "exact text or null",\n  "proprietor": "registered proprietor name from title register or null",\n  "titleClass": "Absolute" or "Good Leasehold" or "Possessory" or "Qualified" or null,\n  "titleNumber": "title number or Unregistered",\n  "restrictionsEasements": "full text of all restrictions and easements from title register. Separate distinct items with newline. Null if none.",\n  "tenancies": "tenancy and rent details, or \'No information found\'",\n  "planningPermissions": "planning applications, permissions or refusals with application numbers, dates, descriptions, decisions. Null if none.",\n  "planningRestrictions": "conservation area, listed building, tree preservation orders, asbestos, permitted development restrictions, any planning restrictions from searches. Null if none.",\n  "auctionHouse": "auction house name or null",\n  "lotNumber": "lot number or null",\n  "auctionDate": "auction date or null",\n  "guidePrice": "guide price or null",\n  "fees": [\n    { "description": "exact fee description", "amount": "exact amount", "due": "when due" }\n  ],\n  "completionTerms": "full completion date clause and late completion penalty terms. Quote key figures.",\n  "otherIssues": "factual findings: EPC rating with costs, subsidence or mining risk, structural concerns, flood risk, contaminated land, radon, any other material issues. Separate each issue with newline. Null if none.",\n  "amendments": ["full text of each amendment to general conditions"],\n  "specialConditions": ["full text of each special condition"],\n  "verdict": "yes" or "caution" or "no",\n  "verdictSummary": "2 sentences max — plain English investor summary for sidebar only",\n  "riskScore": 0-100,\n  "riskFlags": [\n    { "severity": "high" or "medium" or "low", "title": "risk title", "description": "what was found and exact source reference — max 40 words", "impact": "financial or practical impact — max 20 words" }\n  ]\n}\nriskScore: yes=0-35, caution=36-65, no=66-100. Max 6 riskFlags. Return ONLY compact JSON.';
 }
 
 async function callClaudeWithRetry(contentBlocks, batchNum, totalBatches) {
@@ -1562,64 +1626,58 @@ async function callClaude(contentBlocks) {
 }
 
 function mergeResults(results) {
-  if (results.length===1) return results[0];
-
-  // Take the first result as base, then merge in data from subsequent batches
+  if (results.length === 1) return results[0];
   var base = results[0];
-  var allRisks = [].concat(base.risks||[]);
-  var allExtraCosts = [].concat(base.extraCosts||[]);
-  var totalSpecial = base.specialConditions||0;
-  var maxScore = base.riskScore||0;
-
-  for (var i=1; i<results.length; i++) {
-    var r = results[i];
-    // Merge risks — deduplicate by title similarity
-    (r.risks||[]).forEach(function(newRisk){
-      var isDupe = allRisks.some(function(existing){
-        return existing.title.toLowerCase().slice(0,20) === newRisk.title.toLowerCase().slice(0,20);
-      });
-      if (!isDupe) allRisks.push(newRisk);
-    });
-    // Merge extra costs — deduplicate by label similarity
-    (r.extraCosts||[]).forEach(function(newCost){
-      var isDupe = allExtraCosts.some(function(existing){
-        return existing.label.toLowerCase().slice(0,20) === newCost.label.toLowerCase().slice(0,20);
-      });
-      if (!isDupe) allExtraCosts.push(newCost);
-    });
-    // Take highest risk values
-    totalSpecial += (r.specialConditions||0);
-    if ((r.riskScore||0) > maxScore) maxScore = r.riskScore||0;
-    // Override base facts if later batch has better info
-    if (r.tenure && r.tenure!=='Unknown' && base.tenure==='Unknown') base.tenure=r.tenure;
-    if (r.leaseYears && !base.leaseYears) base.leaseYears=r.leaseYears;
-    if (r.titleNumber && r.titleNumber!=='Unknown' && base.titleNumber==='Unknown') base.titleNumber=r.titleNumber;
-    if (r.groundRent && r.groundRent!=='N/A' && (base.groundRent==='N/A'||!base.groundRent)) base.groundRent=r.groundRent;
-    if (r.serviceCharge && r.serviceCharge!=='N/A' && (base.serviceCharge==='N/A'||!base.serviceCharge)) base.serviceCharge=r.serviceCharge;
-  }
-
-  // Sort risks: high first, then medium, then low
-  allRisks.sort(function(a,b){
-    var order = {high:0,medium:1,low:2};
-    return (order[a.severity]||1)-(order[b.severity]||1);
+  ['propertyAddress','proprietor','titleClass','titleNumber','restrictionsEasements',
+   'tenancies','planningPermissions','planningRestrictions','auctionHouse','lotNumber',
+   'auctionDate','guidePrice','completionTerms','tenure','leaseYears','groundRent','serviceCharge'
+  ].forEach(function(k) {
+    if (!base[k]) {
+      for (var i = 1; i < results.length; i++) { if (results[i][k]) { base[k] = results[i][k]; break; } }
+    }
   });
-
-  // Recalculate verdict from merged risk score
-  var finalScore = Math.min(maxScore, 100);
-  var finalVerdict = finalScore>=66?'no':finalScore>=36?'caution':'yes';
-  var verdictAnswer = finalVerdict==='no'?'Avoid — High Risk':finalVerdict==='caution'?'Proceed with Caution':'Looks Viable';
-
-  base.risks = allRisks;
-  base.extraCosts = allExtraCosts;
-  base.specialConditions = totalSpecial;
-  base.riskScore = finalScore;
-  base.verdict = finalVerdict;
-  base.verdictAnswer = verdictAnswer;
+  var allIssues = (base.otherIssues || '').split('\n').filter(Boolean);
+  for (var i = 1; i < results.length; i++) {
+    (results[i].otherIssues || '').split('\n').filter(Boolean).forEach(function(line) {
+      if (!allIssues.some(function(x) { return x.slice(0,30) === line.slice(0,30); })) allIssues.push(line);
+    });
+  }
+  base.otherIssues = allIssues.join('\n') || null;
+  var allFees = [].concat(base.fees || []);
+  for (var i = 1; i < results.length; i++) {
+    (results[i].fees || []).forEach(function(f) {
+      if (!allFees.some(function(x) { return x.description.slice(0,25) === f.description.slice(0,25); })) allFees.push(f);
+    });
+  }
+  base.fees = allFees;
+  var allAmend = [].concat(base.amendments || []);
+  for (var i = 1; i < results.length; i++) {
+    (results[i].amendments || []).forEach(function(a) {
+      if (!allAmend.some(function(x) { return x.slice(0,30) === a.slice(0,30); })) allAmend.push(a);
+    });
+  }
+  base.amendments = allAmend;
+  var allSC = [].concat(base.specialConditions || []);
+  for (var i = 1; i < results.length; i++) {
+    (results[i].specialConditions || []).forEach(function(c) {
+      if (!allSC.some(function(x) { return x.slice(0,30) === c.slice(0,30); })) allSC.push(c);
+    });
+  }
+  base.specialConditions = allSC;
+  var allFlags = [].concat(base.riskFlags || []);
+  var maxScore = base.riskScore || 0;
+  for (var i = 1; i < results.length; i++) {
+    var r = results[i];
+    (r.riskFlags || []).forEach(function(f) {
+      if (!allFlags.some(function(x) { return x.title.slice(0,20) === f.title.slice(0,20); })) allFlags.push(f);
+    });
+    if ((r.riskScore || 0) > maxScore) maxScore = r.riskScore;
+  }
+  allFlags.sort(function(a,b) { var o={high:0,medium:1,low:2}; return (o[a.severity]||1)-(o[b.severity]||1); });
+  base.riskFlags = allFlags;
+  base.riskScore = Math.min(maxScore, 100);
+  base.verdict = maxScore >= 66 ? 'no' : maxScore >= 36 ? 'caution' : 'yes';
   base.verdictSummary = base.verdictSummary || results[results.length-1].verdictSummary;
-  base.mortgageability = base.mortgageability || results[results.length-1].mortgageability;
-  base.resaleImpact = base.resaleImpact || results[results.length-1].resaleImpact;
-  base.rentalPotential = base.rentalPotential || results[results.length-1].rentalPotential;
-
   return base;
 }
 
@@ -1644,64 +1702,137 @@ function autoSaveReport(d) {
 }
 
 // ── BUILD RESULTS ─────────────────────────────────────────────────────────────
+var rvDetailItems = [];
+
 function buildResults(d) {
-  var vtype=d.verdict||'caution';
-  var vicons={yes:'&#9989;',caution:'&#9888;&#65039;',no:'&#10060;'};
-  document.getElementById('verdict-box').className='verdict '+vtype;
-  document.getElementById('v-icon').innerHTML=vicons[vtype]||'&#9888;&#65039;';
-  document.getElementById('v-answer').textContent=d.verdictAnswer||'Proceed with Caution';
-  document.getElementById('v-summary').textContent=d.verdictSummary||'';
-  var score=d.riskScore||50;
-  var sc=score>=66?'red':score>=36?'amber':'green';
-  document.getElementById('m-score').textContent=score;
-  document.getElementById('m-score').className='metric-val '+sc;
-  var risks=d.risks||[];
-  document.getElementById('m-issues').textContent=risks.length;
-  var highs=risks.filter(function(r){return r.severity==='high';}).length;
-  document.getElementById('m-high').textContent=highs;
-  document.getElementById('m-high').className='metric-val '+(highs>0?'red':'amber');
+  document.body.classList.add('showing-results');
+  document.getElementById('rv-addr').textContent = d.propertyAddress || currentPackName || '—';
+  var vtype = d.verdict || 'caution';
+  var chip = document.getElementById('rv-verdict-chip');
+  chip.textContent = vtype === 'yes' ? 'Looks Viable' : vtype === 'no' ? 'Avoid — High Risk' : 'Proceed with Caution';
+  chip.className = 'rv-verdict-chip ' + vtype;
+  document.getElementById('rv-verdict-summary-txt').textContent = d.verdictSummary || '';
 
-  var ec=d.extraCosts||[];
-  var ecBox=document.getElementById('extra-costs-box');
-  if(ec.length>0){
-    var ecHtml='<div class="extra-costs-title">&#128680; Extra Costs On Top Of Purchase Price</div>';
-    ec.forEach(function(e){ecHtml+='<div class="extra-cost-row"><span class="extra-cost-label">'+e.label+(e.mandatory?'':' <em style="font-size:10px;opacity:0.7">(if applicable)</em>')+'</span><span class="extra-cost-amount">'+e.amount+'</span></div>';});
-    ecBox.innerHTML=ecHtml; ecBox.style.display='block';
-  } else { ecBox.style.display='none'; }
+  rvDetailItems = [];
 
-  document.getElementById('risks-list').innerHTML=risks.length?risks.map(function(r){
-    return '<div class="risk"><div class="risk-head"><span class="sev '+r.severity+'">'+r.severity.toUpperCase()+'</span><span class="risk-title">'+r.title+'</span></div><div class="risk-desc">'+r.description+'</div><div class="risk-impact">&rarr; '+r.investorImpact+'</div></div>';
-  }).join(''):'<div style="color:var(--t2);font-size:13px;padding:10px 0">No significant risks flagged.</div>';
+  function val(value) {
+    if (!value || (Array.isArray(value) && !value.length)) return '<span class="rv-row-value na">No information found</span>';
+    if (Array.isArray(value)) return '<div class="rv-row-value"><ol>' + value.map(function(v){ return '<li>' + v + '</li>'; }).join('') + '</ol></div>';
+    var paras = String(value).split('\n').map(function(p){ return p.trim(); }).filter(Boolean);
+    return '<div class="rv-row-value">' + paras.map(function(p){ return '<p>' + p + '</p>'; }).join('') + '</div>';
+  }
 
-  var facts=[
-    {l:'Tenure',v:d.tenure||'Unknown',c:d.tenure==='Freehold'?'good':d.tenure==='Leasehold'?'warn':''},
-    {l:'Lease Length',v:d.leaseYears?d.leaseYears+' years':'N/A',c:d.leaseYears&&d.leaseYears<80?'bad':''},
-    {l:'Ground Rent',v:d.groundRent||'N/A',c:''},
-    {l:'Service Charge',v:d.serviceCharge||'N/A',c:''},
-    {l:'Title Number',v:d.titleNumber||'Unknown',c:d.titleNumber==='Unregistered'?'bad':''},
-    {l:'Special Conditions',v:(d.specialConditions||0)+' found',c:d.specialConditions>2?'bad':d.specialConditions>0?'warn':'good'}
-  ];
-  document.getElementById('facts-grid').innerHTML=facts.map(function(f){
-    return '<div class="fact"><div class="fact-lbl">'+f.l+'</div><div class="fact-val '+f.c+'">'+f.v+'</div></div>';
-  }).join('');
+  function row(label, value, clickIdx) {
+    var click = clickIdx !== undefined;
+    return '<div class="rv-row' + (click ? ' rv-clickable' : '') + '"' + (click ? ' onclick="showReportDetail(' + clickIdx + ')"' : '') + '>' +
+      '<div class="rv-row-label">' + label + (click ? '<span class="rv-arrow">→</span>' : '') + '</div>' + val(value) + '</div>';
+  }
 
-  var mc={Good:'green',Restricted:'amber',Unlikely:'red','Cash Only':'red'};
-  var rc={Positive:'green',Neutral:'green',Reduced:'amber','Significantly Reduced':'red'};
-  var nc={High:'green',Medium:'amber',Low:'red'};
-  var impacts=[
-    {l:'Mortgageability',c:mc[d.mortgageability]||'amber',t:d.mortgageability||'Unknown'},
-    {l:'Resale Value',c:rc[d.resaleImpact]||'amber',t:d.resaleImpact||'Unknown'},
-    {l:'Rental Potential',c:nc[d.rentalPotential]||'amber',t:d.rentalPotential||'Unknown'},
-    {l:'Overall Risk',c:sc,t:score+' / 100'}
-  ];
-  document.getElementById('impact-list').innerHTML=impacts.map(function(im){
-    return '<div class="impact"><span class="impact-label">'+im.l+'</span><div class="dot '+im.c+'"></div><span class="impact-txt '+im.c+'">'+im.t+'</span></div>';
-  }).join('');
+  // Property & Tenure
+  document.getElementById('rv-tenure-rows').innerHTML =
+    row('Address', d.propertyAddress) +
+    row('Tenure', d.tenure) +
+    (d.leaseYears ? row('Lease Length', d.leaseYears + ' years') : '') +
+    (d.groundRent ? row('Ground Rent', d.groundRent) : '') +
+    (d.serviceCharge ? row('Service Charge', d.serviceCharge) : '') +
+    row('Proprietor', d.proprietor) +
+    row('Class', d.titleClass) +
+    row('Title Number', d.titleNumber) +
+    row('Restrictions / Easements', d.restrictionsEasements);
 
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelector('.tab').classList.add('active');
-  document.getElementById('p-risks').classList.add('active');
+  // Tenancies
+  document.getElementById('rv-tenancy-rows').innerHTML = row('Rents', d.tenancies || 'No information found');
+
+  // Planning
+  document.getElementById('rv-planning-rows').innerHTML = row('Permissions', d.planningPermissions) + row('Restrictions', d.planningRestrictions);
+
+  // Auction
+  document.getElementById('rv-auction-rows').innerHTML =
+    row('Auction House', d.auctionHouse) + row('Lot Number', d.lotNumber) +
+    row('Date', d.auctionDate) + row('Guide Price', d.guidePrice);
+
+  // Fee's — table format
+  var fees = d.fees || [];
+  document.getElementById('rv-fees-rows').innerHTML = fees.length
+    ? '<div class="rv-row"><div class="rv-row-label">Buyer Fee\'s</div><div class="rv-row-value"><table class="rv-fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>' +
+      fees.map(function(f){ return '<tr><td>' + f.description + '</td><td class="rv-fees-amount">' + f.amount + '</td><td>' + (f.due||'—') + '</td></tr>'; }).join('') +
+      '</tbody></table></div></div>'
+    : row("Buyer Fee's", null);
+
+  // Special Conditions
+  var sc = d.specialConditions || [];
+  document.getElementById('rv-conditions-rows').innerHTML = sc.length
+    ? sc.map(function(c, i){ return row('Condition ' + (i+1), c); }).join('')
+    : row('Conditions', null);
+
+  // Miscellaneous
+  document.getElementById('rv-misc-rows').innerHTML =
+    row('Completion', d.completionTerms) +
+    row('Other Issues', d.otherIssues) +
+    (d.amendments && d.amendments.length ? row('Amendments', d.amendments) : '');
+
+  // Risk Flags — clickable rows, detail in sidebar
+  var flags = (d.riskFlags || []).slice().sort(function(a,b){ var o={high:0,medium:1,low:2}; return (o[a.severity]||1)-(o[b.severity]||1); });
+  if (flags.length) {
+    document.getElementById('rv-flags-rows').innerHTML = flags.map(function(f){
+      var idx = rvDetailItems.length;
+      rvDetailItems.push({
+        title: f.title,
+        body: '<span class="rv-detail-meta">' + (f.severity||'').toUpperCase() + ' SEVERITY</span><p>' + (f.description||'') + '</p><div class="rv-detail-impact">→ ' + (f.impact||'') + '</div>'
+      });
+      return row(f.title, (f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : '') + ' risk', idx);
+    }).join('');
+    document.getElementById('s-flags').style.display = '';
+    document.getElementById('rv-flags-link').style.display = '';
+  } else {
+    document.getElementById('s-flags').style.display = 'none';
+    document.getElementById('rv-flags-link').style.display = 'none';
+  }
+
+  // Footer docs
+  var footerDocs = (typeof files !== 'undefined' && files && files.length)
+    ? files.map(function(f){ return '<div class="rv-footer-doc">📄 ' + f.name + '</div>'; }).join('') : '';
+  document.getElementById('rv-footer-docs').innerHTML = footerDocs;
+
+  initScrollSpy();
+}
+
+function showReportDetail(idx) {
+  var item = rvDetailItems[idx];
+  if (!item) return;
+  document.getElementById('rv-sidebar-default').style.display = 'none';
+  document.getElementById('rv-sidebar-detail').style.display = 'block';
+  document.getElementById('rv-detail-content').innerHTML = '<span class="rv-detail-title">' + item.title + '</span>' + item.body;
+}
+
+function hideReportDetail() {
+  document.getElementById('rv-sidebar-detail').style.display = 'none';
+  document.getElementById('rv-sidebar-default').style.display = '';
+}
+
+function toggleAiSummary() {
+  document.getElementById('rv-summary-body').classList.toggle('collapsed');
+  document.getElementById('rv-chevron').classList.toggle('open');
+}
+
+function scrollToSection(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initScrollSpy() {
+  var links = document.querySelectorAll('.rv-nav-link');
+  var sections = document.querySelectorAll('.rv-section');
+  if (!sections.length || !links.length) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.id;
+        links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+      }
+    });
+  }, { root: document.getElementById('rv-main'), rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+  sections.forEach(function(s){ obs.observe(s); });
 }
 
 function switchTab(name,el){
@@ -1743,7 +1874,7 @@ function renderDrawer(){
   }).join('');
 }
 
-function reset(){files=[];zipContents=[];document.getElementById('file-list').innerHTML='';document.getElementById('analyse-btn').disabled=true;document.getElementById('file-input').value='';document.getElementById('proc-error').className='proc-error';show('s-upload');}
+function reset(){document.body.classList.remove('showing-results');files=[];zipContents=[];document.getElementById('file-list').innerHTML='';document.getElementById('analyse-btn').disabled=true;document.getElementById('file-input').value='';document.getElementById('proc-error').className='proc-error';show('s-upload');}
 
 function exportReport(){
   if(!currentResult)return;

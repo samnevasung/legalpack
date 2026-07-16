@@ -2918,7 +2918,7 @@ function renderResult(result, packName) {
         <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.mortgageable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Mortgageable</div></div>
         <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.resaleable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Resaleable</div></div>
         <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.tenantable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Tenantable</div></div>
-        <div class="rv-ia-pill"><div class="rv-ia-pill-icon" style="font-size:0.66rem;font-weight:800;color:var(--text);">${ia.insurable || '—'}</div><div class="rv-ia-pill-label">Insurable</div></div>
+        <div class="rv-ia-pill"><div class="rv-ia-pill-icon" style="font-size:0.66rem;font-weight:800;color:var(--text);">${ia.insurable === true || ia.insurable === 'true' || ia.insurable === 'Yes' ? 'Yes' : 'No'}</div><div class="rv-ia-pill-label">Insurable</div></div>
       </div>
       <button class="rv-summary-toggle" onclick="const b=document.getElementById('rv-summary-body');const open=b.classList.toggle('open');this.textContent='Read AI summary '+(open?'▴':'▾');">Read AI summary ▾</button>
       <div class="rv-summary-body" id="rv-summary-body">${result.summary || 'Analysis complete.'}</div>
