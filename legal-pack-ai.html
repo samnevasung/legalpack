@@ -1835,12 +1835,6 @@ function initScrollSpy() {
   sections.forEach(function(s){ obs.observe(s); });
 }
 
-function switchTab(name,el){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
-  el.classList.add('active'); document.getElementById('p-'+name).classList.add('active');
-}
-
 // ── REPORTS DRAWER ────────────────────────────────────────────────────────────
 function deleteReport(id,e){e.stopPropagation();savedReports=savedReports.filter(function(r){return r.id!==id;});localStorage.setItem('lp_reports',JSON.stringify(savedReports));updateCount();renderDrawer();}
 function clearAll(){if(!savedReports.length)return;if(!confirm('Delete all saved reports?'))return;savedReports=[];localStorage.setItem('lp_reports',JSON.stringify(savedReports));updateCount();renderDrawer();}

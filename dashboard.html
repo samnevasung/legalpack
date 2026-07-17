@@ -860,12 +860,26 @@ body {
   background: var(--bg);
 }
 .rv-sidebar {
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
   width: 280px; flex-shrink: 0;
   background: var(--bg); border-right: 1px solid var(--border);
   padding: 24px 20px; display: flex; flex-direction: column;
+  transition: width 0.25s ease;
 }
-.rv-sidebar-state { display: flex; flex-direction: column; gap: 22px; flex: 1; min-height: 100%; }
+.rv-sidebar.collapsed { width: 56px; }
+.rv-collapse-btn {
+  position: absolute; top: 12px; right: 12px; width: 32px; height: 32px;
+  background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+  color: var(--text); cursor: pointer; font-size: 14px; z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+}
+.rv-sidebar-content { display: flex; flex-direction: column; gap: 22px; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
+.rv-sidebar.collapsed .rv-sidebar-content { opacity: 0; pointer-events: none; }
+.rv-score-row { display: flex; align-items: baseline; gap: 3px; margin-top: 10px; }
+.rv-score-num { font-size: 1.6rem; font-weight: 800; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1; }
+.rv-score-max { font-size: 0.78rem; color: var(--text-faint); font-weight: 600; }
+.rv-risk-factors { display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+.rv-risk-factor { font-size: 0.72rem; color: var(--text-faint); line-height: 1.5; }
 .rv-address { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
 .rv-risk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 20px; color: #fff; margin-bottom: 14px; }
 .rv-stat-pills { display: flex; gap: 6px; }
@@ -896,48 +910,25 @@ body {
 .rv-action-btn:hover { color: var(--text); border-color: var(--text-faint); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
-.rv-main { flex: 1; min-width: 0; background: #fafafa; color: #18181b; padding: 56px 64px 40px; }
+.rv-main { flex: 1; min-width: 0; background: #fafafa; color: #18181b; max-width: 860px; margin: 0 auto; padding: 48px 48px; }
 .rv-doc-section { margin-bottom: 64px; scroll-margin-top: 24px; }
 .rv-doc-section:last-of-type { margin-bottom: 0; }
-.rv-section-title { display: flex; align-items: center; gap: 14px; justify-content: center; margin-bottom: 32px; }
-.rv-section-title::before, .rv-section-title::after { content: ''; flex: 1; height: 1px; background: #e4e4e7; }
-.rv-section-title-text { font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #3f3f46; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
 
-.rv-row { display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
-.rv-row:last-child { border-bottom: none; }
-.rv-row-label { font-size: 0.8rem; color: #71717a; flex-shrink: 0; width: 180px; }
-.rv-row-value { font-size: 0.88rem; color: #18181b; font-weight: 600; text-align: right; flex: 1; }
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+.section-line { flex: 1; height: 1px; background: #E8B84B; opacity: 0.5; }
+.section-badge { width: 52px; height: 52px; border-radius: 50%; background: #E8B84B; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rv-doc-section-title { font-size: 22px; font-weight: 500; color: #1a1a1a; white-space: nowrap; }
 
-.rv-flag-row { padding: 18px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 20px; }
-.rv-flag-row:last-child { border-bottom: none; }
-.rv-flag-title { font-size: 0.92rem; font-weight: 700; color: #18181b; margin-bottom: 5px; }
-.rv-flag-desc { font-size: 0.82rem; color: #71717a; line-height: 1.6; }
-.rv-sev-badge { flex-shrink: 0; font-size: 10px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; height: fit-content; white-space: nowrap; }
-.rv-clickable { cursor: pointer; margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 6px; transition: background 0.12s; }
-.rv-clickable:hover { background: #f4f4f5; }
-.rv-arrow { flex-shrink: 0; color: #a1a1aa; font-size: 0.85rem; align-self: center; }
+.content-row { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+.content-row:last-child { border-bottom: none; }
+.row-label { font-weight: 600; font-size: 14px; color: #374151; }
+.row-value { font-size: 14px; color: #1f2937; line-height: 1.6; }
 
-.rv-cost-table { width: 100%; border-collapse: collapse; }
-.rv-cost-table th { text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #a1a1aa; padding: 0 0 10px; border-bottom: 1px solid #e4e4e7; }
-.rv-cost-table th:last-child, .rv-cost-table td:last-child { text-align: right; }
-.rv-cost-table td { padding: 14px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; color: #18181b; vertical-align: top; }
-.rv-cost-table tr:last-child td { border-bottom: none; }
-.rv-cost-desc-label { font-weight: 700; }
-.rv-cost-desc-sub { font-size: 0.74rem; color: #a1a1aa; margin-top: 3px; }
-.rv-cost-amount { font-family: 'DM Mono', monospace; font-weight: 700; white-space: nowrap; }
+.fees-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.fees-table th { text-align: left; font-weight: 700; padding: 8px 12px; border-bottom: 2px solid #e5e7eb; }
+.fees-table td { padding: 10px 12px; color: #1f2937; }
 
-.rv-numbered-row { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid #f0f0f0; }
-.rv-numbered-row:last-child { border-bottom: none; }
-.rv-numbered-num { font-family: 'DM Mono', monospace; font-weight: 800; color: #a1a1aa; flex-shrink: 0; }
-
-.rv-doc-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-.rv-doc-row:last-child { border-bottom: none; }
-.rv-doc-name { font-size: 0.85rem; color: #18181b; font-weight: 600; }
-.rv-doc-pages { font-size: 0.78rem; color: #a1a1aa; font-family: 'DM Mono', monospace; }
-
-.rv-empty { text-align: center; padding: 20px 0; color: #a1a1aa; font-size: 0.82rem; }
-.rv-footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid #e4e4e7; font-size: 0.76rem; color: #a1a1aa; }
-.rv-footer-title { font-weight: 700; color: #71717a; margin-bottom: 8px; }
+.rv-doc-footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
 
 /* Search — slide-over on top of the document, not a permanent third column */
 .rv-search-overlay {
@@ -2748,259 +2739,282 @@ function renderResult(result, packName) {
   if (navCR) navCR.style.display = 'flex';
 
   const el = document.getElementById('result-area');
-  const flags = result.flags || result.risks || [];
-  const criticalFlags = flags.filter(f => f.severity === 'critical' || f.severity === 'high');
-  const warningFlags  = flags.filter(f => f.severity === 'warning'  || f.severity === 'medium');
-  const noteFlags     = flags.filter(f => f.severity === 'note'     || f.severity === 'low');
-  const critical = criticalFlags.length, warnings = warningFlags.length;
-  const costs = result.buyerCostFigures || result.extraCosts || [];
-  const summary = result.buyerCostSummary;
-  const confirmedTotal = costs.reduce((s,c) => s + (c.numericAmount || 0), 0);
-  const risk = result.overallRisk || (critical > 3 ? 'SEVERE' : critical > 0 ? 'HIGH' : warnings > 0 ? 'MODERATE' : 'LOW');
-  const rm = {
-    LOW:     { bg:'#16a34a', border:'#16a34a', text:'#ffffff', label:'🟢 LOW RISK' },
-    MODERATE:{ bg:'#d97706', border:'#d97706', text:'#ffffff', label:'🟡 MODERATE RISK' },
-    HIGH:    { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' },
-    SEVERE:  { bg:'#b91c1c', border:'#b91c1c', text:'#ffffff', label:'🚨 SEVERE RISK' }
-  }[risk] || { bg:'#dc2626', border:'#dc2626', text:'#ffffff', label:'🔴 HIGH RISK' };
-  const ia = result.investorAssessment || {};
-  const mortgage = result.mortgageability || '—';
-  const mortgageColor = (mortgage==='Cash Only'||mortgage==='Bridging Only') ? '#dc2626' : mortgage==='Restricted' ? '#d97706' : 'var(--ok)';
-  const vt = critical===0&&warnings<=2
-    ? {icon:'🟢',text:'Low legal complexity',   sub:'Appears suitable for standard buyers',                        col:'var(--ok)', bg:'rgba(22,163,74,0.1)',   border:'rgba(22,163,74,0.3)'}
-    : critical===0
-    ? {icon:'🟡',text:'Proceed with caution',   sub:'Warnings present — solicitor review advised',                col:'#d97706',   bg:'rgba(245,158,11,0.1)',  border:'rgba(245,158,11,0.3)'}
-    : critical<=3
-    ? {icon:'⚠️',text:'Solicitor review essential',sub:'Critical issues found — do not bid without legal advice', col:'var(--red)', bg:'rgba(220,38,38,0.1)',   border:'rgba(220,38,38,0.3)'}
-    : {icon:'🔴',text:'Cash buyers only likely',sub:'Multiple critical issues — high risk acquisition',           col:'#dc2626',   bg:'rgba(220,38,38,0.12)',  border:'rgba(220,38,38,0.35)'};
+  const NA = 'Not stated in documents provided.';
 
-  const ds = result.documentStatus || {};
-  const uploadedFiles = result._uploadedFiles || [];
-  const pubSlug = addressToSlug(result.address);
+  // ── Risk assessment — authoritative, computed by the backend ──
+  const ra = result.risk_assessment || {};
+  const levelColors = { LOW: '#22c55e', MODERATE: '#f59e0b', HIGH: '#ef4444', CRITICAL: '#7c3aed' };
+  const level = ra.level || 'MODERATE';
+  const levelColor = levelColors[level] || levelColors.MODERATE;
+  const score = typeof ra.score === 'number' ? ra.score : 0;
+  const criticalCount = ra.critical_count || 0;
+  const warningCount = ra.warning_count || 0;
+  const factors = ra.factors || [];
 
-  // ── Row builders (shared by the sections below) ──
-  const rvRow = (label, value) => value ? `<div class="rv-row"><div class="rv-row-label">${label}</div><div class="rv-row-value">${value}</div></div>` : '';
-  const rvEmpty = (msg) => `<div class="rv-empty">${msg}</div>`;
+  const titlesTenure = result.titles_tenure || {};
+  const address = titlesTenure.address || result.address || packName || 'Legal Pack';
+  const pubSlug = addressToSlug(address);
 
-  // ── Detail lookup — verbose text lives here, not in the main document ──
-  const rvDetailItems = [];
-  const addDetail = (item) => { rvDetailItems.push(item); return rvDetailItems.length - 1; };
-  const rvSynopsis = (text, maxLen) => {
-    if (!text) return '';
-    const s = String(text).trim();
-    const m = s.match(/^[^.!?]*[.!?]/);
-    let first = m ? m[0].trim() : s;
-    if (first.length > maxLen) first = first.slice(0, maxLen - 1).trim() + '…';
-    return first;
+  // ── Legacy sidebar fields — new schema no longer produces these; degrade gracefully ──
+  const legacySummary = result.summary || result.verdictSummary || '';
+
+  // ── Shared row builders ──
+  const row = (label, valueHtml) => `<div class="content-row"><div class="row-label">${label}</div><div class="row-value">${valueHtml}</div></div>`;
+  const textVal = (v, fallback) => {
+    if (!v) return `<span style="color:#bbb;font-style:italic;">${fallback}</span>`;
+    const paras = String(v).split('\n').map(p => p.trim()).filter(Boolean);
+    return paras.length > 1 ? paras.map(p => `<p style="margin:0 0 8px;">${p}</p>`).join('') : v;
+  };
+  const emptyMsg = (msg) => `<span style="color:#bbb;font-style:italic;">${msg}</span>`;
+  const sectionHeader = (title, icon) => `<div class="section-header"><div class="section-line"></div><div class="section-badge">${icon}</div><span class="rv-doc-section-title">${title}</span><div class="section-line"></div></div>`;
+
+  const ICONS = {
+    titles: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/></svg>',
+    auction: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 9-9 9-9-9V2z"/><circle cx="8" cy="7" r="1.3" fill="#fff" stroke="none"/></svg>',
+    tenancies: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>',
+    planning: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 13h6M9 17h6"/></svg>',
+    charges: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/><path d="M12 8v5"/><circle cx="12" cy="16" r="0.6" fill="#fff"/></svg>',
+    epc: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-2 7 9-12h-6z"/></svg>',
+    fees: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9.5c0-1 1-1.5 2-1.5h1.5c1 0 2 .6 2 1.5s-1 1.5-2 1.5H11c-1 0-2 .6-2 1.5s1 1.5 2 1.5h1.5c1 0 2-.5 2-1.5"/><path d="M12 6.5v11"/></svg>',
+    flags: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18"/><path d="M5 4h11l-2.5 4L16 12H5"/></svg>',
+    misc: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.4" fill="#fff" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="#fff" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="#fff" stroke="none"/></svg>',
+    docs: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M9.5 14l1.8 1.8L15 12"/></svg>',
+    missing: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12l4 4M14 12l-4 4"/></svg>'
   };
 
-  // ── Property & Tenure rows ──
-  const ta = result.titleAnalysis || {};
-  const notNone = (v) => v && !/^none found$/i.test(String(v).trim());
-  const propertyRows = [
-    rvRow('Tenure', result.tenure),
-    rvRow('Lease Remaining', result.leaseYears ? `${result.leaseYears} years` : ''),
-    rvRow('Title Number', result.titleNumber),
-    rvRow('Seller', result.seller),
-    notNone(ta.restrictiveCovenants) ? rvRow('Restrictive Covenants', ta.restrictiveCovenants) : '',
-    notNone(ta.easements) ? rvRow('Easements', ta.easements) : '',
-    notNone(ta.overage) ? rvRow('Overage', ta.overage) : '',
-    notNone(ta.charges) ? rvRow('Charges', ta.charges) : '',
-    notNone(ta.accessIssues) ? rvRow('Access Issues', ta.accessIssues) : '',
-  ].filter(Boolean).join('');
+  // ── 1. Titles / Tenure ──
+  const titlesRows =
+    row('Address', textVal(titlesTenure.address, NA)) +
+    row('Tenure', textVal(titlesTenure.tenure, NA)) +
+    row('Proprietor', textVal(titlesTenure.proprietor, NA)) +
+    row('Title Number', textVal(titlesTenure.title_number, NA)) +
+    row('Class of Title', textVal(titlesTenure.class_of_title, NA)) +
+    row('Restrictions & Easements', textVal(titlesTenure.restrictions_easements, NA));
 
-  // ── Auction rows ──
-  const lm = result._listingMeta || {};
-  const auctionRows = [
-    rvRow('Guide Price', result.guidePrice || lm.guidePrice),
-    rvRow('Auction House', result.auctionHouse || lm.auctionHouse),
-    rvRow('Auction Date', lm.auctionDate),
-    rvRow('Auction Time', lm.auctionTime),
-    rvRow('Venue', lm.auctionVenue),
-    rvRow('Lot Number', lm.lotNumber),
-  ].filter(Boolean).join('');
+  // ── Auction Details ──
+  const auc = result.auction_details || {};
+  const aucRows =
+    row('Lot Number', textVal(auc.lot_number, NA)) +
+    row('Auction House', textVal(auc.auction_house, NA)) +
+    row('Guide Price', textVal(auc.guide_price, NA)) +
+    row('Reserve Price', textVal(auc.reserve_price, 'Not disclosed.')) +
+    row('Auction Date', textVal(auc.auction_date, NA));
 
-  // ── Flags rows (critical, then warning, then note/info — no grouping headers) ──
-  const orderedFlags = [...criticalFlags, ...warningFlags, ...noteFlags];
-  const flagRows = orderedFlags.map(f => {
-    const detail = f.detail || f.description || f.buyerImpact || '';
-    const source = [f.documentSource, f.evidence ? `"${f.evidence}"` : ''].filter(Boolean).join(' — ');
-    const idx = detail ? addDetail({
-      severity: f.severity,
-      title: f.title,
-      body: [
-        detail ? { label: 'Details', text: detail } : null,
-        f.buyerImpact && f.buyerImpact !== detail ? { label: 'Investor Impact', text: f.buyerImpact } : null,
-        source ? { label: 'Source', text: source } : null,
-      ].filter(Boolean)
-    }) : -1;
-    return renderFlagRow(f, idx, rvSynopsis(detail, 110));
-  }).join('');
+  // ── 2. Tenancies ──
+  const tenancies = result.tenancies || {};
+  const occupationStatus = tenancies.occupied === true ? 'Occupied' : tenancies.occupied === false ? 'Vacant Possession' : 'Not Confirmed';
+  const tenancyDetails = tenancies.occupied === false ? 'Vacant possession.' : tenancies.occupied === null || tenancies.occupied === undefined ? 'Not confirmed in documents.' : (tenancies.rents || NA);
+  const tenanciesRows = row('Occupation Status', occupationStatus) + row('Tenancy Details', tenancyDetails);
 
-  // ── Costs table ──
-  const costRows = costs.map(c => `<tr>
-      <td><div class="rv-cost-desc-label">${c.label}${c.mandatory ? ' <span style="color:#dc2626;font-size:9px;font-weight:800;letter-spacing:0.3px;">MANDATORY</span>' : ''}</div>${c.evidence ? `<div class="rv-cost-desc-sub">${c.evidence}</div>` : ''}</td>
-      <td class="rv-cost-amount">${c.amount || '—'}${c.vatApplies ? ' + VAT' : ''}</td>
-      <td>${c.frequency && c.frequency !== 'unknown' ? c.frequency.replace(/\b\w/g, m => m.toUpperCase()) : 'One-off'}</td>
-    </tr>`).join('');
+  // ── 3. Planning ──
+  const planning = result.planning || {};
+  const perms = planning.permissions || [];
+  const permsHtml = perms.length
+    ? perms.map((p, i) => `<div style="${i < perms.length - 1 ? 'margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f5f5f5;' : ''}">
+        <div style="font-weight:600;">${p.application_number || 'Application'}${p.decision ? ' — ' + p.decision : ''}</div>
+        ${p.date_of_decision ? `<div style="color:#6b7280;font-size:13px;margin-top:2px;">${p.date_of_decision}</div>` : ''}
+        ${p.description ? `<div style="margin-top:4px;">${p.description}</div>` : ''}
+      </div>`).join('')
+    : emptyMsg('No planning applications found in documents provided.');
+  const planningRows = row('Permissions', permsHtml) + row('Restrictions', textVal(planning.restrictions, NA));
 
-  // ── Special Conditions — numbered rows, derived from flags tagged as special/auction conditions ──
-  const specialFlags = flags.filter(f => {
-    const cat=(f.category||'').toLowerCase(), title=(f.title||'').toLowerCase(), src=(f.documentSource||'').toLowerCase();
-    return cat.includes('special')||cat.includes('auction')||cat.includes('condition')||title.includes('special condition')||title.includes('auction condition')||title.includes('seller legal fee')||title.includes('buyer legal fee')||title.includes('completion')||title.includes('deposit')||src.includes('special condition')||src.includes('auction condition');
-  });
-  const specialRows = specialFlags.map((f,i) => {
-    const detail = f.detail || f.buyerImpact || '';
-    const idx = detail ? addDetail({ title: f.title, body: [{ label: 'Details', text: detail }] }) : -1;
-    return `<div class="rv-numbered-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
-      <div class="rv-numbered-num">${i+1}.</div>
-      <div style="flex:1;min-width:0;"><div class="rv-flag-title">${f.title}</div>${detail ? `<div class="rv-flag-desc">${rvSynopsis(detail, 110)}</div>` : ''}</div>
-      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
-    </div>`;
-  }).join('');
+  // ── 4. Local Land Charges ──
+  const charges = result.local_land_charges || [];
+  const chargesRows = charges.length
+    ? charges.map(c => {
+        const unresolved = c.resolved === 'No' || c.resolved === 'Unknown';
+        const label = (unresolved ? '⚠ ' : '') + (c.type || 'Charge');
+        const value = [c.reference, c.date_registered, c.resolved ? `Resolved: ${c.resolved}` : '', c.notes].filter(Boolean).join(' · ');
+        return `<div class="content-row"><div class="row-label"${unresolved ? ' style="color:#d97706;"' : ''}>${label}</div><div class="row-value">${value}</div></div>`;
+      }).join('')
+    : row('Land Charges', emptyMsg('None identified in Local Authority Search.'));
 
-  // ── Documents list ──
-  const docRows = (ds.provided || []).map(d => {
-    const idx = d.evidence ? addDetail({ title: d.document, body: [{ label: 'Evidence', text: d.evidence }] }) : -1;
-    return `<div class="rv-doc-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
-      <div class="rv-doc-name">${d.document}</div>
-      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
-    </div>`;
-  }).join('');
+  // ── 5. Energy Performance ──
+  const epc = result.energy_performance || {};
+  const epcColorMap = { A: '#16a34a', B: '#16a34a', C: '#d97706', D: '#d97706', E: '#ea580c', F: '#dc2626', G: '#dc2626' };
+  let epcRows;
+  if (!epc.rating || epc.rating === 'Not provided') {
+    epcRows = row('EPC Rating', emptyMsg('EPC was not included in the pack.'));
+  } else {
+    const epcColor = epcColorMap[epc.rating] || '#999';
+    const badge = `<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:${epcColor};color:#fff;font-weight:800;font-size:16px;">${epc.rating}</span>`;
+    const improvements = epc.recommended_improvements || [];
+    const impTable = improvements.length
+      ? `<table class="fees-table"><thead><tr><th>Measure</th><th>Estimated Cost</th></tr></thead><tbody>${improvements.map((m, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${m.measure || ''}</td><td>${m.estimated_cost || ''}</td></tr>`).join('')}</tbody></table>`
+      : '';
+    epcRows =
+      row('EPC Rating', badge) +
+      row('Assessment Date', textVal(epc.assessment_date, NA)) +
+      row('Estimated Annual Energy Cost', textVal(epc.estimated_annual_cost, NA)) +
+      row('Construction Notes', textVal(epc.construction_notes, NA)) +
+      (improvements.length ? row('Recommended Improvements', impTable) : '');
+  }
 
-  // ── Missing documents ──
-  const missingRows = (result.missingDocuments || []).map(d => {
-    const doc = typeof d === 'string' ? d : d.document;
-    const risk = typeof d === 'object' ? d.risk : null;
-    const idx = risk ? addDetail({ title: doc, body: [{ label: 'Risk', text: risk }] }) : -1;
-    return `<div class="rv-flag-row${idx>-1?' rv-clickable':''}"${idx>-1?` onclick="showReportDetail(${idx})"`:''}>
-      <div style="flex:1;min-width:0;"><div class="rv-flag-title">${doc}</div>${risk ? `<div class="rv-flag-desc">${rvSynopsis(risk, 100)}</div>` : ''}</div>
-      ${idx>-1?'<span class="rv-arrow">&rarr;</span>':''}
-    </div>`;
-  }).join('');
+  // ── 6. Fees ──
+  const fees = result.fees || [];
+  const feesHtml = fees.length
+    ? `<table class="fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>${fees.map((f, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${f.details || ''}</td><td>${f.amount || ''}</td><td>${f.date_due || ''}</td></tr>`).join('')}</tbody></table>`
+    : emptyMsg('No fee schedule found in documents — obtain full fee breakdown from auctioneer before bidding.');
+  const feesRows = row('Fee Schedule', feesHtml);
 
-  window._rvDetailItems = rvDetailItems;
+  // ── 7. Flags ──
+  const sevOrder = { CRITICAL: 0, WARNING: 1, INFO: 2 };
+  const sevStyle = {
+    CRITICAL: { bg: 'rgba(220,38,38,0.1)', color: '#dc2626' },
+    WARNING: { bg: 'rgba(217,119,6,0.1)', color: '#d97706' },
+    INFO: { bg: 'rgba(113,113,122,0.1)', color: '#71717a' }
+  };
+  const flagsArr = (result.flags || []).slice().sort((a, b) => (sevOrder[a.severity] ?? 1) - (sevOrder[b.severity] ?? 1));
+  const flagsRows = flagsArr.length
+    ? flagsArr.map(f => {
+        const st = sevStyle[f.severity] || sevStyle.INFO;
+        const pill = `<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:0.4px;text-transform:uppercase;background:${st.bg};color:${st.color};">${f.severity || 'INFO'}</span>`;
+        const label = pill + (f.source ? `<div style="color:#9ca3af;font-size:12px;margin-top:6px;font-weight:400;">${f.source}</div>` : '');
+        const value = `<div style="font-weight:600;color:#111;">${f.title || ''}</div>${f.detail ? `<div style="margin-top:4px;">${f.detail}</div>` : ''}`;
+        return row(label, value);
+      }).join('')
+    : row('Flags', emptyMsg('No flags identified.'));
 
-  const riskWord = risk.replace(/^SEVERE$/,'SEVERE').toUpperCase();
-  const address = result.address || packName || 'Legal Pack';
-  const costPillVal = confirmedTotal >= 1000 ? `£${Math.round(confirmedTotal/1000)}k` : `£${confirmedTotal.toLocaleString()}`;
+  // ── 8. Miscellaneous ──
+  const misc = result.miscellaneous || {};
+  const amendments = misc.amendments || [];
+  const amendHtml = amendments.length
+    ? `<ol style="margin:0;padding-left:18px;">${amendments.map(a => `<li style="margin-bottom:6px;">${a}</li>`).join('')}</ol>`
+    : textVal(null, NA);
+  const miscRows =
+    row('Completion Terms', textVal(misc.completion, NA)) +
+    row('Other Issues', textVal(misc.other_issues, NA)) +
+    row('Amendments to General Conditions', amendHtml);
+
+  // ── 9. Documents Reviewed ──
+  const docsReviewed = result.documents_reviewed || [];
+  const docsRows = docsReviewed.length
+    ? docsReviewed.map(d => row(d.name || 'Document', d.pages != null ? `${d.pages} pages` : 'Page count not determined.')).join('')
+    : row('Documents', emptyMsg('No documents recorded.'));
+
+  // ── 10. Missing Documents ──
+  const missingDocs = result.missing_documents || [];
+  const missingRows = missingDocs.length
+    ? missingDocs.map(d => `<div class="content-row"><div class="row-label" style="color:#d97706;">⚠ ${d.name}</div><div class="row-value">${d.significance || ''}</div></div>`).join('')
+    : row('Missing Documents', emptyMsg('No documents identified as missing.'));
 
   el.innerHTML = `<div class="rv-shell">
 
   <!-- ═══ SIDEBAR ═══ -->
-  <div class="rv-sidebar">
-  <div id="rv-sidebar-default" class="rv-sidebar-state">
+  <aside class="rv-sidebar" id="rv-sidebar">
+    <button class="rv-collapse-btn" id="rv-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">«</button>
+    <div class="rv-sidebar-content" id="rv-sidebar-content">
 
-    <!-- Top block -->
-    <div>
-      <div class="rv-address">${address}</div>
-      <div class="rv-risk-badge" style="background:${rm.bg};">${riskWord} RISK</div>
-      <div class="rv-stat-pills">
-        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#dc2626;">${critical}</div><div class="rv-stat-pill-label">Critical</div></div>
-        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#d97706;">${warnings}</div><div class="rv-stat-pill-label">Warnings</div></div>
-        <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:var(--text);">${costPillVal}</div><div class="rv-stat-pill-label">Costs</div></div>
+      <div>
+        <div class="rv-address">${address}</div>
+        <div class="rv-risk-badge" style="background:${levelColor};">${level} RISK</div>
+        <div class="rv-score-row"><span class="rv-score-num">${score}</span><span class="rv-score-max">/100</span></div>
+        <div class="rv-stat-pills">
+          <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#dc2626;">${criticalCount}</div><div class="rv-stat-pill-label">Critical</div></div>
+          <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#d97706;">${warningCount}</div><div class="rv-stat-pill-label">Warnings</div></div>
+        </div>
+        ${factors.length ? `<div class="rv-risk-factors">${factors.map(f => `<div class="rv-risk-factor">${f}</div>`).join('')}</div>` : ''}
       </div>
-    </div>
 
-    <div class="rv-divider"></div>
+      <div class="rv-divider"></div>
 
-    <!-- AI Panel -->
-    <div>
-      <div class="rv-ai-row">
-        <div class="rv-ai-dot" style="background:${vt.col};"></div>
-        <div><div class="rv-ai-label">Investor Verdict</div><div class="rv-ai-value">${vt.text}</div></div>
+      <!-- AI Panel -->
+      <div>
+        <button class="rv-summary-toggle" onclick="const b=document.getElementById('rv-summary-body');const open=b.classList.toggle('open');this.textContent='AI Summary '+(open?'▴':'▾');">AI Summary ▾</button>
+        <div class="rv-summary-body" id="rv-summary-body">${legacySummary || 'No AI summary available for this report.'}</div>
       </div>
-      <div class="rv-ai-row">
-        <div class="rv-ai-dot" style="background:${mortgageColor};"></div>
-        <div><div class="rv-ai-label">Mortgageability</div><div class="rv-ai-value" style="color:${mortgageColor};">${mortgage}</div></div>
+
+      <div class="rv-divider"></div>
+
+      <!-- Section nav + actions -->
+      <div class="rv-jump-links">
+        <button class="rv-jump-link" data-target="rv-sec-titles" onclick="scrollToReportSection('rv-sec-titles')">Titles / Tenure</button>
+        <button class="rv-jump-link" data-target="rv-sec-auction" onclick="scrollToReportSection('rv-sec-auction')">Auction Details</button>
+        <button class="rv-jump-link" data-target="rv-sec-tenancies" onclick="scrollToReportSection('rv-sec-tenancies')">Tenancies</button>
+        <button class="rv-jump-link" data-target="rv-sec-planning" onclick="scrollToReportSection('rv-sec-planning')">Planning</button>
+        <button class="rv-jump-link" data-target="rv-sec-charges" onclick="scrollToReportSection('rv-sec-charges')">Local Land Charges</button>
+        <button class="rv-jump-link" data-target="rv-sec-epc" onclick="scrollToReportSection('rv-sec-epc')">Energy Performance</button>
+        <button class="rv-jump-link" data-target="rv-sec-fees" onclick="scrollToReportSection('rv-sec-fees')">Fees</button>
+        <button class="rv-jump-link" data-target="rv-sec-flags" onclick="scrollToReportSection('rv-sec-flags')">Flags</button>
+        <button class="rv-jump-link" data-target="rv-sec-misc" onclick="scrollToReportSection('rv-sec-misc')">Miscellaneous</button>
+        <button class="rv-jump-link" data-target="rv-sec-docs" onclick="scrollToReportSection('rv-sec-docs')">Documents Reviewed</button>
+        <button class="rv-jump-link" data-target="rv-sec-missing" onclick="scrollToReportSection('rv-sec-missing')">Missing Documents</button>
       </div>
-      <div class="rv-ia-grid">
-        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.mortgageable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Mortgageable</div></div>
-        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.resaleable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Resaleable</div></div>
-        <div class="rv-ia-pill"><div class="rv-ia-pill-icon">${ia.tenantable ? '✅' : '❌'}</div><div class="rv-ia-pill-label">Tenantable</div></div>
-        <div class="rv-ia-pill"><div class="rv-ia-pill-icon" style="font-size:0.66rem;font-weight:800;color:var(--text);">${ia.insurable === true || ia.insurable === 'true' || ia.insurable === 'Yes' ? 'Yes' : 'No'}</div><div class="rv-ia-pill-label">Insurable</div></div>
+
+      <div class="rv-actions">
+        <button class="rv-action-btn" onclick="toggleSearchPane()">🔍 Search</button>
+        <button class="rv-action-btn" onclick="exportReportPDF('${packName.replace(/'/g, "\\'")}')">⬇ PDF</button>
+        <button class="rv-action-btn" onclick="shareReport()">🔗 Share</button>
+        ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
+        <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
       </div>
-      <button class="rv-summary-toggle" onclick="const b=document.getElementById('rv-summary-body');const open=b.classList.toggle('open');this.textContent='Read AI summary '+(open?'▴':'▾');">Read AI summary ▾</button>
-      <div class="rv-summary-body" id="rv-summary-body">${result.summary || 'Analysis complete.'}</div>
-    </div>
 
-    <div class="rv-divider"></div>
-
-    <!-- Section nav + actions -->
-    <div class="rv-jump-links">
-      <button class="rv-jump-link" data-target="report-section-property" onclick="scrollToReportSection('report-section-property')">Property</button>
-      <button class="rv-jump-link" data-target="report-section-auction" onclick="scrollToReportSection('report-section-auction')">Auction</button>
-      <button class="rv-jump-link" data-target="report-section-flags" onclick="scrollToReportSection('report-section-flags')">Flags</button>
-      <button class="rv-jump-link" data-target="report-section-costs" onclick="scrollToReportSection('report-section-costs')">Costs</button>
-      <button class="rv-jump-link" data-target="report-section-special" onclick="scrollToReportSection('report-section-special')">Special Conditions</button>
-      <button class="rv-jump-link" data-target="report-section-docs" onclick="scrollToReportSection('report-section-docs')">Documents</button>
-      <button class="rv-jump-link" data-target="report-section-missing" onclick="scrollToReportSection('report-section-missing')">Missing</button>
-    </div>
-
-    <div class="rv-actions">
-      <button class="rv-action-btn" onclick="toggleSearchPane()">🔍 Search</button>
-      <button class="rv-action-btn" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
-      <button class="rv-action-btn" onclick="shareReport()">🔗 Share</button>
-      ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
-      <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
-    </div>
-
-  </div><!-- /rv-sidebar-default -->
-
-  <div id="rv-sidebar-detail" class="rv-sidebar-state" style="display:none"></div>
-
-  </div><!-- /rv-sidebar -->
+    </div><!-- /rv-sidebar-content -->
+  </aside>
 
   <!-- ═══ MAIN DOCUMENT ═══ -->
-  <div class="rv-main">
+  <main class="rv-main" id="rv-main">
 
     ${result._ocrUsed ? `<div style="margin-bottom:32px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.8rem;color:#1d4ed8;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Ask your solicitor to verify key findings.</div>` : ''}
 
-    <div class="rv-doc-section" id="report-section-property">
-      <div class="rv-section-title"><div class="rv-section-title-text">🏠 Property &amp; Tenure</div></div>
-      ${propertyRows || rvEmpty('No property details extracted from this pack')}
+    <div class="rv-doc-section" id="rv-sec-titles">
+      ${sectionHeader('Titles / Tenure', ICONS.titles)}
+      ${titlesRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-auction">
-      <div class="rv-section-title"><div class="rv-section-title-text">🔨 Auction</div></div>
-      ${auctionRows || rvEmpty('No auction details found for this pack')}
+    <div class="rv-doc-section" id="rv-sec-auction">
+      ${sectionHeader('Auction Details', ICONS.auction)}
+      ${aucRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-flags">
-      <div class="rv-section-title"><div class="rv-section-title-text">🚩 Flags</div></div>
-      ${flagRows || rvEmpty('No significant flags found')}
+    <div class="rv-doc-section" id="rv-sec-tenancies">
+      ${sectionHeader('Tenancies', ICONS.tenancies)}
+      ${tenanciesRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-costs">
-      <div class="rv-section-title"><div class="rv-section-title-text">💰 Costs</div></div>
-      ${costs.length ? `<table class="rv-cost-table">
-        <thead><tr><th>Description</th><th>Amount</th><th>When Due</th></tr></thead>
-        <tbody>${costRows}${confirmedTotal > 0 ? `<tr><td style="font-weight:800;">Total confirmed costs</td><td class="rv-cost-amount" style="font-weight:800;">£${confirmedTotal.toLocaleString()}</td><td></td></tr>` : ''}</tbody>
-      </table>${summary?.unquantifiedLiabilities?.length ? `<div style="margin-top:24px;font-size:0.78rem;color:#71717a;line-height:1.7;"><strong style="color:#3f3f46;">Unquantified liabilities:</strong> ${summary.unquantifiedLiabilities.join(' · ')}</div>` : ''}
-      <div style="margin-top:16px;font-size:0.72rem;color:#a1a1aa;font-style:italic;">${summary?.costWarning || 'Only figures expressly stated in the documents. Does not include SDLT, solicitor fees, survey costs, mortgage costs or finance charges.'}</div>` : rvEmpty('No confirmed buyer cost figures found in documents')}
+    <div class="rv-doc-section" id="rv-sec-planning">
+      ${sectionHeader('Planning', ICONS.planning)}
+      ${planningRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-special">
-      <div class="rv-section-title"><div class="rv-section-title-text">📜 Special Conditions</div></div>
-      ${specialRows || rvEmpty(result.specialConditions || 'No separate Special Conditions document was identified. Always verify with your solicitor before bidding.')}
+    <div class="rv-doc-section" id="rv-sec-charges">
+      ${sectionHeader('Local Land Charges', ICONS.charges)}
+      ${chargesRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-docs">
-      <div class="rv-section-title"><div class="rv-section-title-text">📁 Documents</div></div>
-      ${docRows || rvEmpty('No document breakdown available for this pack')}
+    <div class="rv-doc-section" id="rv-sec-epc">
+      ${sectionHeader('Energy Performance', ICONS.epc)}
+      ${epcRows}
     </div>
 
-    <div class="rv-doc-section" id="report-section-missing">
-      <div class="rv-section-title"><div class="rv-section-title-text">📂 Missing</div></div>
-      ${missingRows || rvEmpty('No missing documents flagged')}
+    <div class="rv-doc-section" id="rv-sec-fees">
+      ${sectionHeader("Fees", ICONS.fees)}
+      ${feesRows}
     </div>
 
-    ${uploadedFiles.length ? `<div class="rv-footer">
-      <div class="rv-footer-title">Documents used to generate this report:</div>
-      ${uploadedFiles.join(', ')}
-    </div>` : ''}
+    <div class="rv-doc-section" id="rv-sec-flags">
+      ${sectionHeader('Flags', ICONS.flags)}
+      ${flagsRows}
+    </div>
 
-  </div><!-- /rv-main -->
+    <div class="rv-doc-section" id="rv-sec-misc">
+      ${sectionHeader('Miscellaneous', ICONS.misc)}
+      ${miscRows}
+    </div>
+
+    <div class="rv-doc-section" id="rv-sec-docs">
+      ${sectionHeader('Documents Reviewed', ICONS.docs)}
+      ${docsRows}
+    </div>
+
+    <div class="rv-doc-section" id="rv-sec-missing">
+      ${sectionHeader('Missing Documents', ICONS.missing)}
+      ${missingRows}
+    </div>
+
+    <div class="rv-doc-footer">⚠ LegalPack AI can make mistakes. Always verify critical information with a solicitor before bidding.</div>
+
+  </main>
 
   <!-- ═══ SEARCH OVERLAY ═══ -->
   <div class="rv-search-overlay" id="rv-search-overlay">
@@ -3036,15 +3050,18 @@ function renderResult(result, packName) {
 
   <!-- ═══ MOBILE BOTTOM BAR ═══ -->
   <div class="rv-mobile-bar">
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-property')">Property</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-auction')">Auction</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-flags')">Flags</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-costs')">Costs</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-special')">Special</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-docs')">Docs</button>
-    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('report-section-missing')">Missing</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-titles')">Tenure</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-auction')">Auction</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-planning')">Planning</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-charges')">Charges</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-epc')">EPC</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-fees')">Fees</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-flags')">Flags</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-misc')">Misc</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-docs')">Docs</button>
+    <button class="rv-mobile-bar-btn" onclick="scrollToReportSection('rv-sec-missing')">Missing</button>
     <button class="rv-mobile-bar-btn" onclick="toggleSearchPane()">🔍</button>
-    <button class="rv-mobile-bar-btn" onclick="exportReportPDF('${packName.replace(/'/g,"\\'")}')">⬇ PDF</button>
+    <button class="rv-mobile-bar-btn" onclick="exportReportPDF('${packName.replace(/'/g, "\\'")}')">⬇ PDF</button>
     <button class="rv-mobile-bar-btn" onclick="shareReport()">🔗 Share</button>
     ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-mobile-bar-btn" style="text-decoration:none;">🌐 Public</a>` : ''}
     <button class="rv-mobile-bar-btn" onclick="showUploadArea()">+ New</button>
@@ -3052,50 +3069,26 @@ function renderResult(result, packName) {
 
 </div>`;
 
+  initSidebarCollapseState();
   initReportScrollSpy();
 }
 
-function renderFlagRow(f, idx, synopsis) {
-  const sev = f.severity || 'note';
-  const isCritical = sev==='critical'||sev==='high';
-  const isWarning = sev==='warning'||sev==='medium';
-  const sevLabel = isCritical?'Critical':isWarning?'Warning':'Info';
-  const sevBg = isCritical?'rgba(220,38,38,0.1)':isWarning?'rgba(217,119,6,0.1)':'rgba(113,113,122,0.1)';
-  const sevColor = isCritical?'#dc2626':isWarning?'#d97706':'#71717a';
-  const clickable = idx > -1;
-  return `<div class="rv-flag-row${clickable ? ' rv-clickable' : ''}"${clickable ? ` onclick="showReportDetail(${idx})"` : ''}>
-    <div style="flex:1;min-width:0;">
-      <div class="rv-flag-title">${f.title}</div>
-      ${synopsis ? `<div class="rv-flag-desc">${synopsis}</div>` : ''}
-    </div>
-    <div class="rv-sev-badge" style="background:${sevBg};color:${sevColor};">${sevLabel}</div>
-    ${clickable ? '<span class="rv-arrow">&rarr;</span>' : ''}
-  </div>`;
+function toggleSidebarCollapse() {
+  const sb = document.getElementById('rv-sidebar');
+  const btn = document.getElementById('rv-collapse-btn');
+  if (!sb) return;
+  const collapsed = sb.classList.toggle('collapsed');
+  if (btn) btn.textContent = collapsed ? '»' : '«';
+  localStorage.setItem('sidebar_collapsed', collapsed ? '1' : '0');
 }
 
-function showReportDetail(idx) {
-  const item = (window._rvDetailItems || [])[idx];
-  const def = document.getElementById('rv-sidebar-default');
-  const det = document.getElementById('rv-sidebar-detail');
-  if (!item || !def || !det) return;
-  const sevColors = { critical:'#dc2626', high:'#dc2626', warning:'#d97706', medium:'#d97706', note:'#71717a', low:'#71717a' };
-  const badge = item.severity ? `<div class="rv-risk-badge" style="background:${sevColors[item.severity]||'#71717a'};">${(item.severity==='high'?'critical':item.severity).toUpperCase()}</div>` : '';
-  det.innerHTML = `
-    <button class="rv-action-btn" onclick="hideReportDetail()" style="margin-bottom:18px;">&larr; Back</button>
-    ${badge}
-    <div class="rv-address" style="margin-top:${badge?'14px':'0'};">${item.title}</div>
-    <div class="rv-divider" style="margin:16px 0;"></div>
-    ${item.body.map(b => `<div class="rv-ai-row" style="align-items:flex-start;"><div style="flex:1;"><div class="rv-ai-label">${b.label}</div><div class="rv-ai-value" style="font-weight:500;line-height:1.55;margin-top:4px;">${b.text}</div></div></div>`).join('')}
-  `;
-  def.style.display = 'none';
-  det.style.display = 'flex';
-}
-
-function hideReportDetail() {
-  const def = document.getElementById('rv-sidebar-default');
-  const det = document.getElementById('rv-sidebar-detail');
-  if (def) def.style.display = '';
-  if (det) det.style.display = 'none';
+function initSidebarCollapseState() {
+  const sb = document.getElementById('rv-sidebar');
+  const btn = document.getElementById('rv-collapse-btn');
+  if (!sb) return;
+  const collapsed = localStorage.getItem('sidebar_collapsed') === '1';
+  sb.classList.toggle('collapsed', collapsed);
+  if (btn) btn.textContent = collapsed ? '»' : '«';
 }
 
 function initReportScrollSpy() {
@@ -3120,6 +3113,7 @@ function scrollToReportSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
 
 
 // ── COMPARE ───────────────────────────────────────────────────────────────────
@@ -4087,13 +4081,13 @@ async function exportReportPDF(packName) {
 
   // Sections are all simultaneously visible in the new document layout (no
   // tab toggling needed) — just screenshot each one directly, in reading order.
-  const sections = ['property','auction','flags','costs','special','docs','missing'];
-  const sectionLabels = { property:'🏠 Property & Tenure', auction:'🔨 Auction', flags:'🚩 Flags', costs:'💰 Costs', special:'📜 Special Conditions', docs:'📁 Documents', missing:'📂 Missing' };
+  const sections = ['titles','auction','tenancies','planning','charges','epc','fees','flags','misc','docs','missing'];
+  const sectionLabels = { titles:'Titles / Tenure', auction:'Auction Details', tenancies:'Tenancies', planning:'Planning', charges:'Local Land Charges', epc:'Energy Performance', fees:'Fees', flags:'Flags', misc:'Miscellaneous', docs:'Documents Reviewed', missing:'Missing Documents' };
   let firstPage = true;
   let yPos = firstPage ? 20 : margin;
 
   for (const sec of sections) {
-    const panel = document.getElementById('report-section-' + sec);
+    const panel = document.getElementById('rv-sec-' + sec);
     if (!panel || !panel.innerHTML.trim()) continue;
 
     try {
