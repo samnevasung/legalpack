@@ -963,6 +963,43 @@ body {
 
 /* Main document area — always light, like a printed page inside the dark shell */
 .rv-main { flex: 1 1 auto; min-width: 0; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 48px 48px; }
+.rv-report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 32px;
+}
+.rv-report-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-left: auto;
+  width: auto;
+}
+.rv-report-actions .rv-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: auto;
+  height: 38px;
+  padding: 0 14px;
+  margin: 0;
+  gap: 7px;
+  white-space: nowrap;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+@media (max-width: 900px) {
+  .rv-report-header { align-items: flex-start; flex-direction: column; }
+  .rv-report-actions { width: 100%; justify-content: flex-start; flex-wrap: wrap; margin-left: 0; }
+}
 .rv-doc-section { margin-bottom: 64px; scroll-margin-top: 24px; }
 .rv-doc-section:last-of-type { margin-bottom: 0; }
 
@@ -3079,10 +3116,6 @@ function renderResult(result, packName) {
       </div>
 
       <div class="rv-actions">
-        <button class="rv-action-btn" onclick="toggleSearchPane()">🔍 Search</button>
-        <button class="rv-action-btn" onclick="exportReportPDF('${packName.replace(/'/g, "\\'")}')">⬇ PDF</button>
-        <button class="rv-action-btn" onclick="shareReport()">🔗 Share</button>
-        ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
         <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
       </div>
 
@@ -3091,6 +3124,15 @@ function renderResult(result, packName) {
 
   <!-- ═══ MAIN DOCUMENT ═══ -->
   <main class="rv-main" id="rv-main">
+
+    <div class="rv-report-header">
+      <div class="rv-report-actions">
+        <button class="rv-action-btn" onclick="toggleSearchPane()">🔍 Search</button>
+        <button class="rv-action-btn" onclick="exportReportPDF('${packName.replace(/'/g, "\\'")}')">⬇ PDF</button>
+        <button class="rv-action-btn" onclick="shareReport()">🔗 Share</button>
+        ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
+      </div>
+    </div>
 
     ${result._ocrUsed ? `<div style="margin-bottom:32px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:0.8rem;color:#1d4ed8;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Ask your solicitor to verify key findings.</div>` : ''}
 
