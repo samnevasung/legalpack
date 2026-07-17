@@ -1127,6 +1127,61 @@ body {
   font-family: 'Geist Sans', sans-serif;
   transition: opacity 0.2s ease;
 }
+
+.risk-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.risk-tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.45);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: default;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: border-color 0.2s, color 0.2s;
+}
+.risk-tooltip-wrap:hover .risk-tooltip-icon {
+  border-color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.8);
+}
+.risk-tooltip-box {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.7);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  z-index: 100;
+  white-space: normal;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.risk-tooltip-box strong {
+  color: rgba(255,255,255,0.95);
+  font-size: 11px;
+}
+.risk-tooltip-wrap:hover .risk-tooltip-box {
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -2761,7 +2816,7 @@ function renderResult(result, packName) {
   // ── Shared row builders ──
   const row = (label, valueHtml) => `<div class="content-row"><div class="row-label">${label}</div><div class="row-value">${valueHtml}</div></div>`;
   const textVal = (v, fallback) => {
-    if (!v) return `<span style="color:#bbb;font-style:italic;">${fallback}</span>`;
+    if (v === null || v === undefined || String(v).trim() === '') return `<span style="color:#bbb;font-style:italic;">${fallback}</span>`;
     const paras = String(v).split('\n').map(p => p.trim()).filter(Boolean);
     return paras.length > 1 ? paras.map(p => `<p style="margin:0 0 8px;">${p}</p>`).join('') : v;
   };
@@ -2783,12 +2838,18 @@ function renderResult(result, packName) {
   };
 
   // ── 1. Titles / Tenure ──
+  const guarantee = titlesTenure.title_guarantee || '';
+  const guaranteeDisplay = guarantee.toLowerCase().includes('limited')
+    ? '<span style="color:#ef4444;font-weight:700">Limited</span> — seller gives fewer implied title covenants. Verify with solicitor before bidding.'
+    : (guarantee || 'Not stated in documents provided.');
+
   const titlesRows =
     row('Address', textVal(titlesTenure.address, NA)) +
     row('Tenure', textVal(titlesTenure.tenure, NA)) +
     row('Proprietor', textVal(titlesTenure.proprietor, NA)) +
     row('Title Number', textVal(titlesTenure.title_number, NA)) +
     row('Class of Title', textVal(titlesTenure.class_of_title, NA)) +
+    row('Title Guarantee', guaranteeDisplay) +
     row('Restrictions & Easements', textVal(titlesTenure.restrictions_easements, NA));
 
   // ── Auction Details ──
@@ -2908,7 +2969,22 @@ function renderResult(result, packName) {
       <div>
         <div class="rv-address">${address}</div>
         <div class="rv-risk-badge" style="background:${levelColor};">${level} RISK</div>
-        <div class="rv-score-row"><span class="rv-score-num">${score}</span><span class="rv-score-max">/100</span></div>
+        <div class="rv-score-row"><span class="rv-score-num">${score}</span><span class="rv-score-max">/100</span><span class="risk-tooltip-wrap">
+          <span class="risk-tooltip-icon">?</span>
+          <div class="risk-tooltip-box">
+            <strong>How the risk score works</strong><br><br>
+            Scores run from 0 to 100. Each issue found in the legal pack adds points:<br><br>
+            · Critical issues — 15 pts each<br>
+            · Warnings — 8 pts each<br>
+            · Unresolved local land charges — 8 pts each<br>
+            · Limited title guarantee — 12 pts<br>
+            · Missing key documents — 8 pts each<br>
+            · Article 4 Direction — 5 pts<br>
+            · Poor EPC rating (F/G) — 6 pts<br><br>
+            LOW = 0–25 &nbsp; MODERATE = 26–50<br>
+            HIGH = 51–75 &nbsp; CRITICAL = 76–100
+          </div>
+        </span></span>
         <div class="rv-stat-pills">
           <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#dc2626;">${criticalCount}</div><div class="rv-stat-pill-label">Critical</div></div>
           <div class="rv-stat-pill"><div class="rv-stat-pill-val" style="color:#d97706;">${warningCount}</div><div class="rv-stat-pill-label">Warnings</div></div>
@@ -2920,8 +2996,8 @@ function renderResult(result, packName) {
 
       <!-- AI Panel -->
       <div>
-        <button class="rv-summary-toggle" onclick="const b=document.getElementById('rv-summary-body');const open=b.classList.toggle('open');this.textContent='AI Summary '+(open?'▴':'▾');">AI Summary ▾</button>
-        <div class="rv-summary-body" id="rv-summary-body">${legacySummary || 'No AI summary available for this report.'}</div>
+        <button class="rv-summary-toggle" onclick="const b=document.getElementById('sidebar-summary');const open=b.classList.toggle('open');this.textContent='AI Summary '+(open?'▴':'▾');">AI Summary ▾</button>
+        <div class="rv-summary-body" id="sidebar-summary">${legacySummary || 'Summary not available for this report.'}</div>
       </div>
 
       <div class="rv-divider"></div>
