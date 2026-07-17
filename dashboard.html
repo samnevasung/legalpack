@@ -870,12 +870,12 @@ body {
 .rv-sidebar.collapsed { width: 56px; min-width: 56px; }
 .rv-collapse-btn {
   position: absolute; top: 16px; right: 12px; width: 24px; height: 24px;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px;
-  color: rgba(255,255,255,0.4); cursor: pointer; font-size: 11px; z-index: 20;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
+  color: var(--text-faint); cursor: pointer; font-size: 11px; z-index: 20;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
-.rv-collapse-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+.rv-collapse-btn:hover { background: var(--surface-2); color: var(--text); }
 .rv-sidebar-content { display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
 .rv-sidebar.collapsed .rv-sidebar-content { opacity: 0; pointer-events: none; }
 .rv-address-wrap { padding: 20px 20px 0 20px; box-sizing: border-box; width: 100%; }
@@ -947,19 +947,19 @@ body {
 }
 
 .rv-summary-block { padding: 14px 20px; border-bottom: 1px solid var(--border); }
-.rv-summary-toggle { background: none; border: none; color: rgba(255,255,255,0.5); font-family: 'Geist Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 6px; }
-.rv-summary-body { display: none; margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+.rv-summary-toggle { background: none; border: none; color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 6px; }
+.rv-summary-body { display: none; margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
 .rv-summary-body.open { display: block; }
 
 .rv-jump-links { display: flex; flex-direction: column; gap: 0; padding: 8px 0; overflow-y: auto; }
-.rv-jump-link { display: block; width: 100%; padding: 9px 20px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); background: transparent; border: none; border-left: 2px solid transparent; text-align: left; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; line-height: 1.3; box-sizing: border-box; font-family: 'Geist Sans', sans-serif; }
-.rv-jump-link:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); border-left-color: rgba(124,58,237,0.5); }
-.rv-jump-link.active { color: #ffffff; background: rgba(124,58,237,0.08); border-left-color: #7c3aed; font-weight: 600; }
+.rv-jump-link { display: block; width: 100%; padding: 9px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted); background: transparent; border: none; border-left: 2px solid transparent; text-align: left; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; line-height: 1.3; box-sizing: border-box; font-family: 'Geist Sans', sans-serif; }
+.rv-jump-link:hover { color: var(--text); background: var(--surface-2); border-left-color: rgba(124,58,237,0.5); }
+.rv-jump-link.active { color: var(--accent); background: rgba(124,58,237,0.08); border-left-color: #7c3aed; font-weight: 600; }
 .rv-nav { display: flex; flex-direction: column; width: 100%; gap: 4px; }
 .rv-nav-item { display: flex; align-items: center; width: 100%; min-width: 0; padding: 11px 14px; border: 0; text-align: left; box-sizing: border-box; }
 .rv-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border); }
-.rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-family: 'Geist Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.15s, color 0.15s, border-color 0.15s; }
-.rv-action-btn:hover { background: rgba(255,255,255,0.07); color: #ffffff; border-color: rgba(255,255,255,0.2); }
+.rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.rv-action-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-faint); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
 .rv-main { flex: 1 1 auto; min-width: 0; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 48px 48px; }
