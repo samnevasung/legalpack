@@ -855,26 +855,30 @@ body {
 
 /* ── REPORT VIEWER — sticky sidebar + scrollable document ── */
 .rv-shell {
-  display: flex; align-items: stretch; width: 100%;
+  display: flex; flex-direction: row; align-items: stretch; width: 100%;
   margin: -32px; min-height: calc(100vh - 56px);
   background: var(--bg);
 }
 .rv-sidebar {
-  position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
-  width: 280px; flex-shrink: 0;
-  background: var(--bg); border-right: 1px solid var(--border);
-  padding: 24px 20px; display: flex; flex-direction: column;
+  width: 240px; min-width: 240px; max-width: 240px; flex-shrink: 0;
+  height: 100vh; position: sticky; top: 0; overflow-y: auto; overflow-x: hidden;
+  background: var(--surface); border-right: 1px solid var(--border);
+  padding: 24px 0 32px 0; display: flex; flex-direction: column;
+  box-sizing: border-box; z-index: 10;
   transition: width 0.25s ease;
 }
-.rv-sidebar.collapsed { width: 56px; }
+.rv-sidebar.collapsed { width: 56px; min-width: 56px; }
 .rv-collapse-btn {
-  position: absolute; top: 12px; right: 12px; width: 32px; height: 32px;
-  background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
-  color: var(--text); cursor: pointer; font-size: 14px; z-index: 5;
+  position: absolute; top: 16px; right: 12px; width: 24px; height: 24px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px;
+  color: rgba(255,255,255,0.4); cursor: pointer; font-size: 11px; z-index: 20;
   display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
 }
-.rv-sidebar-content { display: flex; flex-direction: column; gap: 22px; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
+.rv-collapse-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+.rv-sidebar-content { display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
 .rv-sidebar.collapsed .rv-sidebar-content { opacity: 0; pointer-events: none; }
+.rv-score-block { padding: 20px 20px 16px 20px; border-bottom: 1px solid var(--border); }
 .rv-score-row { display: flex; align-items: baseline; gap: 3px; margin-top: 10px; }
 .rv-score-num { font-size: 1.6rem; font-weight: 800; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1; }
 .rv-score-max { font-size: 0.78rem; color: var(--text-faint); font-weight: 600; }
@@ -882,32 +886,23 @@ body {
 .rv-risk-factor { font-size: 0.72rem; color: var(--text-faint); line-height: 1.5; }
 .rv-address { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
 .rv-risk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 20px; color: #fff; margin-bottom: 14px; }
-.rv-stat-pills { display: flex; gap: 6px; }
-.rv-stat-pill { flex: 1; min-width: 0; padding: 8px 4px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
+.rv-stat-pills { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.rv-stat-pill { flex: 1; min-width: 0; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
 .rv-stat-pill-val { font-size: 0.92rem; font-weight: 800; font-family: 'DM Mono', monospace; line-height: 1.1; }
 .rv-stat-pill-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text-faint); margin-top: 3px; }
-.rv-divider { border-top: 1px solid var(--border); }
 
-.rv-ai-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
-.rv-ai-row:last-of-type { margin-bottom: 0; }
-.rv-ai-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-.rv-ai-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); margin-bottom: 2px; }
-.rv-ai-value { font-size: 0.82rem; font-weight: 700; color: var(--text); line-height: 1.35; }
-.rv-ia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; }
-.rv-ia-pill { padding: 8px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); text-align: center; }
-.rv-ia-pill-icon { font-size: 0.95rem; margin-bottom: 2px; }
-.rv-ia-pill-label { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2px; color: var(--text-faint); }
-.rv-summary-toggle { background: none; border: none; color: var(--accent); font-family: 'Geist Sans', sans-serif; font-size: 0.76rem; font-weight: 700; cursor: pointer; padding: 0; margin-top: 14px; display: flex; align-items: center; gap: 4px; }
-.rv-summary-body { display: none; margin-top: 8px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+.rv-summary-block { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.rv-summary-toggle { background: none; border: none; color: rgba(255,255,255,0.5); font-family: 'Geist Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 6px; }
+.rv-summary-body { display: none; margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.45); line-height: 1.6; }
 .rv-summary-body.open { display: block; }
 
-.rv-jump-links { display: flex; flex-direction: column; gap: 1px; }
-.rv-jump-link { padding: 7px 10px; border-radius: var(--radius-sm); font-size: 0.78rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.12s; background: none; border: none; text-align: left; font-family: 'Geist Sans', sans-serif; width: 100%; }
-.rv-jump-link:hover { color: var(--text); background: var(--surface-2); }
-.rv-jump-link.active { color: var(--accent); background: var(--surface-2); font-weight: 700; }
-.rv-actions { display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 16px; }
-.rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.12s; }
-.rv-action-btn:hover { color: var(--text); border-color: var(--text-faint); }
+.rv-jump-links { display: flex; flex-direction: column; gap: 0; padding: 8px 0; overflow-y: auto; }
+.rv-jump-link { display: block; width: 100%; padding: 9px 20px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); background: transparent; border: none; border-left: 2px solid transparent; text-align: left; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; line-height: 1.3; box-sizing: border-box; font-family: 'Geist Sans', sans-serif; }
+.rv-jump-link:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); border-left-color: rgba(124,58,237,0.5); }
+.rv-jump-link.active { color: #ffffff; background: rgba(124,58,237,0.08); border-left-color: #7c3aed; font-weight: 600; }
+.rv-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border); }
+.rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); font-family: 'Geist Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.rv-action-btn:hover { background: rgba(255,255,255,0.07); color: #ffffff; border-color: rgba(255,255,255,0.2); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
 .rv-main { flex: 1; min-width: 0; background: #fafafa; color: #18181b; max-width: 860px; margin: 0 auto; padding: 48px 48px; }
@@ -2966,7 +2961,7 @@ function renderResult(result, packName) {
     <button class="rv-collapse-btn" id="rv-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">«</button>
     <div class="rv-sidebar-content" id="rv-sidebar-content">
 
-      <div>
+      <div class="rv-score-block">
         <div class="rv-address">${address}</div>
         <div class="rv-risk-badge" style="background:${levelColor};">${level} RISK</div>
         <div class="rv-score-row"><span class="rv-score-num">${score}</span><span class="rv-score-max">/100</span><span class="risk-tooltip-wrap">
@@ -2992,15 +2987,11 @@ function renderResult(result, packName) {
         ${factors.length ? `<div class="rv-risk-factors">${factors.map(f => `<div class="rv-risk-factor">${f}</div>`).join('')}</div>` : ''}
       </div>
 
-      <div class="rv-divider"></div>
-
       <!-- AI Panel -->
-      <div>
+      <div class="rv-summary-block">
         <button class="rv-summary-toggle" onclick="const b=document.getElementById('sidebar-summary');const open=b.classList.toggle('open');this.textContent='AI Summary '+(open?'▴':'▾');">AI Summary ▾</button>
         <div class="rv-summary-body" id="sidebar-summary">${legacySummary || 'Summary not available for this report.'}</div>
       </div>
-
-      <div class="rv-divider"></div>
 
       <!-- Section nav + actions -->
       <div class="rv-jump-links">
