@@ -855,12 +855,12 @@ body {
 
 /* ── REPORT VIEWER — sticky sidebar + scrollable document ── */
 .rv-shell {
-  display: flex; flex-direction: row; align-items: stretch; width: 100%;
-  margin: -32px; min-height: calc(100vh - 56px);
+  display: flex; flex-direction: row; align-items: flex-start; width: 100%;
+  margin: -32px; min-height: 100vh;
   background: var(--bg);
 }
 .rv-sidebar {
-  width: 240px; min-width: 240px; max-width: 240px; flex-shrink: 0;
+  width: 260px; min-width: 260px; max-width: 260px; flex-shrink: 0;
   height: 100vh; position: sticky; top: 0; overflow-y: auto; overflow-x: hidden;
   background: var(--surface); border-right: 1px solid var(--border);
   padding: 24px 0 32px 0; display: flex; flex-direction: column;
@@ -905,7 +905,7 @@ body {
 .rv-action-btn:hover { background: rgba(255,255,255,0.07); color: #ffffff; border-color: rgba(255,255,255,0.2); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
-.rv-main { flex: 1; min-width: 0; background: #fafafa; color: #18181b; max-width: 860px; margin: 0 auto; padding: 48px 48px; }
+.rv-main { flex: 1; min-width: 0; overflow-y: auto; background: #fafafa; color: #18181b; max-width: 860px; margin: 0 auto; padding: 48px 48px; }
 .rv-doc-section { margin-bottom: 64px; scroll-margin-top: 24px; }
 .rv-doc-section:last-of-type { margin-bottom: 0; }
 
@@ -2994,18 +2994,18 @@ function renderResult(result, packName) {
       </div>
 
       <!-- Section nav + actions -->
-      <div class="rv-jump-links">
-        <button class="rv-jump-link" data-target="rv-sec-titles" onclick="scrollToReportSection('rv-sec-titles')">Titles / Tenure</button>
-        <button class="rv-jump-link" data-target="rv-sec-auction" onclick="scrollToReportSection('rv-sec-auction')">Auction Details</button>
-        <button class="rv-jump-link" data-target="rv-sec-tenancies" onclick="scrollToReportSection('rv-sec-tenancies')">Tenancies</button>
-        <button class="rv-jump-link" data-target="rv-sec-planning" onclick="scrollToReportSection('rv-sec-planning')">Planning</button>
-        <button class="rv-jump-link" data-target="rv-sec-charges" onclick="scrollToReportSection('rv-sec-charges')">Local Land Charges</button>
-        <button class="rv-jump-link" data-target="rv-sec-epc" onclick="scrollToReportSection('rv-sec-epc')">Energy Performance</button>
-        <button class="rv-jump-link" data-target="rv-sec-fees" onclick="scrollToReportSection('rv-sec-fees')">Fees</button>
-        <button class="rv-jump-link" data-target="rv-sec-flags" onclick="scrollToReportSection('rv-sec-flags')">Flags</button>
-        <button class="rv-jump-link" data-target="rv-sec-misc" onclick="scrollToReportSection('rv-sec-misc')">Miscellaneous</button>
-        <button class="rv-jump-link" data-target="rv-sec-docs" onclick="scrollToReportSection('rv-sec-docs')">Documents Reviewed</button>
-        <button class="rv-jump-link" data-target="rv-sec-missing" onclick="scrollToReportSection('rv-sec-missing')">Missing Documents</button>
+      <div class="rv-jump-links rv-nav">
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-titles" onclick="scrollToReportSection('rv-sec-titles')">Titles / Tenure</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-auction" onclick="scrollToReportSection('rv-sec-auction')">Auction Details</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-tenancies" onclick="scrollToReportSection('rv-sec-tenancies')">Tenancies</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-planning" onclick="scrollToReportSection('rv-sec-planning')">Planning</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-charges" onclick="scrollToReportSection('rv-sec-charges')">Local Land Charges</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-epc" onclick="scrollToReportSection('rv-sec-epc')">Energy Performance</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-fees" onclick="scrollToReportSection('rv-sec-fees')">Fees</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-flags" onclick="scrollToReportSection('rv-sec-flags')">Flags</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-misc" onclick="scrollToReportSection('rv-sec-misc')">Miscellaneous</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-docs" onclick="scrollToReportSection('rv-sec-docs')">Documents Reviewed</button>
+        <button class="rv-jump-link rv-nav-item" data-target="rv-sec-missing" onclick="scrollToReportSection('rv-sec-missing')">Missing Documents</button>
       </div>
 
       <div class="rv-actions">
