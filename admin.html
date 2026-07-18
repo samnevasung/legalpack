@@ -1048,8 +1048,6 @@ function renderStoredReport(result, packName){
     <button class="report-tab"        onclick="showReportTab('checklist',this)" style="border-radius:0;">Checklist</button>
   </div>
 
-  ${result._ocrUsed ? `<div style="margin-bottom:14px;padding:10px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);border-radius:9px;font-size:0.78rem;color:#3b82f6;line-height:1.5;">📷 <strong>Scanned documents detected</strong> — OCR was used to extract text from image-based PDFs. Analysis accuracy may be lower than with text-searchable PDFs.</div>` : ''}
-
   <!-- TAB: OVERVIEW -->
   <div id="rtab-overview" class="report-tab-panel">
 
