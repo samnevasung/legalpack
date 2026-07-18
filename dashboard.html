@@ -3011,8 +3011,24 @@ function renderResult(result, packName) {
 
   // ── 6. Fees ──
   const fees = result.fees || [];
+  let feesTotal = 0, feesHasVat = false, feesExcluded = 0;
+  fees.forEach(f => {
+    const m = String(f.amount || '').match(/^£\s?([\d,]+(?:\.\d+)?)/);
+    if (m) {
+      feesTotal += parseFloat(m[1].replace(/,/g, ''));
+      if (/vat/i.test(f.amount)) feesHasVat = true;
+    } else {
+      feesExcluded++;
+    }
+  });
+  const feesTotalRow = fees.length
+    ? `<tr style="border-top:2px solid #e5e7eb;font-weight:700;"><td>Total confirmed fees${feesHasVat ? ' (excl. VAT)' : ''}</td><td>£${feesTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td></td></tr>`
+    : '';
+  const feesNote = feesExcluded > 0
+    ? `<div style="font-size:12px;color:#9ca3af;margin-top:8px;">${feesExcluded} fee${feesExcluded > 1 ? 's are' : ' is'} variable, percentage-based, or unconfirmed and not included in the total above — see the Amount column for detail.</div>`
+    : '';
   const feesHtml = fees.length
-    ? `<table class="fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>${fees.map((f, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${f.details || ''}</td><td>${f.amount || ''}</td><td>${f.date_due || ''}</td></tr>`).join('')}</tbody></table>`
+    ? `<table class="fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>${fees.map((f, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${f.details || ''}</td><td>${f.amount || ''}</td><td>${f.date_due || ''}</td></tr>`).join('')}${feesTotalRow}</tbody></table>${feesNote}`
     : emptyMsg('No fee schedule found in documents — obtain full fee breakdown from auctioneer before bidding.');
   const feesRows = row('Fee Schedule', feesHtml);
 
