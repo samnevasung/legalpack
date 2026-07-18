@@ -946,7 +946,7 @@ body {
   overflow-wrap: anywhere;
 }
 
-.rv-summary-block { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.rv-summary-block { padding: 16px 20px; border-bottom: 1px solid var(--border); }
 .rv-summary-toggle { background: none; border: none; color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; padding: 0; display: flex; align-items: center; gap: 6px; }
 .rv-summary-body { display: none; margin-top: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
 .rv-summary-body.open { display: block; }
@@ -956,13 +956,13 @@ body {
 .rv-jump-link:hover { color: var(--text); background: var(--surface-2); border-left-color: rgba(124,58,237,0.5); }
 .rv-jump-link.active { color: var(--accent); background: rgba(124,58,237,0.08); border-left-color: #7c3aed; font-weight: 600; }
 .rv-nav { display: flex; flex-direction: column; width: 100%; gap: 4px; }
-.rv-nav-item { display: flex; align-items: center; width: 100%; min-width: 0; padding: 11px 14px; border: 0; text-align: left; box-sizing: border-box; }
-.rv-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border); }
+.rv-nav-item { display: flex; align-items: center; width: 100%; min-width: 0; border: 0; text-align: left; box-sizing: border-box; }
+.rv-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); }
 .rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .rv-action-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-faint); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
-.rv-main { flex: 1 1 auto; min-width: 0; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 48px 48px; }
+.rv-main { flex: 1 1 auto; min-width: 0; max-width: 960px; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 48px 48px; }
 .rv-report-header {
   display: flex;
   align-items: center;
