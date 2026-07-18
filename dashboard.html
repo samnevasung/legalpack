@@ -2810,10 +2810,13 @@ async function fetchWithRetry(url, options, retries = 1, delayMs = 3000) {
 
 async function callAnalyse(payload, batchIndex, totalBatches, listingMeta, fileHash) {
   for (let attempt = 0; attempt < 2; attempt++) {
+    const body = JSON.stringify({ batches: payload, batchIndex, totalBatches, listingMeta, fileHash });
+    const payloadBytes = new Blob([body]).size;
+    console.log(`[payload-size] ${(payloadBytes / (1024*1024)).toFixed(2)} MB`);
     const r = await fetchWithRetry(API_BASE + '/analyse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + authToken },
-      body: JSON.stringify({ batches: payload, batchIndex, totalBatches, listingMeta, fileHash })
+      body
     });
     const d = await r.json();
     if (r.status === 429) {
