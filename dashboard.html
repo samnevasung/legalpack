@@ -863,13 +863,13 @@ body {
   width: 320px; min-width: 320px; max-width: 320px; flex: 0 0 320px;
   height: 100vh; position: sticky; top: 0; overflow-y: auto; overflow-x: hidden;
   background: var(--surface); border-right: 1px solid var(--border);
-  padding: 24px 0 32px 0; display: flex; flex-direction: column;
+  padding: 16px 0 32px 0; display: flex; flex-direction: column;
   box-sizing: border-box; z-index: 10;
   transition: width 0.25s ease;
 }
 .rv-sidebar.collapsed { width: 56px; min-width: 56px; }
 .rv-collapse-btn {
-  position: absolute; top: 16px; right: 12px; width: 24px; height: 24px;
+  position: absolute; top: 20px; right: 12px; width: 24px; height: 24px;
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
   color: var(--text-faint); cursor: pointer; font-size: 11px; z-index: 20;
   display: flex; align-items: center; justify-content: center;
@@ -878,7 +878,7 @@ body {
 .rv-collapse-btn:hover { background: var(--surface-2); color: var(--text); }
 .rv-sidebar-content { display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
 .rv-sidebar.collapsed .rv-sidebar-content { opacity: 0; pointer-events: none; }
-.rv-address-wrap { padding: 20px 20px 0 20px; box-sizing: border-box; width: 100%; }
+.rv-address-wrap { padding: 16px 20px 0 20px; box-sizing: border-box; width: 100%; }
 .rv-address { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
 .rv-risk-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 10px; border-radius: 20px; color: #fff; margin-bottom: 14px; }
 
@@ -962,7 +962,7 @@ body {
 .rv-action-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-faint); }
 
 /* Main document area — always light, like a printed page inside the dark shell */
-.rv-main { flex: 1 1 auto; min-width: 0; max-width: 960px; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 48px 48px; }
+.rv-main { flex: 1 1 auto; min-width: 0; max-width: 960px; margin-left: 0; overflow-y: auto; box-sizing: border-box; background: #fafafa; color: #18181b; padding: 32px 48px 48px 40px; }
 .rv-report-header {
   display: flex;
   align-items: center;
@@ -970,7 +970,7 @@ body {
   gap: 20px;
   width: 100%;
   min-width: 0;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .rv-report-actions {
   display: flex;
