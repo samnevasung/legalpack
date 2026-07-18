@@ -2778,8 +2778,20 @@ async function extractAllItems(files) {
 function buildSinglePayload(items) {
   const textItems = items.filter(i => i.type === 'text' || i.type === 'image');
   const docItems = items.filter(i => i.type === 'document');
-  const MAX_BASE64_ITEMS = 6; // cap scanned docs to avoid oversized payloads
-  return [...textItems, ...docItems.slice(0, MAX_BASE64_ITEMS)];
+  const MAX_BASE64_ITEMS = 10; // cap scanned docs to avoid oversized payloads
+  const includedDocs = docItems.slice(0, MAX_BASE64_ITEMS);
+  const overflowDocs = docItems.slice(MAX_BASE64_ITEMS);
+  const payload = [...textItems, ...includedDocs];
+  if (overflowDocs.length) {
+    const names = overflowDocs.map(i => i.name);
+    console.warn('[payload-overflow] dropped: ' + names.join(', '));
+    payload.push({
+      type: 'text',
+      name: '_overflow_notice',
+      text: `[NOTICE TO ANALYST: The following documents were provided in the pack but could not be included in this analysis due to size limits: ${names.join(', ')}. List each of these in missing_documents with significance "Provided in pack but not analysed — request manual review."]`
+    });
+  }
+  return payload;
 }
 
 async function fetchWithRetry(url, options, retries = 1, delayMs = 3000) {
@@ -2903,9 +2915,21 @@ async function pdfToItems(file) {
   if (!window._pdfTextCache) window._pdfTextCache = {};
   window._pdfTextCache[file.name] = docText;
 
-  if (docText.length > 500) {
+  // Title plans are drawings — pdf.js text scraping yields ~1k chars of labels, not the plan itself
+  const isTitlePlan = /title\s*plan|plan\s*-\s*fh|plan\s*-\s*lh/i.test(file.name);
+  if (isTitlePlan) {
+    console.log(`[pdf-plan] ${file.name} — routing as native PDF (plan document).`);
+  }
+
+  if (!isTitlePlan && docText.length > 500) {
     // Text-based PDF — send as cheap text block
-    return [{ type: 'text', name: file.name, text: `[DOCUMENT: ${file.name}]\n\n${docText}` }];
+    let finalText = docText;
+    const isBoilerplateCandidate = /common\s*auction\s*conditions|bidder.?s?\s*terms|rics/i.test(file.name);
+    const isSpecialCondition = /special\s*condition/i.test(file.name);
+    if (isBoilerplateCandidate && !isSpecialCondition && (docText.includes('Common Auction Conditions') || docText.includes('Auction Conduct Conditions'))) {
+      finalText = docText.slice(0, 3000) + '\n\n[TRUNCATED: This is a standard auction conditions boilerplate document. Remainder omitted. Special conditions and amendments are in separate documents.]';
+    }
+    return [{ type: 'text', name: file.name, text: `[DOCUMENT: ${file.name}]\n\n${finalText}` }];
   }
 
   // ── Scanned / image-only PDF — base64 fallback ───────────────────────────
