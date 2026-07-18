@@ -1054,6 +1054,22 @@ body {
 .fees-table th { text-align: left; font-weight: 700; padding: 8px 12px; border-bottom: 2px solid #e5e7eb; }
 .fees-table td { padding: 10px 12px; color: #1f2937; }
 
+.epc-imp-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; box-sizing: border-box;
+  padding: 10px 14px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+  cursor: pointer; font-family: 'Geist Sans', -apple-system, sans-serif;
+  font-size: 14px; font-weight: 600; color: #374151;
+  transition: background 0.15s, border-color 0.15s;
+}
+.epc-imp-toggle:hover { background: #f9fafb; border-color: #d1d5db; }
+.epc-imp-toggle:focus-visible { outline: 2px solid #7c3aed; outline-offset: 2px; }
+.epc-imp-chevron { color: #9ca3af; font-size: 12px; transition: transform 0.2s ease; }
+.epc-imp-chevron.open { transform: rotate(180deg); }
+.epc-imp-panel { margin-top: 10px; }
+.epc-imp-panel[hidden] { display: none; }
+
 .rv-doc-footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; }
 
 /* Search — slide-over on top of the document, not a permanent third column */
@@ -3029,12 +3045,19 @@ function renderResult(result, packName) {
     const impTable = improvements.length
       ? `<table class="fees-table"><thead><tr><th>Measure</th><th>Estimated Cost</th></tr></thead><tbody>${improvements.map((m, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${m.measure || ''}</td><td>${m.estimated_cost || ''}</td></tr>`).join('')}</tbody></table>`
       : '';
+    const impCollapsible = improvements.length ? `
+      <button type="button" class="epc-imp-toggle" id="rv-epc-imp-btn" aria-expanded="false" aria-controls="rv-epc-imp-panel" onclick="toggleEpcImprovements()">
+        <span id="rv-epc-imp-label">Show improvements</span>
+        <span class="epc-imp-chevron" id="rv-epc-imp-chevron">▾</span>
+      </button>
+      <div class="epc-imp-panel" id="rv-epc-imp-panel" hidden>${impTable}</div>
+    ` : '';
     epcRows =
       row('EPC Rating', badge) +
       row('Assessment Date', textVal(epc.assessment_date, NA)) +
       row('Estimated Annual Energy Cost', textVal(epc.estimated_annual_cost, NA)) +
       row('Construction Notes', textVal(epc.construction_notes, NA)) +
-      (improvements.length ? row('Recommended Improvements', impTable) : '');
+      (improvements.length ? row('Recommended Improvements', impCollapsible) : '');
   }
 
   // ── 6. Fees ──
@@ -3299,6 +3322,19 @@ function renderResult(result, packName) {
 
   initSidebarCollapseState();
   initReportScrollSpy();
+}
+
+function toggleEpcImprovements() {
+  const btn = document.getElementById('rv-epc-imp-btn');
+  const panel = document.getElementById('rv-epc-imp-panel');
+  const label = document.getElementById('rv-epc-imp-label');
+  const chevron = document.getElementById('rv-epc-imp-chevron');
+  if (!btn || !panel) return;
+  const willExpand = btn.getAttribute('aria-expanded') !== 'true';
+  btn.setAttribute('aria-expanded', String(willExpand));
+  panel.hidden = !willExpand;
+  if (label) label.textContent = willExpand ? 'Hide improvements' : 'Show improvements';
+  if (chevron) chevron.classList.toggle('open', willExpand);
 }
 
 function toggleSidebarCollapse() {
@@ -4314,6 +4350,13 @@ async function exportReportPDF(packName) {
   let firstPage = true;
   let yPos = firstPage ? 20 : margin;
 
+  // The EPC recommendations panel may be collapsed onscreen — html2canvas only
+  // captures what's actually rendered, so force it open for the capture and
+  // restore whatever state the user had afterwards.
+  const impPanel = document.getElementById('rv-epc-imp-panel');
+  const impWasHidden = impPanel ? impPanel.hidden : null;
+  if (impPanel) impPanel.hidden = false;
+
   for (const sec of sections) {
     const panel = document.getElementById('rv-sec-' + sec);
     if (!panel || !panel.innerHTML.trim()) continue;
@@ -4366,6 +4409,8 @@ async function exportReportPDF(packName) {
       }
     } catch(e) { console.error('Section capture error:', sec, e); }
   }
+
+  if (impPanel && impWasHidden !== null) impPanel.hidden = impWasHidden;
 
   // Footer on all pages
   const totalPages = pdf.internal.getNumberOfPages();
