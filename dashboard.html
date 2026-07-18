@@ -861,6 +861,7 @@ body {
 
 /* ── REPORT VIEWER — sticky sidebar + scrollable document ── */
 .rv-shell {
+  position: relative;
   display: flex; flex-direction: row; align-items: stretch; width: 100%; min-width: 0;
   margin: -32px; min-height: 100vh; gap: 0;
   background: var(--bg);
@@ -873,15 +874,17 @@ body {
   box-sizing: border-box; z-index: 10;
   transition: width 0.25s ease;
 }
-.rv-sidebar.collapsed { width: 56px; min-width: 56px; }
+.rv-sidebar.collapsed { width: 0; min-width: 0; flex: 0 0 0; border-right: none; overflow: hidden; }
 .rv-collapse-btn {
-  position: absolute; top: 8px; right: 12px; width: 24px; height: 24px;
+  position: absolute; top: 20px; left: 284px; width: 24px; height: 24px;
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
-  color: var(--text-faint); cursor: pointer; font-size: 11px; z-index: 20;
+  color: var(--text-faint); cursor: pointer; font-size: 11px; z-index: 30;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, left 0.25s ease;
 }
 .rv-collapse-btn:hover { background: var(--surface-2); color: var(--text); }
+.rv-sidebar.collapsed ~ .rv-collapse-btn { left: 12px; }
+.rv-sidebar.collapsed ~ .rv-main { margin: 0 auto; }
 .rv-sidebar-content { display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 100%; transition: opacity 0.2s ease; }
 .rv-sidebar.collapsed .rv-sidebar-content { opacity: 0; pointer-events: none; }
 .rv-address-wrap { padding: 20px 20px 0 20px; box-sizing: border-box; width: 100%; }
@@ -3091,7 +3094,6 @@ function renderResult(result, packName) {
 
   <!-- ═══ SIDEBAR ═══ -->
   <aside class="rv-sidebar" id="rv-sidebar">
-    <button class="rv-collapse-btn" id="rv-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">«</button>
     <div class="rv-sidebar-content" id="rv-sidebar-content">
 
       <div class="rv-address-wrap">
@@ -3127,6 +3129,8 @@ function renderResult(result, packName) {
 
     </div><!-- /rv-sidebar-content -->
   </aside>
+
+  <button class="rv-collapse-btn" id="rv-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">«</button>
 
   <!-- ═══ MAIN DOCUMENT ═══ -->
   <main class="rv-main" id="rv-main">
