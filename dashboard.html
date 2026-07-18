@@ -290,6 +290,18 @@ body {
 }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { background: var(--accent-hover); }
+
+.rv-topbar-new-btn {
+  height: 40px; padding: 0 18px; border: none; border-radius: var(--radius-sm);
+  background: var(--accent); color: #fff; font-family: 'Geist Sans', -apple-system, sans-serif;
+  font-size: 0.85rem; font-weight: 700; letter-spacing: -0.1px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+  transition: background 0.15s;
+}
+.rv-topbar-new-btn:hover { background: var(--accent-hover); }
+@media (max-width: 768px) {
+  .rv-topbar-new-btn { padding: 0 14px; font-size: 0.8rem; }
+}
 .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
 .btn-outline:hover { color: var(--text); border-color: var(--text-faint); background: transparent; }
 
@@ -994,7 +1006,6 @@ body {
 .rv-jump-link.active { color: var(--accent); background: rgba(124,58,237,0.08); border-left-color: #7c3aed; font-weight: 600; }
 .rv-nav { display: flex; flex-direction: column; width: 100%; gap: 4px; }
 .rv-nav-item { display: flex; align-items: center; width: 100%; min-width: 0; border: 0; text-align: left; box-sizing: border-box; }
-.rv-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); }
 .rv-action-btn { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Geist Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; width: 100%; box-sizing: border-box; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .rv-action-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-faint); }
 
@@ -1095,7 +1106,7 @@ body {
 @media (max-width: 768px) {
   .rv-shell { flex-direction: column; margin: -16px; min-height: 0; }
   .rv-sidebar { position: static; height: auto; overflow-y: visible; width: 100%; }
-  .rv-jump-links, .rv-actions { display: none; }
+  .rv-jump-links { display: none; }
   .rv-main { padding: 32px 20px 88px; }
   .rv-search-overlay { width: 100%; max-width: 100%; }
   .rv-mobile-bar {
@@ -3185,10 +3196,6 @@ function renderResult(result, packName) {
         <button class="rv-jump-link rv-nav-item" data-target="rv-sec-missing" onclick="scrollToReportSection('rv-sec-missing')">Missing Documents</button>
       </div>
 
-      <div class="rv-actions">
-        <button class="rv-action-btn" onclick="showUploadArea()">+ New</button>
-      </div>
-
     </div><!-- /rv-sidebar-content -->
   </aside>
 
@@ -3322,6 +3329,9 @@ function renderResult(result, packName) {
 
   initSidebarCollapseState();
   initReportScrollSpy();
+
+  const topbarActionsEl = document.getElementById('topbar-actions');
+  if (topbarActionsEl) topbarActionsEl.innerHTML = '<button class="rv-topbar-new-btn" onclick="showUploadArea()">New Analysis +</button>';
 }
 
 function toggleEpcImprovements() {
@@ -4772,6 +4782,8 @@ function showUploadArea() {
   document.getElementById('analyse-btn').disabled = true;
   selectedFiles = [];
   renderFileList();
+  const topbarActionsEl = document.getElementById('topbar-actions');
+  if (topbarActionsEl) topbarActionsEl.innerHTML = '';
   // Don't clear lastResult — Current Report nav still works
 }
 
