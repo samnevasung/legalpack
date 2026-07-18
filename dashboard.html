@@ -68,6 +68,7 @@
   --blue:var(--info); --bluemid:var(--infomid);
 
   --sidebar-w: 220px;
+  --app-topbar-height: 64px;
 }
 
 /* ── ACCENT THEMES ── */
@@ -123,7 +124,10 @@ body {
 }
 
 .sidebar-logo {
-  padding: 18px 16px 14px;
+  height: var(--app-topbar-height);
+  min-height: var(--app-topbar-height);
+  box-sizing: border-box;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   display: flex;
@@ -223,7 +227,9 @@ body {
 }
 
 .topbar {
-  height: 56px;
+  height: var(--app-topbar-height);
+  min-height: var(--app-topbar-height);
+  box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
