@@ -2537,13 +2537,13 @@ async function runAnalysisJob(job) {
       // Fallback: split into 2 batches (max ever)
       console.log('[analysis] Single call failed — falling back to 2 batches');
       showToast('Retrying with split batches...');
-      const mid = Math.ceil(allItems.length / 2);
+      const [batch1Items, batch2Items] = splitItemsByWeight(allItems);
       let acc = null;
 
-      const b1 = await callAnalyse(buildSinglePayload(allItems.slice(0, mid)), 1, 2, job.listingMeta, fileHash);
+      const b1 = await callAnalyse(buildSinglePayload(batch1Items), 1, 2, job.listingMeta, fileHash);
       if (b1) { acc = mergeBatchResult(acc, b1.result, true); if (b1.packName !== 'Legal Pack') finalPackName = b1.packName; }
 
-      const b2 = await callAnalyse(buildSinglePayload(allItems.slice(mid)), 2, 2, null, fileHash);
+      const b2 = await callAnalyse(buildSinglePayload(batch2Items), 2, 2, null, fileHash);
       if (b2) { acc = mergeBatchResult(acc, b2.result, !acc); if (b2.packName !== 'Legal Pack') finalPackName = b2.packName; }
 
       if (acc) {
@@ -2794,6 +2794,28 @@ function buildSinglePayload(items) {
   return payload;
 }
 
+function itemWeight(item) {
+  if (item.type === 'text') return (item.text?.length || 0) / 4;
+  if (item.type === 'document') return Math.max(1, Math.ceil((item.data?.length || 0) / 68000)) * 2500;
+  if (item.type === 'image') return 1600;
+  return 0;
+}
+
+function splitItemsByWeight(items) {
+  const overflowNotice = items.find(i => i.name === '_overflow_notice');
+  const rest = items.filter(i => i.name !== '_overflow_notice');
+  const sorted = [...rest].sort((a, b) => itemWeight(b) - itemWeight(a));
+  const batches = [[], []];
+  const weights = [0, 0];
+  for (const item of sorted) {
+    const idx = weights[0] <= weights[1] ? 0 : 1;
+    batches[idx].push(item);
+    weights[idx] += itemWeight(item);
+  }
+  if (overflowNotice) batches[0].push(overflowNotice);
+  return batches;
+}
+
 async function fetchWithRetry(url, options, retries = 1, delayMs = 3000) {
   try {
     const res = await fetch(url, options);
@@ -2950,7 +2972,9 @@ async function pdfToItems(file) {
   const base64 = btoa(binary);
 
   if (file.size < 8 * 1024 * 1024) {
-    return [{ type: 'document', name: file.name, data: base64 }];
+    const docItem = { type: 'document', name: file.name, data: base64 };
+    if (isTitlePlan) docItem.forceNative = true;
+    return [docItem];
   }
 
   // Large scanned PDF — render as images, max 40 pages
