@@ -3116,12 +3116,63 @@ function renderResult(result, packName) {
   // ── 5. Energy Performance ──
   const epc = result.energy_performance || {};
   const epcColorMap = { A: '#16a34a', B: '#16a34a', C: '#d97706', D: '#d97706', E: '#ea580c', F: '#dc2626', G: '#dc2626' };
+  // EPC rating can be a single letter, a multi-unit string (e.g. "C (73), D (68)"),
+  // or (defensively) an array/object shape — never assume a single short value.
+  const epcChip = (letter, score) => {
+    const color = epcColorMap[letter] || '#6b7280';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:8px;background:${color};color:#fff;font-weight:800;font-size:13px;line-height:1.2;white-space:nowrap;">${letter}${score ? ` · ${score}` : ''}</span>`;
+  };
+  const formatEpcRating = (raw) => {
+    let str;
+    if (Array.isArray(raw)) {
+      str = raw.map(r => {
+        if (r && typeof r === 'object') {
+          const letter = r.letter || r.rating || r.grade || '';
+          const score = r.score || r.value || r.points || '';
+          return score ? `${letter} (${score})` : String(letter);
+        }
+        return String(r);
+      }).join(', ');
+    } else if (raw && typeof raw === 'object') {
+      const letter = raw.letter || raw.rating || raw.grade || '';
+      const score = raw.score || raw.value || raw.points || '';
+      str = score ? `${letter} (${score})` : (letter || JSON.stringify(raw));
+    } else {
+      str = String(raw).trim();
+    }
+
+    // Extract "LETTER (score)" pairs, e.g. "C (73)", "D (68)"
+    const pairs = [...str.matchAll(/\b([A-G])\s*\(\s*(\d{1,3})\s*\)/gi)].map(m => ({ letter: m[1].toUpperCase(), score: m[2] }));
+    const seen = new Set();
+    const uniquePairs = pairs.filter(p => {
+      const key = p.letter + p.score;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    if (uniquePairs.length >= 2) {
+      return `<div style="display:flex;flex-wrap:wrap;gap:8px;min-width:0;">${uniquePairs.map(p => epcChip(p.letter, p.score)).join('')}</div>`;
+    }
+    if (uniquePairs.length === 1) {
+      return epcChip(uniquePairs[0].letter, uniquePairs[0].score);
+    }
+    if (/^[A-G]$/i.test(str)) {
+      return epcChip(str.toUpperCase(), null);
+    }
+
+    // No structured letter+score pairs found — fall back to a readable summary,
+    // preserving the original detail underneath rather than discarding it.
+    const bareLetters = [...new Set([...str.matchAll(/\b([A-G])\b/gi)].map(m => m[1].toUpperCase()))].sort();
+    const summary = bareLetters.length >= 2 ? `${bareLetters[0]}–${bareLetters[bareLetters.length - 1]} across ${bareLetters.length} unit${bareLetters.length > 1 ? 's' : ''}` : null;
+    return `<div style="color:#1f2937;line-height:1.6;overflow-wrap:break-word;word-break:break-word;min-width:0;">${summary || str}</div>` +
+      (summary ? `<div style="color:#9ca3af;font-size:12px;margin-top:4px;overflow-wrap:break-word;word-break:break-word;min-width:0;">${str}</div>` : '');
+  };
   let epcRows;
   if (!epc.rating || epc.rating === 'Not provided') {
     epcRows = row('EPC Rating', emptyMsg('EPC was not included in the pack.'));
   } else {
-    const epcColor = epcColorMap[epc.rating] || '#999';
-    const badge = `<span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:${epcColor};color:#fff;font-weight:800;font-size:16px;">${epc.rating}</span>`;
+    const badge = formatEpcRating(epc.rating);
     const improvements = epc.recommended_improvements || [];
     const impTable = improvements.length
       ? `<table class="fees-table"><thead><tr><th>Measure</th><th>Estimated Cost</th></tr></thead><tbody>${improvements.map((m, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${m.measure || ''}</td><td>${m.estimated_cost || ''}</td></tr>`).join('')}</tbody></table>`
