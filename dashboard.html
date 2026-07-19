@@ -2509,6 +2509,7 @@ async function runAnalysisJob(job) {
   }
 
   if (finalResult && job.files?.length) finalResult._uploadedFiles = job.files.map(f => f.name);
+  if (finalResult && window._excludedFiles?.length) finalResult._excludedFiles = window._excludedFiles;
 
   const flags = finalResult?.flags || finalResult?.risks || [];
   job.criticalCount = flags.filter(f => f.severity === 'critical' || f.severity === 'high').length;
@@ -3076,6 +3077,8 @@ function renderResult(result, packName) {
   const address = titlesTenure.address || result.address || packName || 'Legal Pack';
   const pubSlug = addressToSlug(address);
 
+  const excludedFiles = result._excludedFiles || [];
+
   // ── Legacy sidebar fields — new schema no longer produces these; degrade gracefully ──
   const legacySummary = result.summary || result.verdictSummary || '';
 
@@ -3359,6 +3362,13 @@ function renderResult(result, packName) {
         ${pubSlug ? `<a href="https://legalpackai.com/property/${pubSlug}" target="_blank" class="rv-action-btn">🌐 Public Page</a>` : ''}
       </div>
     </div>
+
+    ${excludedFiles.length ? `<div style="margin-bottom:32px;padding:14px 18px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:0.82rem;color:#92400e;line-height:1.6;">⚠ <strong>${excludedFiles.length} document${excludedFiles.length !== 1 ? 's' : ''} could not be included</strong> in this analysis and ${excludedFiles.length !== 1 ? 'were' : 'was'} not reviewed:
+      <ul style="margin:8px 0 0;padding-left:20px;">
+        ${excludedFiles.map(f => `<li>${escHtml(f.name || 'Unknown file')}${f.reason ? ` — ${escHtml(f.reason)}` : ''}</li>`).join('')}
+      </ul>
+      Consider re-uploading these separately, or contact support if a file keeps getting excluded.
+    </div>` : ''}
 
     <div class="rv-doc-section" id="rv-sec-titles">
       ${sectionHeader('Titles / Tenure', ICONS.titles)}
