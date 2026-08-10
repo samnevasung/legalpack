@@ -270,11 +270,15 @@ body {
   z-index: 10;
 }
 .topbar-title {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: -0.3px;
   flex: 1;
+  min-width: 0;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .rv-topbar-toggle {
@@ -3074,6 +3078,8 @@ function renderResult(result, packName) {
 
   const titlesTenure = result.titles_tenure || {};
   const address = titlesTenure.address || result.address || packName || 'Legal Pack';
+  lastAddress = address;
+  document.getElementById('topbar-title').textContent = address;
   const pubSlug = addressToSlug(address);
 
   // ── Legacy sidebar fields — new schema no longer produces these; degrade gracefully ──
@@ -4952,6 +4958,7 @@ function showUploadArea() {
 // ── CURRENT REPORT STORAGE ────────────────────────────────────────────────────
 let lastResult = null;
 let lastPackName = null;
+let lastAddress = null;
 
 function switchToCurrentReport() {
   if (!lastResult) { showToast('No current report'); return; }
@@ -4960,7 +4967,7 @@ function switchToCurrentReport() {
   document.getElementById('nav-current-report')?.classList.add('active');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-analyse')?.classList.add('active');
-  document.getElementById('topbar-title').textContent = 'Analyse Legal Pack';
+  document.getElementById('topbar-title').textContent = lastAddress || 'Analyse Legal Pack';
   // Hide upload, show report
   const uw = document.getElementById('upload-wrap');
   if (uw) uw.style.display = 'none';
