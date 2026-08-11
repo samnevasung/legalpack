@@ -3308,11 +3308,6 @@ function renderResult(result, packName) {
 
   const riskHtml = `
     <div class="rv-score-block">
-      <div class="rv-score-badges">
-        <span class="rv-score-badge rv-score-badge-critical">${criticalCount} CRITICAL</span>
-        <span class="rv-score-badge rv-score-badge-warning">${warningCount} WARNINGS</span>
-      </div>
-
       <div class="rv-score-factors">
         ${factors.map(f => `<div class="rv-score-factor">· ${f}</div>`).join('')}
       </div>
