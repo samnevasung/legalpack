@@ -1625,6 +1625,94 @@ async function callClaude(contentBlocks) {
   }
 }
 
+// ── FEES: merge helpers ───────────────────────────────────────────────────────
+// Backend schema 2.1: fees = {deposit, seller_fees, conditional_fees, not_applicable} plus fees_summary.
+// Older results have fees as a flat array (legacy): never mixed into the buckets, never totalled.
+// All arithmetic uses numeric `amount` fields only; amount strings are never parsed.
+function lpIsFeesObj(f) { return !!f && typeof f === 'object' && !Array.isArray(f); }
+function lpFeeNum(v) { return (typeof v === 'number' && isFinite(v)) ? v : null; }
+function lpFeeList(v) { return Array.isArray(v) ? v.filter(function(x) { return x && typeof x === 'object'; }) : []; }
+function lpFeeKey(f) {
+  var label = String(f.label || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  var amt = lpFeeNum(f.amount);
+  return label + '|' + (amt === null ? 'null:' + String(f.amount_text || '').trim().toLowerCase() : amt);
+}
+// Dedupe by label + numeric amount (same rule as the backend); join the sources of repeats.
+function lpDedupeFees(items) {
+  var out = [], byKey = Object.create(null);
+  items.forEach(function(item) {
+    var key = lpFeeKey(item), existing = byKey[key];
+    if (!existing) {
+      var copy = {};
+      for (var k in item) { if (Object.prototype.hasOwnProperty.call(item, k)) copy[k] = item[k]; }
+      copy.amount = lpFeeNum(item.amount);
+      byKey[key] = copy; out.push(copy);
+      return;
+    }
+    var src = String(item.source || '').trim();
+    if (src && String(existing.source || '').split('; ').indexOf(src) === -1) existing.source = existing.source ? existing.source + '; ' + src : src;
+  });
+  return out;
+}
+function lpSumFees(items) {
+  return Math.round(items.reduce(function(t, f) { var n = lpFeeNum(f.amount); return t + (n === null ? 0 : n); }, 0) * 100) / 100;
+}
+// Recompute fees_summary from the buckets. confirmed = seller_fees + listing buyer fees only.
+function lpBuildFeesSummary(fees, listingFees) {
+  var seller = lpFeeList(fees && fees.seller_fees);
+  var conditional = lpFeeList(fees && fees.conditional_fees);
+  // Double-count guard (same as the backend): skip a listing buyer fee the pack already states under an "admin" label
+  var listing = lpFeeList(listingFees).filter(function(l) {
+    var a = lpFeeNum(l.amount);
+    return a === null || !seller.some(function(s) { return lpFeeNum(s.amount) === a && /admin/i.test(String(s.label || '')); });
+  });
+  var confirmed = seller.concat(listing);
+  function unquantified(list) {
+    return list.filter(function(f) { return lpFeeNum(f.amount) === null; }).map(function(f) { return String(f.label || ''); });
+  }
+  return {
+    confirmed_total: lpSumFees(confirmed), confirmed_items: confirmed, listing_buyer_fees: listing,
+    confirmed_unquantified: unquantified(confirmed),
+    conditional_total: lpSumFees(conditional), conditional_unquantified: unquantified(conditional),
+    deposit: (fees && fees.deposit) || null
+  };
+}
+// Merge `fees` across batch results into base, then recompute fees_summary in code.
+function mergeFeesAcross(base, results) {
+  var lead = null;
+  for (var i = 0; i < results.length; i++) { if (results[i].fees != null) { lead = results[i].fees; break; } }
+  if (!lpIsFeesObj(lead)) {
+    // Legacy flat arrays (or no fees at all): previous behaviour, concat + dedupe by description. No buckets, no totals.
+    var allFees = [].concat(Array.isArray(base.fees) ? base.fees : []);
+    for (var k = 1; k < results.length; k++) {
+      if (!Array.isArray(results[k].fees)) continue;
+      results[k].fees.forEach(function(f) {
+        var fd = String((f && f.description) || '').slice(0, 25);
+        if (!allFees.some(function(x) { return String((x && x.description) || '').slice(0, 25) === fd; })) allFees.push(f);
+      });
+    }
+    base.fees = allFees;
+    return;
+  }
+  var merged = { deposit: null, seller_fees: [], conditional_fees: [], not_applicable: [] };
+  var listing = [];
+  for (var j = 0; j < results.length; j++) {
+    var fj = results[j].fees;
+    if (!lpIsFeesObj(fj)) continue;                         // a legacy array in the mix is never put into the buckets
+    merged.deposit = merged.deposit || fj.deposit || null;  // first batch that has one
+    merged.seller_fees = merged.seller_fees.concat(lpFeeList(fj.seller_fees));
+    merged.conditional_fees = merged.conditional_fees.concat(lpFeeList(fj.conditional_fees));
+    merged.not_applicable = merged.not_applicable.concat(lpFeeList(fj.not_applicable));
+    // listing buyer fees: first batch that has them
+    if (!listing.length) listing = lpFeeList(results[j].fees_summary && results[j].fees_summary.listing_buyer_fees);
+  }
+  merged.seller_fees = lpDedupeFees(merged.seller_fees);
+  merged.conditional_fees = lpDedupeFees(merged.conditional_fees);
+  merged.not_applicable = lpDedupeFees(merged.not_applicable);
+  base.fees = merged;
+  base.fees_summary = lpBuildFeesSummary(merged, listing);
+}
+
 function mergeResults(results) {
   if (results.length === 1) return results[0];
   var base = results[0];
@@ -1643,13 +1731,7 @@ function mergeResults(results) {
     });
   }
   base.otherIssues = allIssues.join('\n') || null;
-  var allFees = [].concat(base.fees || []);
-  for (var i = 1; i < results.length; i++) {
-    (results[i].fees || []).forEach(function(f) {
-      if (!allFees.some(function(x) { return x.description.slice(0,25) === f.description.slice(0,25); })) allFees.push(f);
-    });
-  }
-  base.fees = allFees;
+  mergeFeesAcross(base, results);
   var allAmend = [].concat(base.amendments || []);
   for (var i = 1; i < results.length; i++) {
     (results[i].amendments || []).forEach(function(a) {
@@ -1751,13 +1833,8 @@ function buildResults(d) {
     row('Auction House', d.auctionHouse) + row('Lot Number', d.lotNumber) +
     row('Date', d.auctionDate) + row('Guide Price', d.guidePrice);
 
-  // Fee's — table format
-  var fees = d.fees || [];
-  document.getElementById('rv-fees-rows').innerHTML = fees.length
-    ? '<div class="rv-row"><div class="rv-row-label">Buyer Fee\'s</div><div class="rv-row-value"><table class="rv-fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>' +
-      fees.map(function(f){ return '<tr><td>' + f.description + '</td><td class="rv-fees-amount">' + f.amount + '</td><td>' + (f.due||'—') + '</td></tr>'; }).join('') +
-      '</tbody></table></div></div>'
-    : row("Buyer Fee's", null);
+  // Fee's — schema 2.1 buckets, or the legacy flat array (see buildFeesHtml)
+  document.getElementById('rv-fees-rows').innerHTML = buildFeesHtml(d, row);
 
   // Special Conditions
   var sc = d.specialConditions || [];
@@ -1795,6 +1872,94 @@ function buildResults(d) {
   document.getElementById('rv-footer-docs').innerHTML = footerDocs;
 
   initScrollSpy();
+}
+
+// ── FEES SECTION MARKUP ───────────────────────────────────────────────────────
+// Schema 2.1: confirmed fees (+ listing fees, total), deposit, conditional, not applicable.
+// Legacy flat array: plain list with no total. Every model-produced string is escaped (lpEsc).
+function lpEsc(v) {
+  return (v === null || v === undefined) ? '' : String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function buildFeesHtml(d, row) {
+  var fees = d.fees;
+  function fr(label, inner) { return '<div class="rv-row"><div class="rv-row-label">' + label + '</div><div class="rv-row-value">' + inner + '</div></div>'; }
+  function muted(t) { return '<span style="color:#888;font-size:0.75rem;">' + t + '</span>'; }
+  function money(n) { return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function table(head, body) {
+    return '<div style="overflow-x:auto;"><table class="rv-fees-table"><thead><tr>' + head.map(function(h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+
+  // Legacy report: flat array. Plain list, no total row. Legacy data is never summed.
+  if (Array.isArray(fees)) {
+    if (!fees.length) return row("Buyer Fee's", null);
+    return fr("Buyer Fee's",
+      table(['Details', 'Amount', 'Date Due'], fees.map(function(f) {
+        f = f || {};
+        return '<tr><td>' + lpEsc(f.description) + '</td><td class="rv-fees-amount">' + lpEsc(f.amount) + '</td><td>' + lpEsc(f.due || '—') + '</td></tr>';
+      }).join('')) +
+      '<div style="font-size:0.75rem;color:#888;margin-top:8px;">Totals aren’t shown for older reports. Re-run for the updated fee breakdown.</div>');
+  }
+  if (!lpIsFeesObj(fees)) return row("Buyer Fee's", null);
+
+  var seller = lpFeeList(fees.seller_fees), cond = lpFeeList(fees.conditional_fees), na = lpFeeList(fees.not_applicable);
+  // Prefer the stored fees_summary (built in code); if missing, rebuild it from numeric amounts. No string parsing.
+  var stored = lpIsFeesObj(d.fees_summary) && lpFeeNum(d.fees_summary.confirmed_total) !== null ? d.fees_summary : null;
+  var sum = stored || lpBuildFeesSummary(fees, null);
+  var listing = lpFeeList(sum.listing_buyer_fees);
+  var confirmedUnq = Array.isArray(sum.confirmed_unquantified) ? sum.confirmed_unquantified : [];
+  var condUnq = Array.isArray(sum.conditional_unquantified) ? sum.conditional_unquantified : [];
+  var dep = lpIsFeesObj(fees.deposit) ? fees.deposit : (lpIsFeesObj(sum.deposit) ? sum.deposit : null);
+
+  function vatNote(v) { return v === 'inc' ? 'inc VAT' : v === 'exc' ? 'exc VAT' : 'VAT not stated'; }
+  function amountCell(f) {
+    var t = typeof f.amount_text === 'string' ? f.amount_text.trim() : '';
+    if (t) return lpEsc(t);
+    var n = lpFeeNum(f.amount);
+    return n === null ? muted('Amount not stated') : lpEsc(money(n));
+  }
+  function confirmedRow(f) {
+    return '<tr><td>' + lpEsc(f.label) + (f.notes ? '<div>' + muted(lpEsc(f.notes)) + '</div>' : '') + '</td><td>' + amountCell(f) + '</td><td>' + muted(vatNote(f.vat)) + '</td><td>' + (f.source ? muted(lpEsc(f.source)) : '') + '</td></tr>';
+  }
+  function unquantifiedRow(names, what) {
+    return names.length ? '<tr><td colspan="4">' + muted('Amount not stated, not included in the ' + what + ': ' + names.map(function(n) { return lpEsc(n); }).join(', ')) + '</td></tr>' : '';
+  }
+
+  var out = '';
+  // 1. Confirmed fees: pack fees, then fees from the auction listing, then the total
+  if (seller.length || listing.length) {
+    var anyQuantified = seller.concat(listing).some(function(f) { return lpFeeNum(f.amount) !== null; });
+    out += fr('Confirmed fees', table(['Fee', 'Amount', 'VAT', 'Source'],
+      seller.map(confirmedRow).join('') +
+      (listing.length ? '<tr><td colspan="4" style="padding-top:14px;"><strong style="font-size:0.6875rem;letter-spacing:0.6px;text-transform:uppercase;color:#888;">From auction listing</strong></td></tr>' + listing.map(confirmedRow).join('') : '') +
+      unquantifiedRow(confirmedUnq, 'total') +
+      (anyQuantified ? '<tr style="border-top:2px solid #e0e0e0;font-weight:700;"><td>Total confirmed fees</td><td>' + lpEsc(money(lpFeeNum(sum.confirmed_total) === null ? 0 : sum.confirmed_total)) + '</td><td colspan="2" style="font-weight:400;">' + muted('VAT as stated on each line') + '</td></tr>' : '')));
+  }
+  // 2. Deposit: separate row, outside the fee total
+  if (dep && (dep.rule || dep.amount_text)) {
+    out += fr('Deposit (part of purchase price, not a fee)',
+      (dep.rule ? '<div>' + lpEsc(dep.rule) + '</div>' : '') +
+      (dep.amount_text ? '<div style="font-weight:600;">' + lpEsc(dep.amount_text) + '</div>' : '') +
+      (dep.source ? '<div>' + muted(lpEsc(dep.source)) + '</div>' : ''));
+  }
+  // 3. Conditional / may apply: with the condition, a subtotal for quantified items only
+  if (cond.length) {
+    var condQuantified = cond.some(function(f) { return lpFeeNum(f.amount) !== null; });
+    out += fr('Conditional / may apply', table(['Fee', 'Amount', 'VAT', 'Condition'],
+      cond.map(function(f) {
+        return '<tr><td>' + lpEsc(f.label) + '</td><td>' + amountCell(f) + '</td><td>' + muted(vatNote(f.vat)) + '</td><td>' + (f.condition ? lpEsc(f.condition) : muted('Condition not stated')) + (f.source ? '<div>' + muted(lpEsc(f.source)) + '</div>' : '') + '</td></tr>';
+      }).join('') +
+      unquantifiedRow(condUnq, 'subtotal') +
+      (condQuantified ? '<tr style="border-top:2px solid #e0e0e0;font-weight:700;"><td>Subtotal if these apply</td><td>' + lpEsc(money(lpFeeNum(sum.conditional_total) === null ? 0 : sum.conditional_total)) + '</td><td colspan="2" style="font-weight:400;">' + muted('Quantified items only. VAT as stated on each line') + '</td></tr>' : '')));
+  }
+  // 4. Not applicable: collapsed by default, each with its reason
+  if (na.length) {
+    out += fr('Not applicable', '<details><summary style="cursor:pointer;color:#888;font-size:0.8125rem;">' + na.length + ' item' + (na.length !== 1 ? 's' : '') + ' not applicable to this sale</summary><div style="margin-top:8px;">' +
+      table(['Fee', 'Reason', 'Source'], na.map(function(f) {
+        return '<tr><td>' + lpEsc(f.label) + (lpFeeNum(f.amount) !== null ? '<div>' + muted(lpEsc(money(f.amount))) + '</div>' : '') + '</td><td>' + (f.reason ? lpEsc(f.reason) : muted('Reason not stated')) + '</td><td>' + (f.source ? muted(lpEsc(f.source)) : '') + '</td></tr>';
+      }).join('')) + '</div></details>');
+  }
+  // Empty sub-sections are simply not rendered
+  return out || row("Buyer Fee's", null);
 }
 
 function showReportDetail(idx) {
