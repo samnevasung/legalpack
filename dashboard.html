@@ -1940,6 +1940,8 @@ let analysisQueue = [];
 let queueProcessing = false;
 let queueMinimized = false;
 let _queueIdCounter = 0;
+// Saved-report ids (this session only) whose auction listing couldn't be read; the notice itself rides on result._listingScrapeFailed
+const _listingScrapeFailedReports = new Set();
 
 // Promise that resolves once init() has completed auth + data loading + renderUserUI.
 // Anything that needs the dashboard chrome to be populated before it runs (e.g. the
@@ -2269,6 +2271,7 @@ async function openReport(id) {
       const address = result?.address || (looksReal ? name : '');
       if (address) document.getElementById('intel-address').value = address;
       else document.getElementById('intel-address').value = '';
+      if (result && _listingScrapeFailedReports.has(String(id))) result._listingScrapeFailed = true;
       currentReportId = id;
       renderResult(result, name || 'Legal Pack');
       setTimeout(() => {
@@ -2365,10 +2368,18 @@ async function enqueueAnalysis() {
   btn.disabled = true;
   btn.textContent = '⏳ Checking...';
 
-  // Auto-fetch listing URL if provided
+  // New analysis: drop any listing data left over from a previous pack BEFORE this job's own
+  // scrape, so one pack's listing can never attach to the next. The job takes its own snapshot
+  // below, so this cannot touch a job that is already queued, and the scrape that follows
+  // repopulates the globals for this job only.
+  resetListingState();
+
+  // Auto-fetch listing URL if provided. A scrape failure must never abort the analysis:
+  // carry on without listing data and flag the report with a notice instead.
   const listingUrl = document.getElementById('listing-url-input')?.value?.trim();
+  let listingScrapeFailed = false;
   if (listingUrl && listingUrl.startsWith('http')) {
-    try { await scrapeListing(true); } catch(e) {}
+    try { listingScrapeFailed = (await scrapeListing(true)) === false; } catch(e) { listingScrapeFailed = true; }
   }
   if (scrapedListingData) window._listingMeta = scrapedListingData;
 
@@ -2398,7 +2409,7 @@ async function enqueueAnalysis() {
     jobFiles[0]?.name || 'Legal Pack'
   ).slice(0, 60);
 
-  const job = { id: jobId, files: jobFiles, listingMeta: jobListingMeta, sig: currentSig, displayName, status: 'queued', result: null, packName: null, reportId: null, criticalCount: 0 };
+  const job = { id: jobId, files: jobFiles, listingMeta: jobListingMeta, listingScrapeFailed, sig: currentSig, displayName, status: 'queued', result: null, packName: null, reportId: null, criticalCount: 0 };
   analysisQueue.push(job);
 
   lastAnalysedSignature = currentSig;
@@ -2431,6 +2442,93 @@ async function processQueue() {
   processQueue();
 }
 
+// ── FEES: shape handling, merge and totals ───────────────────────────────────
+// Backend schema 2.1: result.fees = {deposit, seller_fees, conditional_fees, not_applicable} and
+// result.fees_summary holds the totals. Older saved reports have result.fees as a flat array
+// ("legacy"): shown as a plain list, never totalled, never mixed into the buckets.
+// All arithmetic uses numeric `amount` fields only. Amount strings are never parsed.
+function isFeesObject(f) { return !!f && typeof f === 'object' && !Array.isArray(f); }
+function feeNum(v) { return (typeof v === 'number' && Number.isFinite(v)) ? v : null; }
+function feeList(v) { return Array.isArray(v) ? v.filter(x => x && typeof x === 'object') : []; }
+
+// Dedupe key: label + numeric amount (same rule as the backend; an unquantified fee also
+// keys on its amount_text so two differently-worded unquantified fees stay separate).
+function feeKey(f) {
+  const label = String(f.label || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  const amt = feeNum(f.amount);
+  return label + '|' + (amt === null ? 'null:' + String(f.amount_text || '').trim().toLowerCase() : amt);
+}
+
+// Collapse duplicates; when the same charge is cited from several places keep one entry and join the sources.
+function dedupeFeeList(items) {
+  const out = [];
+  const byKey = new Map();
+  items.forEach(item => {
+    const key = feeKey(item);
+    const existing = byKey.get(key);
+    if (!existing) {
+      const copy = { ...item, amount: feeNum(item.amount) };
+      byKey.set(key, copy);
+      out.push(copy);
+      return;
+    }
+    const src = String(item.source || '').trim();
+    if (src && !String(existing.source || '').split('; ').includes(src)) {
+      existing.source = existing.source ? existing.source + '; ' + src : src;
+    }
+  });
+  return out;
+}
+
+function sumFeeAmounts(items) {
+  return Math.round(items.reduce((t, f) => t + (feeNum(f.amount) ?? 0), 0) * 100) / 100;
+}
+
+// Recompute fees_summary from the bucket arrays. confirmed = seller_fees + listing buyer fees only;
+// deposit, conditional and not-applicable items are never added to the confirmed total.
+function buildFeesSummary(fees, listingFees) {
+  const seller = feeList(fees && fees.seller_fees);
+  const conditional = feeList(fees && fees.conditional_fees);
+  // Double-count guard (same as the backend): skip a listing buyer fee when the pack already states
+  // the same amount under a label containing "admin".
+  const listing = feeList(listingFees).filter(l => {
+    const a = feeNum(l.amount);
+    return a === null || !seller.some(s => feeNum(s.amount) === a && /admin/i.test(String(s.label || '')));
+  });
+  const confirmed = [...seller, ...listing];
+  return {
+    confirmed_total: sumFeeAmounts(confirmed),
+    confirmed_items: confirmed,
+    listing_buyer_fees: listing,
+    confirmed_unquantified: confirmed.filter(f => feeNum(f.amount) === null).map(f => String(f.label || '')),
+    conditional_total: sumFeeAmounts(conditional),
+    conditional_unquantified: conditional.filter(f => feeNum(f.amount) === null).map(f => String(f.label || '')),
+    deposit: (fees && fees.deposit) || null
+  };
+}
+
+// Merge one later batch's fees into the accumulated result, then recompute fees_summary in code
+// (each batch's own partial summary is discarded). The backend has no batch merge, so this owns it.
+function mergeFeesInto(acc, nr) {
+  if (Array.isArray(acc.fees)) return;                      // legacy so far: leave it alone, never total it
+  if (!isFeesObject(nr.fees)) {                             // legacy array (or nothing) from this batch:
+    if (acc.fees == null && Array.isArray(nr.fees)) acc.fees = JSON.parse(JSON.stringify(nr.fees));
+    return;                                                 // never mixed into the new buckets
+  }
+  const base = isFeesObject(acc.fees) ? acc.fees : { deposit: null, seller_fees: [], conditional_fees: [], not_applicable: [] };
+  const baseListing = feeList(acc.fees_summary && acc.fees_summary.listing_buyer_fees);
+  const newListing = feeList(nr.fees_summary && nr.fees_summary.listing_buyer_fees);
+  const merged = {
+    deposit: base.deposit || nr.fees.deposit || null,       // first batch that has one
+    seller_fees: dedupeFeeList([...feeList(base.seller_fees), ...feeList(nr.fees.seller_fees)]),
+    conditional_fees: dedupeFeeList([...feeList(base.conditional_fees), ...feeList(nr.fees.conditional_fees)]),
+    not_applicable: dedupeFeeList([...feeList(base.not_applicable), ...feeList(nr.fees.not_applicable)])
+  };
+  acc.fees = merged;
+  // Listing buyer fees: first batch that has them (only batch 1 is sent the listing).
+  acc.fees_summary = buildFeesSummary(merged, baseListing.length ? baseListing : newListing);
+}
+
 function mergeBatchResult(accumulated, newResult, isFirstBatch) {
   if (!newResult) return accumulated;
   if (isFirstBatch || !accumulated) return JSON.parse(JSON.stringify(newResult));
@@ -2442,6 +2540,7 @@ function mergeBatchResult(accumulated, newResult, isFirstBatch) {
   ads.provided = [...(ads.provided || []), ...(nds.provided || [])];
   ads.notIdentified = [...(ads.notIdentified || []), ...(nds.notIdentified || [])];
   ads.optionalBuyerDueDiligence = [...(ads.optionalBuyerDueDiligence || []), ...(nds.optionalBuyerDueDiligence || [])];
+  mergeFeesInto(accumulated, newResult);
   return accumulated;
 }
 
@@ -2512,6 +2611,7 @@ async function runAnalysisJob(job) {
 
   if (finalResult && job.files?.length) finalResult._uploadedFiles = job.files.map(f => f.name);
   if (finalResult && window._excludedFiles?.length) finalResult._excludedFiles = window._excludedFiles;
+  if (finalResult && job.listingScrapeFailed) finalResult._listingScrapeFailed = true;
 
   const flags = finalResult?.flags || finalResult?.risks || [];
   job.criticalCount = flags.filter(f => f.severity === 'critical' || f.severity === 'high').length;
@@ -2544,6 +2644,8 @@ async function runAnalysisJob(job) {
 
   await loadReports();
   job.reportId = allReports[0]?.id || null;
+  // Remember (this session only) which saved report had an unreadable listing, so reopening it from the queue keeps the notice
+  if (job.listingScrapeFailed && job.reportId) _listingScrapeFailedReports.add(String(job.reportId));
 
   // Auto-show result if analyse panel is active and result-area is empty
   const panel = document.getElementById('panel-analyse');
@@ -3242,28 +3344,8 @@ function renderResult(result, packName) {
       (improvements.length ? row('Recommended Improvements', impCollapsible) : '');
   }
 
-  // ── 6. Fees ──
-  const fees = result.fees || [];
-  let feesTotal = 0, feesHasVat = false, feesExcluded = 0;
-  fees.forEach(f => {
-    const m = String(f.amount || '').match(/^£\s?([\d,]+(?:\.\d+)?)/);
-    if (m) {
-      feesTotal += parseFloat(m[1].replace(/,/g, ''));
-      if (/vat/i.test(f.amount)) feesHasVat = true;
-    } else {
-      feesExcluded++;
-    }
-  });
-  const feesTotalRow = fees.length
-    ? `<tr style="border-top:2px solid #e5e7eb;font-weight:700;"><td>Total confirmed fees${feesHasVat ? ' (excl. VAT)' : ''}</td><td>£${feesTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td></td></tr>`
-    : '';
-  const feesNote = feesExcluded > 0
-    ? `<div style="font-size:12px;color:#9ca3af;margin-top:8px;">${feesExcluded} fee${feesExcluded > 1 ? 's are' : ' is'} variable, percentage-based, or unconfirmed and not included in the total above — see the Amount column for detail.</div>`
-    : '';
-  const feesHtml = fees.length
-    ? `<table class="fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>${fees.map((f, i) => `<tr style="background:${i % 2 ? '#f9f9f9' : '#fff'};"><td>${f.details || ''}</td><td>${f.amount || ''}</td><td>${f.date_due || ''}</td></tr>`).join('')}${feesTotalRow}</tbody></table>${feesNote}`
-    : emptyMsg('No fee schedule found in documents — obtain full fee breakdown from auctioneer before bidding.');
-  const feesRows = row('Fee Schedule', feesHtml);
+  // ── 6. Fees ── (schema 2.1 buckets, or a legacy flat array: see buildFeesSectionHtml)
+  const feesRows = buildFeesSectionHtml(result, row, emptyMsg);
 
   // ── 7. Flags ──
   const sevOrder = { CRITICAL: 0, WARNING: 1, INFO: 2 };
@@ -3479,6 +3561,112 @@ function renderResult(result, packName) {
   if (topbarActionsEl) topbarActionsEl.innerHTML = '<button class="rv-topbar-new-btn" onclick="showUploadArea()">New Analysis +</button>';
 }
 
+// ── Fees section markup ──────────────────────────────────────────────────────
+// Schema 2.1: confirmed fees (+ listing fees, total), deposit, conditional, not applicable.
+// Legacy flat array: plain list, no total. Every model-produced string goes through escHtml.
+function buildFeesSectionHtml(result, row, emptyMsg) {
+  const E = v => (v === null || v === undefined) ? '' : escHtml(v);
+  const money = n => '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const muted = html => `<span style="color:#6b7280;font-size:12px;">${html}</span>`;
+  const faint = html => `<span style="color:#9ca3af;font-size:12px;">${html}</span>`;
+  const stripe = i => `background:${i % 2 ? '#f9f9f9' : '#fff'};`;
+  const noFees = emptyMsg('No fee schedule found in documents — obtain full fee breakdown from auctioneer before bidding.');
+  const notice = result._listingScrapeFailed
+    ? `<div style="margin-bottom:14px;padding:9px 14px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;font-size:12.5px;color:#92400e;line-height:1.5;">Couldn’t read the auction listing, so listing fees aren’t included.</div>`
+    : '';
+  const fees = result.fees;
+
+  // Legacy report: flat array. Plain list with no total row. Legacy data is never summed.
+  if (Array.isArray(fees)) {
+    if (!fees.length) return notice + row('Fee Schedule', noFees);
+    const legacyRows = fees.map((f, i) => {
+      f = (f && typeof f === 'object') ? f : {};
+      return `<tr style="${stripe(i)}"><td>${E(f.details ?? f.description)}</td><td>${E(f.amount)}</td><td>${E(f.date_due ?? f.due)}</td></tr>`;
+    }).join('');
+    return notice + row('Fee Schedule',
+      `<div style="overflow-x:auto;"><table class="fees-table"><thead><tr><th>Details</th><th>Amount</th><th>Date Due</th></tr></thead><tbody>${legacyRows}</tbody></table></div>` +
+      `<div style="font-size:12px;color:#9ca3af;margin-top:8px;">Totals aren’t shown for older reports. Re-run for the updated fee breakdown.</div>`);
+  }
+  if (!isFeesObject(fees)) return notice + row('Fee Schedule', noFees);
+
+  const sellerFees = feeList(fees.seller_fees);
+  const condFees = feeList(fees.conditional_fees);
+  const naFees = feeList(fees.not_applicable);
+  // Prefer the stored fees_summary (built in code by the backend / the batch merge); if it is missing,
+  // rebuild it from the numeric amounts. No amount string is ever parsed.
+  const stored = isFeesObject(result.fees_summary) && feeNum(result.fees_summary.confirmed_total) !== null ? result.fees_summary : null;
+  const sum = stored || buildFeesSummary(fees, null);
+  const listing = feeList(sum.listing_buyer_fees);
+  const confirmedUnq = Array.isArray(sum.confirmed_unquantified) ? sum.confirmed_unquantified : [];
+  const condUnq = Array.isArray(sum.conditional_unquantified) ? sum.conditional_unquantified : [];
+  const dep = isFeesObject(fees.deposit) ? fees.deposit : (isFeesObject(sum.deposit) ? sum.deposit : null);
+
+  const vatNote = v => v === 'inc' ? 'inc VAT' : v === 'exc' ? 'exc VAT' : 'VAT not stated';
+  const amountCell = f => {
+    const t = typeof f.amount_text === 'string' ? f.amount_text.trim() : '';
+    if (t) return E(t);
+    const n = feeNum(f.amount);
+    return n === null ? faint('Amount not stated') : E(money(n));
+  };
+  const confirmedRow = (f, i) => `<tr style="${stripe(i)}"><td>${E(f.label)}${f.notes ? `<div style="margin-top:2px;">${muted(E(f.notes))}</div>` : ''}</td><td>${amountCell(f)}</td><td>${muted(vatNote(f.vat))}</td><td>${f.source ? faint(E(f.source)) : ''}</td></tr>`;
+  const listNote = (names, what) => names.length
+    ? `<tr><td colspan="4" style="padding:10px 12px;font-size:13px;color:#6b7280;">Amount not stated, not included in the ${what}: ${names.map(n => E(n)).join(', ')}</td></tr>`
+    : '';
+
+  // 1. Confirmed fees: pack fees, then fees from the auction listing, then the total
+  let confirmedHtml = '';
+  if (sellerFees.length || listing.length) {
+    const anyQuantified = [...sellerFees, ...listing].some(f => feeNum(f.amount) !== null);
+    confirmedHtml = row('Confirmed fees',
+      `<div style="overflow-x:auto;"><table class="fees-table"><thead><tr><th>Fee</th><th>Amount</th><th>VAT</th><th>Source</th></tr></thead><tbody>` +
+      sellerFees.map((f, i) => confirmedRow(f, i)).join('') +
+      (listing.length
+        ? `<tr><td colspan="4" style="padding:14px 12px 4px;font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:#6b7280;">From auction listing</td></tr>${listing.map((f, i) => confirmedRow(f, i)).join('')}`
+        : '') +
+      listNote(confirmedUnq, 'total') +
+      (anyQuantified
+        ? `<tr style="border-top:2px solid #e5e7eb;font-weight:700;"><td>Total confirmed fees</td><td>${E(money(feeNum(sum.confirmed_total) ?? 0))}</td><td colspan="2" style="font-weight:400;">${muted('VAT as stated on each line')}</td></tr>`
+        : '') +
+      `</tbody></table></div>`);
+  }
+
+  // 2. Deposit: separate row, outside the fee total
+  let depHtml = '';
+  if (dep && (dep.rule || dep.amount_text)) {
+    depHtml = row('Deposit (part of purchase price, not a fee)',
+      (dep.rule ? `<div>${E(dep.rule)}</div>` : '') +
+      (dep.amount_text ? `<div style="font-weight:600;margin-top:2px;">${E(dep.amount_text)}</div>` : '') +
+      (dep.source ? `<div style="margin-top:2px;">${faint(E(dep.source))}</div>` : ''));
+  }
+
+  // 3. Conditional / may apply: with the condition, a subtotal for quantified items only
+  let condHtml = '';
+  if (condFees.length) {
+    const condQuantified = condFees.some(f => feeNum(f.amount) !== null);
+    condHtml = row('Conditional / may apply',
+      `<div style="overflow-x:auto;"><table class="fees-table"><thead><tr><th>Fee</th><th>Amount</th><th>VAT</th><th>Condition</th></tr></thead><tbody>` +
+      condFees.map((f, i) => `<tr style="${stripe(i)}"><td>${E(f.label)}</td><td>${amountCell(f)}</td><td>${muted(vatNote(f.vat))}</td><td>${f.condition ? E(f.condition) : faint('Condition not stated')}${f.source ? `<div style="margin-top:2px;">${faint(E(f.source))}</div>` : ''}</td></tr>`).join('') +
+      listNote(condUnq, 'subtotal') +
+      (condQuantified
+        ? `<tr style="border-top:2px solid #e5e7eb;font-weight:700;"><td>Subtotal if these apply</td><td>${E(money(feeNum(sum.conditional_total) ?? 0))}</td><td colspan="2" style="font-weight:400;">${muted('Quantified items only. VAT as stated on each line')}</td></tr>`
+        : '') +
+      `</tbody></table></div>`);
+  }
+
+  // 4. Not applicable: collapsed by default, each with its reason
+  let naHtml = '';
+  if (naFees.length) {
+    naHtml = row('Not applicable',
+      `<details><summary style="cursor:pointer;color:#6b7280;font-size:13px;">${naFees.length} item${naFees.length !== 1 ? 's' : ''} not applicable to this sale</summary>` +
+      `<div style="overflow-x:auto;margin-top:8px;"><table class="fees-table"><thead><tr><th>Fee</th><th>Reason</th><th>Source</th></tr></thead><tbody>` +
+      naFees.map((f, i) => `<tr style="${stripe(i)}"><td>${E(f.label)}${feeNum(f.amount) !== null ? `<div>${faint(E(money(f.amount)))}</div>` : ''}</td><td>${f.reason ? E(f.reason) : faint('Reason not stated')}</td><td>${f.source ? faint(E(f.source)) : ''}</td></tr>`).join('') +
+      `</tbody></table></div></details>`);
+  }
+
+  // Empty sub-sections are simply not rendered
+  return notice + (confirmedHtml + depHtml + condHtml + naHtml || row('Fee Schedule', noFees));
+}
+
 function toggleEpcImprovements() {
   const btn = document.getElementById('rv-epc-imp-btn');
   const panel = document.getElementById('rv-epc-imp-panel');
@@ -3643,6 +3831,27 @@ function renderCompare() {
 // ── LISTING SCRAPER ───────────────────────────────────────────────────────────
 let scrapedListingData = null;
 
+// Drop any listing data held over from a previous pack. Runs when a new analysis starts, before that
+// job's own scrape. Unlike clearListingData() it keeps the URL box, which holds the new job's URL.
+function resetListingState() {
+  scrapedListingData = null;
+  window._listingMeta = null;
+  const resEl = document.getElementById('scrape-result');
+  const errEl = document.getElementById('scrape-error');
+  if (resEl) resEl.style.display = 'none';
+  if (errEl) errEl.style.display = 'none';
+}
+
+// A scrape is usable only if at least one key field has a value. ok:true with every field null means
+// the page was not really read (e.g. a blocked or empty page), so it is treated as a failed scrape.
+function listingHasData(x) {
+  if (!x || typeof x !== 'object') return false;
+  const keys = ['auctionHouse', 'auctionDate', 'auctionTime', 'auctionVenue', 'propertyAddress', 'guidePrice', 'lotNumber', 'propertyType', 'tenure', 'description', 'legalPackUrl'];
+  if (keys.some(k => x[k] !== null && x[k] !== undefined && String(x[k]).trim() !== '')) return true;
+  const fee = x.auctioneer_admin_fee;
+  return !!fee && typeof fee === 'object' && ((fee.amount !== null && fee.amount !== undefined) || String(fee.amount_text || '').trim() !== '');
+}
+
 function toggleListingScraper() {
   const body = document.getElementById('listing-scraper-body');
   const chevron = document.getElementById('listing-scraper-chevron');
@@ -3653,7 +3862,7 @@ function toggleListingScraper() {
 
 async function scrapeListing(silent = false) {
   const url = document.getElementById('listing-url-input').value.trim();
-  if (!url || !url.startsWith('http')) { if (!silent) showToast('Enter a valid URL starting with http'); return; }
+  if (!url || !url.startsWith('http')) { if (!silent) showToast('Enter a valid URL starting with http'); return null; }
 
   const loadingEl = document.getElementById('scrape-loading');
   const resultEl = document.getElementById('scrape-result');
@@ -3665,6 +3874,9 @@ async function scrapeListing(silent = false) {
     errorEl.style.display = 'none';
   }
 
+  // Resolves true only when the page gave us at least one real field; false = tried and failed / nothing usable;
+  // null = not attempted. The caller must never let a false abort the analysis.
+  let usable = false;
   try {
     const r = await fetch(API_BASE + '/scrape-listing', {
       method: 'POST',
@@ -3672,18 +3884,23 @@ async function scrapeListing(silent = false) {
       body: JSON.stringify({ url })
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'Failed to fetch listing');
+    // The backend answers HTTP 502 {ok:false, reason, error} when the listing site can't be read
+    if (!r.ok || d.ok === false) throw new Error(d.reason || d.error || 'Failed to fetch listing');
 
-    scrapedListingData = d.extracted;
-    window._listingMeta = d.extracted;
     loadingEl.style.display = 'none';
 
     const extracted = d.extracted || {};
-    const hasData = Object.values(extracted).some(v => v);
+    const hasData = listingHasData(extracted);
 
     if (!hasData) {
+      // ok:true but every key field is null: nothing usable, so no listing data is kept
+      scrapedListingData = null;
+      window._listingMeta = null;
       if (!silent) showToast('Could not extract listing data — the site may block scrapers');
     } else {
+      scrapedListingData = extracted;
+      window._listingMeta = extracted;
+      usable = true;
       const fieldDefs = [
         { key: 'auctionHouse',   label: 'Auction House' },
         { key: 'auctionDate',    label: 'Auction Date'  },
@@ -3716,6 +3933,7 @@ async function scrapeListing(silent = false) {
   } finally {
     if (!silent) loadingEl.style.display = 'none';
   }
+  return usable;
 }
 
 function applyListingData() {
